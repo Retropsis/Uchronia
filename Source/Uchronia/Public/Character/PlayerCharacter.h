@@ -6,6 +6,7 @@
 #include "Character/BaseCharacter.h"
 #include "PlayerCharacter.generated.h"
 
+class UWidgetComponent;
 class UCameraComponent;
 class USpringArmComponent;
 /**
@@ -18,6 +19,11 @@ class UCHRONIA_API APlayerCharacter : public ABaseCharacter
 
 public:
 	APlayerCharacter();
+
+protected:
+	// TODO: Could be somewhere else like WidgetController
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UWidgetComponent> OverheadWidget;
 
 private:
 	UPROPERTY(VisibleAnywhere)

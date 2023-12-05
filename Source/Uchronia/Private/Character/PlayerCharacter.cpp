@@ -1,7 +1,9 @@
 // Retropsis @ 2023
 
 #include "Character/PlayerCharacter.h"
+
 #include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -18,4 +20,7 @@ APlayerCharacter::APlayerCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Overhead Display"));
+	OverheadWidget->SetupAttachment(GetRootComponent());
 }
