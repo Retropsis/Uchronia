@@ -6,6 +6,7 @@
 #include "Character/BaseCharacter.h"
 #include "PlayerCharacter.generated.h"
 
+class AWeapon;
 class UWidgetComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -19,6 +20,8 @@ class UCHRONIA_API APlayerCharacter : public ABaseCharacter
 
 public:
 	APlayerCharacter();
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	// TODO: Could be somewhere else like WidgetController
@@ -31,4 +34,14 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;
+
+	// TODO: Could be any pickable actor
+	UPROPERTY(ReplicatedUsing=OnRep_OverlappingWeapon)
+	TObjectPtr<AWeapon> OverlappingWeapon;
+
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon) const;
+
+public:
+	void SetOverlappingWeapon(AWeapon* Weapon);
 };
