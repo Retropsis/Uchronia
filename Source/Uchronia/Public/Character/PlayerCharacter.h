@@ -6,6 +6,7 @@
 #include "Character/BaseCharacter.h"
 #include "PlayerCharacter.generated.h"
 
+class UCombatComponent;
 class AWeapon;
 class UWidgetComponent;
 class UCameraComponent;
@@ -22,6 +23,9 @@ public:
 	APlayerCharacter();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void PostInitializeComponents() override;
+
+	void EquipWeapon();
 
 protected:
 	// TODO: Could be somewhere else like WidgetController
@@ -42,6 +46,16 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon) const;
 
+	/*
+	 * Combat
+	 */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCombatComponent> CombatComponent;
+
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
+
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
+	FORCEINLINE UCombatComponent* GetCombatComponent() const { return CombatComponent; }; 
 };

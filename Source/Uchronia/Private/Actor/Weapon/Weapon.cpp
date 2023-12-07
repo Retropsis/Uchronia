@@ -1,10 +1,10 @@
 // Retropsis @ 2023-2024
 
 #include "Actor/Weapon/Weapon.h"
-
 #include "Character/PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
 
 /*
  * This should be the base weapon and not used as BP,
@@ -30,6 +30,12 @@ AWeapon::AWeapon()
 
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
 	PickupWidget->SetupAttachment(GetRootComponent());
+}
+
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AWeapon, WeaponState);
 }
 
 void AWeapon::BeginPlay()
@@ -72,6 +78,37 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
 		PlayerCharacter->SetOverlappingWeapon(nullptr);
+	}
+}
+
+void AWeapon::SetWeaponState(const EWeaponState InWeaponState)
+{
+	WeaponState = InWeaponState;
+	switch (WeaponState) {
+	case EWeaponState::EWS_Initial:
+		break;
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		OverlapSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EWeaponState::EWS_Dropped:
+		break;
+	default: ;
+	}
+}
+
+void AWeapon::OnRep_WeaponState()
+{
+	switch (WeaponState) {
+	case EWeaponState::EWS_Initial:
+		break;
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		OverlapSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EWeaponState::EWS_Dropped:
+		break;
+	default: ;
 	}
 }
 

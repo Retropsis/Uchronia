@@ -27,6 +27,7 @@ class UCHRONIA_API AWeapon : public AActor
 	
 public:	
 	AWeapon();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickupWidget(const bool bShowWidget) const;
 
@@ -50,8 +51,11 @@ protected:
 		int32 OtherBodyIndex);
 
 private:
-	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
+	UPROPERTY(ReplicatedUsing=OnRep_WeaponState, VisibleAnywhere, Category="Weapon Properties")
 	EWeaponState WeaponState;
+
+	UFUNCTION()
+	void OnRep_WeaponState();
 	
 	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
@@ -61,4 +65,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
 	TObjectPtr<UWidgetComponent> PickupWidget;
+
+public:
+	void SetWeaponState(const EWeaponState InWeaponState);
+	FORCEINLINE USphereComponent* GetOverlapSphere() const { return OverlapSphere; };
 };

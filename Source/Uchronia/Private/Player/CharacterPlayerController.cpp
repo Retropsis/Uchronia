@@ -3,6 +3,7 @@
 
 #include "Player/CharacterPlayerController.h"
 #include "EnhancedInputSubsystems.h"
+#include "ActorComponents/CombatComponent.h"
 #include "Character/PlayerCharacter.h"
 #include "Input/UEnhancedInputComponent.h"
 
@@ -16,8 +17,7 @@ void ACharacterPlayerController::BeginPlay()
 	Super::BeginPlay();
 	check(CharacterContext);
 
-	UEnhancedInputLocalPlayerSubsystem*  Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if(Subsystem)
+	if(UEnhancedInputLocalPlayerSubsystem*  Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(CharacterContext, 0);
 	}
@@ -32,7 +32,7 @@ void ACharacterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Look);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Jump);
-	
+	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
 }
 
 void ACharacterPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -52,7 +52,7 @@ void ACharacterPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void ACharacterPlayerController::Look(const FInputActionValue& InputActionValue)
 {
-	FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
+	const FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
 
 	if(APawn* ControlledPawn = GetPawn<APawn>())
 	{
@@ -61,11 +61,19 @@ void ACharacterPlayerController::Look(const FInputActionValue& InputActionValue)
 	}
 }
 
-void ACharacterPlayerController::Jump(const FInputActionValue& InputActionValue)
+void ACharacterPlayerController::Jump()
 {
 	// TODO: Make it Lazy Init
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
 	{
 		PlayerCharacter->Jump();
+	}
+}
+
+void ACharacterPlayerController::EquipButtonPressed()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->EquipWeapon();
 	}
 }

@@ -3,6 +3,7 @@
 #include "Character/PlayerCharacter.h"
 
 #include "Actor/Weapon/Weapon.h"
+#include "ActorComponents/CombatComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -25,6 +26,28 @@ APlayerCharacter::APlayerCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Overhead Display"));
 	OverheadWidget->SetupAttachment(GetRootComponent());
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	CombatComponent->SetIsReplicated(true);
+}
+
+/*
+ * UEngine Functionality
+ */
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
+
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if(CombatComponent)
+	{
+		CombatComponent->PlayerCharacter = this;
+	}
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -32,11 +55,30 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+/*
+ *  Weapon Functionality
+*/
+void APlayerCharacter::EquipWeapon()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	if(CombatComponent)
+	{
+		if(HasAuthority())
+		{
+			CombatComponent->EquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			ServerEquipButtonPressed();
+		}
+	}
+}
 
-	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+void APlayerCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->EquipWeapon(OverlappingWeapon);
+	}	
 }
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
@@ -57,3 +99,7 @@ void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 		LastWeapon->ShowPickupWidget(false);
 	}
 }
+
+/*
+*
+*/
