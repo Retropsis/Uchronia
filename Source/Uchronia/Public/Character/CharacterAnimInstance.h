@@ -31,4 +31,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bIsAccelerating = false;
+
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	bool bWeaponEquipped = false;
+
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	bool bIsCrouched = false;
 };

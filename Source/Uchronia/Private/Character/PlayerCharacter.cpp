@@ -13,7 +13,7 @@
 APlayerCharacter::APlayerCharacter()
 {
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(GetRootComponent());
+	SpringArm->SetupAttachment(GetMesh());
 	SpringArm->TargetArmLength = 600.f;
 	SpringArm->bUsePawnControlRotation = true;
 	
@@ -29,6 +29,8 @@ APlayerCharacter::APlayerCharacter()
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 /*
@@ -98,6 +100,11 @@ void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 	{
 		LastWeapon->ShowPickupWidget(false);
 	}
+}
+
+bool APlayerCharacter::IsWeaponEquipped()
+{
+	return (CombatComponent && CombatComponent->EquippedWeapon);
 }
 
 /*

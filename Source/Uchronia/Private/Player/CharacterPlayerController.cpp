@@ -32,7 +32,9 @@ void ACharacterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Look);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Jump);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::CrouchButtonPressed);
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
+	EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::DropButtonPressed);	
 }
 
 void ACharacterPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -75,5 +77,25 @@ void ACharacterPlayerController::EquipButtonPressed()
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
 	{
 		PlayerCharacter->EquipWeapon();
+	}
+}
+
+void ACharacterPlayerController::DropButtonPressed()
+{
+	
+}
+
+void ACharacterPlayerController::CrouchButtonPressed()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		if(PlayerCharacter->bIsCrouched)
+		{
+			PlayerCharacter->UnCrouch();
+		}
+		else
+		{
+			PlayerCharacter->Crouch();
+		}
 	}
 }

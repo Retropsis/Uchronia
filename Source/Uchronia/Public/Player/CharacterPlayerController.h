@@ -37,10 +37,18 @@ private:
 	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> CrouchAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> EquipAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> DropAction;
 	
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
 	void Jump();
 	void EquipButtonPressed();
+	void DropButtonPressed();
+	void CrouchButtonPressed();
 };

@@ -17,6 +17,7 @@ class UCHRONIA_API UCombatComponent : public UActorComponent
 public:
 	UCombatComponent();
 	friend class APlayerCharacter; // TODO: Could be base character ?
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
@@ -26,6 +27,8 @@ protected:
 
 private:
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
+
+	UPROPERTY(Replicated)
 	TObjectPtr<AWeapon> EquippedWeapon;
 	
 public:	
