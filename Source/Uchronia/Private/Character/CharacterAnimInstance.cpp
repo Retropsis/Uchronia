@@ -33,4 +33,6 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bWeaponEquipped = PlayerCharacter->IsWeaponEquipped();
 
 	bIsCrouched = PlayerCharacter->bIsCrouched;
+
+	bAiming = PlayerCharacter->IsAiming();
 }

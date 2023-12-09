@@ -3,7 +3,6 @@
 
 #include "Player/CharacterPlayerController.h"
 #include "EnhancedInputSubsystems.h"
-#include "ActorComponents/CombatComponent.h"
 #include "Character/PlayerCharacter.h"
 #include "Input/UEnhancedInputComponent.h"
 
@@ -35,6 +34,7 @@ void ACharacterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::CrouchButtonPressed);
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
 	EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::DropButtonPressed);	
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::AimButtonPressed);	
 }
 
 void ACharacterPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -98,4 +98,24 @@ void ACharacterPlayerController::CrouchButtonPressed()
 			PlayerCharacter->Crouch();
 		}
 	}
+}
+
+void ACharacterPlayerController::AimButtonPressed(const FInputActionValue& Value)
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->Aim(Value.Get<bool>());
+	}
+}
+
+void ACharacterPlayerController::FireButtonPressed(const FInputActionValue& Value)
+{
+}
+
+void ACharacterPlayerController::ReloadButtonPressed(const FInputActionValue& Value)
+{
+}
+
+void ACharacterPlayerController::ThrowButtonPressed(const FInputActionValue& Value)
+{
 }

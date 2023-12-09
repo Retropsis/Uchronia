@@ -26,6 +26,7 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	void EquipWeapon();
+	void Aim(bool bIsAiming);
 
 protected:
 	// TODO: Could be somewhere else like WidgetController
@@ -59,4 +60,5 @@ public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return CombatComponent; };
 	bool IsWeaponEquipped();
+	bool IsAiming();
 };

@@ -24,12 +24,19 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void SetAiming(bool IsAiming);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetAiming(bool IsAiming);
 
 private:
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
 
 	UPROPERTY(Replicated)
 	TObjectPtr<AWeapon> EquippedWeapon;
+	
+	UPROPERTY(Replicated)
+	bool bAiming = false;
 	
 public:	
 

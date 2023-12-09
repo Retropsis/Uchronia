@@ -37,4 +37,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bIsCrouched = false;
+
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	bool bAiming = false;
 };

@@ -75,6 +75,14 @@ void APlayerCharacter::EquipWeapon()
 	}
 }
 
+void APlayerCharacter::Aim(const bool bIsAiming)
+{
+	if(CombatComponent)
+	{
+		CombatComponent->SetAiming(bIsAiming);
+	}	
+}
+
 void APlayerCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(CombatComponent)
@@ -105,6 +113,11 @@ void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 bool APlayerCharacter::IsWeaponEquipped()
 {
 	return (CombatComponent && CombatComponent->EquippedWeapon);
+}
+
+bool APlayerCharacter::IsAiming()
+{
+	return (CombatComponent && CombatComponent->bAiming);
 }
 
 /*

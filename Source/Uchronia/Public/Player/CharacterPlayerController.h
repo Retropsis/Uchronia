@@ -44,6 +44,18 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> DropAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> AimAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> FireAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> ReloadAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> ThrowAction;
 	
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
@@ -51,4 +63,10 @@ private:
 	void EquipButtonPressed();
 	void DropButtonPressed();
 	void CrouchButtonPressed();
+	void AimButtonPressed(const FInputActionValue& Value);
+	void FireButtonPressed(const FInputActionValue& Value);
+	void ReloadButtonPressed(const FInputActionValue& Value);
+	void ThrowButtonPressed(const FInputActionValue& Value);
 };
+
+
