@@ -4,6 +4,7 @@
 #include "Actor/Weapon/Weapon.h"
 #include "Character/PlayerCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 
 UCombatComponent::UCombatComponent()
@@ -38,6 +39,15 @@ void UCombatComponent::SetAiming(bool IsAiming)
 	ServerSetAiming(IsAiming);
 }
 
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if(IsValid(EquippedWeapon) && IsValid(PlayerCharacter))
+	{
+		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		PlayerCharacter->bUseControllerRotationYaw = true;
+	}
+}
+
 void UCombatComponent::ServerSetAiming_Implementation(bool IsAiming)
 {
 	bAiming = IsAiming;
@@ -55,5 +65,8 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		RightHandSocket->AttachActor(EquippedWeapon, PlayerCharacter->GetMesh());
 	}
 	EquippedWeapon->SetOwner(PlayerCharacter); // is replicated
+
+	PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+	PlayerCharacter->bUseControllerRotationYaw = true;
 }
 

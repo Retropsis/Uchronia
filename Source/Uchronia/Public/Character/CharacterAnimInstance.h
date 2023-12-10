@@ -40,4 +40,14 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bAiming = false;
+
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	float YawOffset;
+	
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	float Lean;
+
+	FRotator CharacterRotationLastFrame;
+	FRotator CharacterRotation;
+	FRotator DeltaRotation;
 };
