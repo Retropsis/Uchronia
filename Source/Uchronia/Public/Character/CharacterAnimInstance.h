@@ -47,6 +47,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	float YawOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category="CharacterMovement")
+	float YawOffsetInterpSpeed = 6.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="CharacterMovement")
+	float LeanInterpSpeed = 6.f;
 	
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	float Lean;

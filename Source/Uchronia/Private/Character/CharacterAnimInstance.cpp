@@ -41,7 +41,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	const FRotator AimRotation = PlayerCharacter->GetBaseAimRotation();
 	const FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(PlayerCharacter->GetVelocity());
 	const FRotator DeltaRot = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation);
-	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRot, DeltaSeconds, 6.f);
+	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRot, DeltaSeconds, YawOffsetInterpSpeed);
 	YawOffset = DeltaRotation.Yaw;
 
 	// Leaning
@@ -49,7 +49,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	CharacterRotation = PlayerCharacter->GetActorRotation();
 	const FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation, CharacterRotationLastFrame);
 	const float Target = Delta.Yaw / DeltaSeconds;
-	const float Interp = FMath::FInterpTo(Lean, Target, DeltaSeconds, 6.f);
+	const float Interp = FMath::FInterpTo(Lean, Target, DeltaSeconds, LeanInterpSpeed);
 	Lean = FMath::Clamp(Interp, -90.f, 90.f);
 
 	AO_Yaw = PlayerCharacter->GetAO_Yaw();

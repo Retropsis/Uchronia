@@ -59,8 +59,12 @@ private:
 
 	void AimOffset(float DeltaTime);
 	float AO_Yaw;
+	float InterpAO_Yaw;
 	float AO_Pitch;
 	FRotator StartingAimRotation;
+
+	UPROPERTY(EditDefaultsOnly, Category="Animation")
+	float InterpAO_YawSpeed = 4.f;
 	
 	/*
 	 * Turning In Place

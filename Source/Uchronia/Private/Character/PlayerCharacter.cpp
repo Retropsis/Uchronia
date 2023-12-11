@@ -89,7 +89,7 @@ void APlayerCharacter::ServerEquipButtonPressed_Implementation()
 }
 
 /*
- * Aiming and AImOffset
+ * Aiming, AImOffset, TurningInPlace
  */
 void APlayerCharacter::Aim(const bool bIsAiming)
 {
@@ -113,7 +113,11 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 		const FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		const FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
-		bUseControllerRotationYaw = false;
+		if(TurningInPlace == ETurningInPlace::ETIP_None)
+		{
+			InterpAO_Yaw = AO_Yaw;
+		}
+		bUseControllerRotationYaw = true;
 		TurnInPlace(DeltaTime);
 	}
 	if(GroundSpeed > 0.f || bAirborne) // running or jumping
@@ -133,9 +137,6 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
-/*
- * End
- */
 
 void APlayerCharacter::TurnInPlace(float DeltaTime)
 {
@@ -147,7 +148,20 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 	{
 		TurningInPlace = ETurningInPlace::ETIP_Left;
 	}
+	if(TurningInPlace != ETurningInPlace::ETIP_None)
+	{
+		InterpAO_Yaw = FMath::FInterpTo(InterpAO_Yaw, 0.f, DeltaTime, InterpAO_YawSpeed);
+		AO_Yaw = InterpAO_Yaw;
+		if(FMath::Abs(AO_Yaw) < 15.f)
+		{
+			TurningInPlace = ETurningInPlace::ETIP_None;
+			StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		}
+	}
 }
+/*
+ * End
+ */
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
