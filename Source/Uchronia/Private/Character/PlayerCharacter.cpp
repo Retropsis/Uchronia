@@ -14,6 +14,9 @@
 
 APlayerCharacter::APlayerCharacter()
 {
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
+	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(GetMesh());
 	SpringArm->TargetArmLength = 600.f;
