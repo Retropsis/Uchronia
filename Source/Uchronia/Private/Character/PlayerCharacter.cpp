@@ -114,12 +114,14 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 		const FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
 		bUseControllerRotationYaw = false;
+		TurnInPlace(DeltaTime);
 	}
 	if(GroundSpeed > 0.f || bAirborne) // running or jumping
 	{
 		bUseControllerRotationYaw = true;
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		AO_Yaw = 0.f;
+		TurningInPlace = ETurningInPlace::ETIP_None;
 	}
 
 	AO_Pitch = GetBaseAimRotation().Pitch;
@@ -135,6 +137,17 @@ void APlayerCharacter::AimOffset(float DeltaTime)
  * End
  */
 
+void APlayerCharacter::TurnInPlace(float DeltaTime)
+{
+	if(AO_Yaw > 90.f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Right;
+	}
+	else if(AO_Yaw < -90.f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Left;
+	}
+}
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {

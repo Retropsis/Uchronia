@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Types/AnimationStates.h"
 #include "CharacterAnimInstance.generated.h"
 
 class AWeapon;
@@ -58,6 +59,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	FTransform LeftHandTransform;
+	
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	ETurningInPlace TurningInPlace;
 
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/BaseCharacter.h"
+#include "Types/AnimationStates.h"
 #include "PlayerCharacter.generated.h"
 
 class UCombatComponent;
@@ -60,6 +61,12 @@ private:
 	float AO_Yaw;
 	float AO_Pitch;
 	FRotator StartingAimRotation;
+	
+	/*
+	 * Turning In Place
+	 */
+	ETurningInPlace TurningInPlace = ETurningInPlace::ETIP_None;
+	void TurnInPlace(float DeltaTime);
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -71,4 +78,6 @@ public:
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; };
 
 	AWeapon* GetEquippedWeapon();
+
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 };

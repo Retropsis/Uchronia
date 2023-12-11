@@ -35,6 +35,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	EquippedWeapon = PlayerCharacter->GetEquippedWeapon();
 	bIsCrouched = PlayerCharacter->bIsCrouched;
 	bAiming = PlayerCharacter->IsAiming();
+	TurningInPlace = PlayerCharacter->GetTurningInPlace();
 
 	// Offset Yaw for Strafing
 	const FRotator AimRotation = PlayerCharacter->GetBaseAimRotation();
