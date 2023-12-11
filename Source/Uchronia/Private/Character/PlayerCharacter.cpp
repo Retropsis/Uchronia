@@ -99,6 +99,7 @@ void APlayerCharacter::Aim(const bool bIsAiming)
 	}	
 }
 
+// TODO: Try having this code in AnimInstance instead
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
 	if(CombatComponent && CombatComponent->EquippedWeapon == nullptr) return; 
@@ -154,14 +155,20 @@ void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 	}
 }
 
-bool APlayerCharacter::IsWeaponEquipped()
+bool APlayerCharacter::IsWeaponEquipped() const
 {
 	return (CombatComponent && CombatComponent->EquippedWeapon);
 }
 
-bool APlayerCharacter::IsAiming()
+bool APlayerCharacter::IsAiming() const
 {
 	return (CombatComponent && CombatComponent->bAiming);
+}
+
+AWeapon* APlayerCharacter::GetEquippedWeapon()
+{
+	if(!IsValid(CombatComponent)) return nullptr;
+	return CombatComponent->EquippedWeapon;
 }
 
 /*

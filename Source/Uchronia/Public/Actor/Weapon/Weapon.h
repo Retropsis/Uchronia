@@ -68,5 +68,6 @@ private:
 
 public:
 	void SetWeaponState(const EWeaponState InWeaponState);
-	FORCEINLINE USphereComponent* GetOverlapSphere() const { return OverlapSphere; };
+	FORCEINLINE USphereComponent* GetOverlapSphere() const { return OverlapSphere; }
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 };

@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "CharacterAnimInstance.generated.h"
 
+class AWeapon;
 class APlayerCharacter;
 /**
  * 
@@ -35,6 +36,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bWeaponEquipped = false;
 
+	TObjectPtr<AWeapon> EquippedWeapon;
+
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bIsCrouched = false;
 
@@ -52,6 +55,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	float AO_Pitch;
+
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	FTransform LeftHandTransform;
 
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
