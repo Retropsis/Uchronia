@@ -56,9 +56,17 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 
+	void AimOffset(float DeltaTime);
+	float AO_Yaw;
+	float AO_Pitch;
+	FRotator StartingAimRotation;
+
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return CombatComponent; };
 	bool IsWeaponEquipped();
 	bool IsAiming();
+
+	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; };
+	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; };
 };

@@ -5,9 +5,11 @@
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -31,6 +33,8 @@ APlayerCharacter::APlayerCharacter()
 	CombatComponent->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 /*
@@ -55,6 +59,7 @@ void APlayerCharacter::PostInitializeComponents()
 void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	AimOffset(DeltaSeconds);
 }
 
 /*
@@ -75,6 +80,17 @@ void APlayerCharacter::EquipWeapon()
 	}
 }
 
+void APlayerCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->EquipWeapon(OverlappingWeapon);
+	}	
+}
+
+/*
+ * Aiming and AImOffset
+ */
 void APlayerCharacter::Aim(const bool bIsAiming)
 {
 	if(CombatComponent)
@@ -83,13 +99,41 @@ void APlayerCharacter::Aim(const bool bIsAiming)
 	}	
 }
 
-void APlayerCharacter::ServerEquipButtonPressed_Implementation()
+void APlayerCharacter::AimOffset(float DeltaTime)
 {
-	if(CombatComponent)
+	if(CombatComponent && CombatComponent->EquippedWeapon == nullptr) return; 
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	const float GroundSpeed = Velocity.Size();
+	const bool bAirborne = GetCharacterMovement()->IsFalling();
+
+	if(GroundSpeed == 0.f && !bAirborne) // standing still not jumping
 	{
-		CombatComponent->EquipWeapon(OverlappingWeapon);
-	}	
+		const FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		const FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		AO_Yaw = DeltaAimRotation.Yaw;
+		bUseControllerRotationYaw = false;
+	}
+	if(GroundSpeed > 0.f || bAirborne) // running or jumping
+	{
+		bUseControllerRotationYaw = true;
+		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		AO_Yaw = 0.f;
+	}
+
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if(AO_Pitch > 90.f && !IsLocallyControlled())
+	{
+		// Mapping pitch from [270, 360) to [-90, 0)
+		const FVector2D InRange(270.f, 360.f);
+		const FVector2D OutRange(-90.f, 0.f);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
+	}
 }
+/*
+ * End
+ */
+
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {

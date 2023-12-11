@@ -46,6 +46,12 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	float Lean;
+	
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	float AO_Yaw;
+	
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	float AO_Pitch;
 
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;

@@ -40,6 +40,12 @@ private:
 	
 	UPROPERTY(Replicated)
 	bool bAiming = false;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
+	float BaseWalkSpeed = 600.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
+	float AimWalkSpeed = 450.f;
 	
 public:	
 
