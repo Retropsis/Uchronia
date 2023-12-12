@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class AAmmoContainer;
 class UWidgetComponent;
 
 UENUM(BlueprintType)
@@ -31,7 +32,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickupWidget(const bool bShowWidget) const;
 
-	void Trigger();
+	virtual void Trigger(const FVector& HitTarget);
 
 protected:
 	virtual void BeginPlay() override;
@@ -73,6 +74,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	TObjectPtr<UAnimationAsset> FireAnimation;
+	
+	UPROPERTY(EditAnywhere, Category="Weapon Properties")
+	TObjectPtr<AAmmoContainer> AmmoContainer;
 	/*
 	 * End
 	 */
@@ -80,4 +84,5 @@ public:
 	void SetWeaponState(const EWeaponState InWeaponState);
 	FORCEINLINE USphereComponent* GetOverlapSphere() const { return OverlapSphere; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+	FORCEINLINE AAmmoContainer* GetAmmoContainer() const { return AmmoContainer; }
 };

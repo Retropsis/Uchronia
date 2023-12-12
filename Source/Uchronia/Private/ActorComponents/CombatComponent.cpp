@@ -69,7 +69,7 @@ void UCombatComponent::MulticastTrigger_Implementation()
 	if(IsValid(PlayerCharacter) && CharacterAnimInstance)
 	{
 		CharacterAnimInstance->PlayFireMontage(bAiming);
-		EquippedWeapon->Trigger();
+		EquippedWeapon->Trigger(HitTarget);
 	}
 }
 
@@ -103,9 +103,11 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		if(!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint = End;
+			HitTarget = End;
 		}
 		else
 		{
+			HitTarget =  TraceHitResult.ImpactPoint;
 			UKismetSystemLibrary::DrawDebugPoint(this, TraceHitResult.ImpactPoint, 5.f, FLinearColor::Blue);
 		}
 	}

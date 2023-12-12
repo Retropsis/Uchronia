@@ -62,6 +62,8 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	float AimWalkSpeed = 450.f;
+
+	FVector HitTarget;
 	
 public:	
 

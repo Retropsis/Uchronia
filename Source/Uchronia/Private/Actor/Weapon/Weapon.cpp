@@ -1,9 +1,12 @@
 // Retropsis @ 2023-2024
 
 #include "Actor/Weapon/Weapon.h"
+
+#include "Actor/Weapon/AmmoContainer.h"
 #include "Character/PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Net/UnrealNetwork.h"
 
 /*
@@ -30,6 +33,13 @@ AWeapon::AWeapon()
 
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
 	PickupWidget->SetupAttachment(GetRootComponent());
+	
+	AmmoContainer = CreateDefaultSubobject<AAmmoContainer>(TEXT("Ammo Container"));
+	const USkeletalMeshSocket* ClipSocket =WeaponMesh->GetSocketByName(FName("ClipSocket"));
+	if(ClipSocket)
+	{
+		ClipSocket->AttachActor(AmmoContainer, WeaponMesh);
+	}
 }
 
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,7 +68,7 @@ void AWeapon::Tick(float DeltaTime)
 
 }
 
-void AWeapon::Trigger()
+void AWeapon::Trigger(const FVector& HitTarget)
 {
 	if(IsValid(FireAnimation))
 	{
