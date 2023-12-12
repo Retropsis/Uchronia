@@ -36,6 +36,7 @@ APlayerCharacter::APlayerCharacter()
 	CombatComponent->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 520.f);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
@@ -63,6 +64,18 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	AimOffset(DeltaSeconds);
+}
+
+void APlayerCharacter::Jump()
+{
+	if(bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Super::Jump();
+	}
 }
 
 /*
