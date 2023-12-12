@@ -119,7 +119,7 @@ void APlayerCharacter::TriggerButtonPressed(bool bPressed)
 {
 	if(CombatComponent)
 	{
-		CombatComponent->TriggerButtonPressed(bPressed);
+		CombatComponent->Trigger(bPressed);
 	}
 }
 

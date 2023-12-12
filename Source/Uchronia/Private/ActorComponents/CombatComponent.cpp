@@ -48,14 +48,24 @@ void UCombatComponent::SetAiming(const bool IsAiming)
 	}
 }
 
-void UCombatComponent::TriggerButtonPressed(const bool bPressed)
+void UCombatComponent::Trigger(const bool bPressed)
 {
 	bTriggerButtonPressed = bPressed;
+	if(bTriggerButtonPressed) ServerTrigger();
+}
+
+void UCombatComponent::ServerTrigger_Implementation()
+{
+	MulticastTrigger();
+}
+
+void UCombatComponent::MulticastTrigger_Implementation()
+{
 	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
 	if(EquippedWeapon == nullptr) return;
 	if(IsValid(PlayerCharacter) && CharacterAnimInstance)
 	{
-		CharacterAnimInstance->PlayFireMontage(bPressed);
+		CharacterAnimInstance->PlayFireMontage(bAiming);
 		EquippedWeapon->Trigger();
 	}
 }

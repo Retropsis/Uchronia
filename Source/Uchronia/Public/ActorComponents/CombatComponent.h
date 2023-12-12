@@ -26,10 +26,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool IsAiming);
-	void TriggerButtonPressed(bool bPressed);
+	void Trigger(bool bPressed);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool IsAiming);
+
+	UFUNCTION(Server, Reliable)
+	void ServerTrigger();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastTrigger();
 
 private:
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
