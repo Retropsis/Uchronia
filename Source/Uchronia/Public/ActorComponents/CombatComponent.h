@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
+#define TRACE_LENGTH 80000.f
 
 class UCharacterAnimInstance;
 class AWeapon;
@@ -36,6 +37,8 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastTrigger();
+
+	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
 private:
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
