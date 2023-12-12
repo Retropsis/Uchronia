@@ -35,6 +35,9 @@ void ACharacterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
 	EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::DropButtonPressed);	
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::AimButtonPressed);	
+	EnhancedInputComponent->BindAction(TriggerAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonPressed);	
+	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ThrowButtonPressed);	
+	EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ReloadButtonPressed);	
 }
 
 void ACharacterPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -108,14 +111,20 @@ void ACharacterPlayerController::AimButtonPressed(const FInputActionValue& Value
 	}
 }
 
-void ACharacterPlayerController::FireButtonPressed(const FInputActionValue& Value)
+void ACharacterPlayerController::TriggerButtonPressed(const FInputActionValue& Value)
 {
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->TriggerButtonPressed(Value.Get<bool>());
+	}
 }
 
 void ACharacterPlayerController::ReloadButtonPressed(const FInputActionValue& Value)
 {
+	
 }
 
 void ACharacterPlayerController::ThrowButtonPressed(const FInputActionValue& Value)
 {
+	
 }

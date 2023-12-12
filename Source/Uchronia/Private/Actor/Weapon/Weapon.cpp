@@ -58,13 +58,16 @@ void AWeapon::Tick(float DeltaTime)
 
 }
 
-void AWeapon::ShowPickupWidget(const bool bShowWidget) const
+void AWeapon::Trigger()
 {
-	if(PickupWidget) PickupWidget->SetVisibility(bShowWidget);
+	if(IsValid(FireAnimation))
+	{
+		WeaponMesh->PlayAnimation(FireAnimation, false);
+	}	
 }
 
 void AWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
@@ -79,6 +82,11 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		PlayerCharacter->SetOverlappingWeapon(nullptr);
 	}
+}
+
+void AWeapon::ShowPickupWidget(const bool bShowWidget) const
+{
+	if(PickupWidget) PickupWidget->SetVisibility(bShowWidget);
 }
 
 void AWeapon::SetWeaponState(const EWeaponState InWeaponState)

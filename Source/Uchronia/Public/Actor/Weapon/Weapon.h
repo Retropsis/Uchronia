@@ -31,6 +31,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickupWidget(const bool bShowWidget) const;
 
+	void Trigger();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -56,9 +58,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_WeaponState();
-	
-	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
-	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 
 	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
 	TObjectPtr<USphereComponent> OverlapSphere;
@@ -66,6 +65,17 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
 	TObjectPtr<UWidgetComponent> PickupWidget;
 
+	/*
+	 * TODO: Move to Data Asset
+	*/
+	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
+	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
+
+	UPROPERTY(EditAnywhere, Category="Weapon Properties")
+	TObjectPtr<UAnimationAsset> FireAnimation;
+	/*
+	 * End
+	 */
 public:
 	void SetWeaponState(const EWeaponState InWeaponState);
 	FORCEINLINE USphereComponent* GetOverlapSphere() const { return OverlapSphere; }

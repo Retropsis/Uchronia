@@ -2,6 +2,7 @@
 
 #include "ActorComponents/CombatComponent.h"
 #include "Actor/Weapon/Weapon.h"
+#include "Character/CharacterAnimInstance.h"
 #include "Character/PlayerCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -37,7 +38,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 /*
  * Combat Functionality
  */
-void UCombatComponent::SetAiming(bool IsAiming)
+void UCombatComponent::SetAiming(const bool IsAiming)
 {
 	bAiming = IsAiming;
 	ServerSetAiming(IsAiming);
@@ -47,7 +48,19 @@ void UCombatComponent::SetAiming(bool IsAiming)
 	}
 }
 
-void UCombatComponent::ServerSetAiming_Implementation(bool IsAiming)
+void UCombatComponent::TriggerButtonPressed(const bool bPressed)
+{
+	bTriggerButtonPressed = bPressed;
+	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
+	if(EquippedWeapon == nullptr) return;
+	if(IsValid(PlayerCharacter) && CharacterAnimInstance)
+	{
+		CharacterAnimInstance->PlayFireMontage(bPressed);
+		EquippedWeapon->Trigger();
+	}
+}
+
+void UCombatComponent::ServerSetAiming_Implementation(const bool IsAiming)
 {
 	bAiming = IsAiming;
 	if(IsValid(PlayerCharacter))

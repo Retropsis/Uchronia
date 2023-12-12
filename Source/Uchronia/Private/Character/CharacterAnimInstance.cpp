@@ -60,9 +60,20 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		LeftHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"), RTS_World);
 		FVector OutPosition;
 		FRotator OutRotation;
-		FRotator InRotation = LeftHandTransform.GetRotation().Rotator();
+		const FRotator InRotation = LeftHandTransform.GetRotation().Rotator();
 		PlayerCharacter->GetMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), InRotation, OutPosition, OutRotation);
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
+	}
+}
+
+void UCharacterAnimInstance::PlayFireMontage(bool bIsAiming)
+{
+	if(PlayerCharacter->GetCombatComponent() == nullptr || PlayerCharacter->GetEquippedWeapon() == nullptr) return;
+	if(IsValid(FireWeaponMontage))
+	{
+		Montage_Play(FireWeaponMontage);
+		const FName SectionName = bIsAiming ? FName("TwoHands_Aim") : FName("TwoHands_Hip");
+		Montage_JumpToSection(SectionName);
 	}
 }

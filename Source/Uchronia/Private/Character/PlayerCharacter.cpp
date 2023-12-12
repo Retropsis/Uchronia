@@ -115,6 +115,14 @@ void APlayerCharacter::Aim(const bool bIsAiming)
 	}	
 }
 
+void APlayerCharacter::TriggerButtonPressed(bool bPressed)
+{
+	if(CombatComponent)
+	{
+		CombatComponent->TriggerButtonPressed(bPressed);
+	}
+}
+
 // TODO: Try having this code in AnimInstance instead
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
@@ -212,6 +220,12 @@ AWeapon* APlayerCharacter::GetEquippedWeapon()
 {
 	if(!IsValid(CombatComponent)) return nullptr;
 	return CombatComponent->EquippedWeapon;
+}
+
+UAnimInstance* APlayerCharacter::GetAnimInstance() const
+{
+	if(GetMesh()) return GetMesh()->GetAnimInstance();
+	return nullptr;
 }
 
 /*

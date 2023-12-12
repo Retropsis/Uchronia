@@ -7,6 +7,7 @@
 #include "CombatComponent.generated.h"
 
 
+class UCharacterAnimInstance;
 class AWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -25,6 +26,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool IsAiming);
+	void TriggerButtonPressed(bool bPressed);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool IsAiming);
@@ -35,11 +37,16 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeapon)
 	TObjectPtr<AWeapon> EquippedWeapon;
 
+	UPROPERTY()
+	UCharacterAnimInstance* CharacterAnimInstance;
+
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 	
 	UPROPERTY(Replicated)
 	bool bAiming = false;
+
+	bool bTriggerButtonPressed;
 
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	float BaseWalkSpeed = 600.f;

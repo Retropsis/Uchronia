@@ -21,6 +21,8 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual  void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	void PlayFireMontage(bool bIsAiming);
+
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
@@ -72,4 +74,7 @@ protected:
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
 	FRotator DeltaRotation;
+
+	UPROPERTY(EditDefaultsOnly, Category="Montage")
+	TObjectPtr<UAnimMontage> FireWeaponMontage;
 };

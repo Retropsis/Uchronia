@@ -29,6 +29,7 @@ public:
 	virtual void Jump() override;
 	void EquipWeapon();
 	void Aim(bool bIsAiming);
+	void TriggerButtonPressed(bool bPressed);
 
 protected:
 	// TODO: Could be somewhere else like WidgetController
@@ -81,8 +82,9 @@ public:
 
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; };
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; };
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 
 	AWeapon* GetEquippedWeapon();
 
-	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
+	UAnimInstance* GetAnimInstance() const;
 };
