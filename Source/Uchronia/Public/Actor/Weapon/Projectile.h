@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+class UProjectileMovementComponent;
 class UBoxComponent;
 
 UCLASS()
@@ -23,6 +24,18 @@ protected:
 private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> CollisionBox;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
+
+	/*
+	 * TODO: Should be DataAsset
+	 */
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UParticleSystem> Tracer;
+	/* End */
+	
+	TObjectPtr<UParticleSystemComponent> TracerComponent;
 
 public:	
 

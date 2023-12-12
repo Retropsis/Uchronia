@@ -34,8 +34,6 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	FHitResult HitResult;
-	TraceUnderCrosshairs(HitResult);
 }
 
 /*
@@ -54,22 +52,27 @@ void UCombatComponent::SetAiming(const bool IsAiming)
 void UCombatComponent::Trigger(const bool bPressed)
 {
 	bTriggerButtonPressed = bPressed;
-	if(bTriggerButtonPressed) ServerTrigger();
+	if(bTriggerButtonPressed)
+	{
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		ServerTrigger(HitResult.ImpactPoint);
+	}
 }
 
-void UCombatComponent::ServerTrigger_Implementation()
+void UCombatComponent::ServerTrigger_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	MulticastTrigger();
+	MulticastTrigger(TraceHitTarget);
 }
 
-void UCombatComponent::MulticastTrigger_Implementation()
+void UCombatComponent::MulticastTrigger_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
 	if(EquippedWeapon == nullptr) return;
 	if(IsValid(PlayerCharacter) && CharacterAnimInstance)
 	{
 		CharacterAnimInstance->PlayFireMontage(bAiming);
-		EquippedWeapon->Trigger(HitTarget);
+		EquippedWeapon->Trigger(TraceHitTarget);
 	}
 }
 
@@ -103,12 +106,6 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		if(!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint = End;
-			HitTarget = End;
-		}
-		else
-		{
-			HitTarget =  TraceHitResult.ImpactPoint;
-			UKismetSystemLibrary::DrawDebugPoint(this, TraceHitResult.ImpactPoint, 5.f, FLinearColor::Blue);
 		}
 	}
 }

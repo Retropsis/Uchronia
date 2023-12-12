@@ -33,10 +33,10 @@ protected:
 	void ServerSetAiming(bool IsAiming);
 
 	UFUNCTION(Server, Reliable)
-	void ServerTrigger();
+	void ServerTrigger(const FVector_NetQuantize& TraceHitTarget);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastTrigger();
+	void MulticastTrigger(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
@@ -62,8 +62,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	float AimWalkSpeed = 450.f;
-
-	FVector HitTarget;
 	
 public:	
 
