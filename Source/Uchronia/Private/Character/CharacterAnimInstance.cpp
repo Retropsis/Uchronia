@@ -6,6 +6,7 @@
 #include "Character/PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UCharacterAnimInstance::NativeInitializeAnimation()
 {
@@ -64,6 +65,29 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		PlayerCharacter->GetMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), InRotation, OutPosition, OutRotation);
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
+
+		// TODO: Need HitTarget to replicate (NetQuantize?) for simulated proxies
+		if(PlayerCharacter->IsLocallyControlled())
+		{
+			bIsLocallyControlled = true;
+			const FTransform RightHandTransform = PlayerCharacter->GetMesh()->GetSocketTransform(FName("hand_r"), RTS_World);
+			// const FTransform RightHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("hand_r"), RTS_World);
+
+			// RightHandRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(), RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - PlayerCharacter->GetHitTarget()));
+			// RightHandRotation = UKismetMathLibrary::FindLookAtRotation(FVector(), (RightHandTransform.GetLocation() - PlayerCharacter->GetHitTarget()));
+			
+			// FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(FVector(), RightHandTransform.GetLocation() - PlayerCharacter->GetHitTarget());
+			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(), RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - PlayerCharacter->GetHitTarget()));
+			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaSeconds, 30.f);
+			// RightHandRotation.Roll += RightHandRotationRoll; 
+			// RightHandRotation.Yaw += RightHandRotationYaw; 
+			// RightHandRotation.Pitch += RightHandRotationPitch;
+		
+			const FTransform MuzzleFlashTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("MuzzleFlash"), RTS_World);
+			const FVector MuzzleX(FRotationMatrix(MuzzleFlashTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::X));
+			UKismetSystemLibrary::DrawDebugLine(this, MuzzleFlashTransform.GetLocation(), MuzzleFlashTransform.GetLocation() + MuzzleX * 1000.f, FLinearColor::Blue);
+			UKismetSystemLibrary::DrawDebugLine(this, MuzzleFlashTransform.GetLocation(), PlayerCharacter->GetHitTarget(), FLinearColor::Red);
+		}
 	}
 }
 

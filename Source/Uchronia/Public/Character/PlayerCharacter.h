@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "Character/BaseCharacter.h"
 #include "Types/AnimationStates.h"
 #include "PlayerCharacter.generated.h"
@@ -76,6 +77,7 @@ private:
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
+	AWeapon* GetEquippedWeapon();
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return CombatComponent; };
 	bool IsWeaponEquipped() const;
 	bool IsAiming() const;
@@ -83,8 +85,9 @@ public:
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; };
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; };
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
-
-	AWeapon* GetEquippedWeapon();
-
+	
 	UAnimInstance* GetAnimInstance() const;
+	FVector GetHitTarget() const;
+
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };

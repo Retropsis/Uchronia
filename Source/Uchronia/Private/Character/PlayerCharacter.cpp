@@ -228,6 +228,12 @@ UAnimInstance* APlayerCharacter::GetAnimInstance() const
 	return nullptr;
 }
 
+FVector APlayerCharacter::GetHitTarget() const
+{
+	if(!IsValid(CombatComponent)) return FVector();
+	return CombatComponent->HitTarget;
+}
+
 /*
 *
 */

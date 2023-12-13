@@ -30,13 +30,27 @@ void UCombatComponent::BeginPlay()
 	if(IsValid(PlayerCharacter))
 	{
 		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		if (PlayerCharacter->GetFollowCamera()) 
+		{
+			DefaultFOV = PlayerCharacter->GetFollowCamera()->FieldOfView;
+			CurrentFOV = DefaultFOV;
+		}
 	}
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	SetHUDCrosshairs(DeltaTime);
+
+	if(PlayerCharacter && PlayerCharacter->IsLocallyControlled())
+	{
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		HitTarget = HitResult.ImpactPoint;
+
+		SetHUDCrosshairs(DeltaTime);
+		InterpFOV(DeltaTime);
+	}
 }
 
 /*
@@ -50,6 +64,24 @@ void UCombatComponent::SetAiming(const bool IsAiming)
 	{
 		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = bAiming ? AimWalkSpeed : BaseWalkSpeed;
 	}
+}
+
+void UCombatComponent::InterpFOV(float DeltaTime)
+{
+	if(!IsValid(EquippedWeapon)) return;
+
+	if(bAiming)
+	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, EquippedWeapon->GetMarksmanFOV(), DeltaTime, EquippedWeapon->GetMarksmanInterpSpeed());
+	}
+	else
+	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, DefaultFOV, DeltaTime, MarksmanInterpSpeed);		
+	}
+	if(IsValid(PlayerCharacter) && PlayerCharacter->GetFollowCamera())
+	{
+		PlayerCharacter->GetFollowCamera()->SetFieldOfView(CurrentFOV);
+	} 
 }
 
 void UCombatComponent::Trigger(const bool bPressed)

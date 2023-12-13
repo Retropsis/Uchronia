@@ -72,10 +72,27 @@ private:
 	float AimWalkSpeed = 450.f;
 
 	/*
-	 * HUD & Crosshairs
+	 * HUD & Crosshair
 	 */
 	float CrosshairVelocityModifier;
 	float CrosshairAirborneModifier;
+
+	FVector HitTarget;
+
+	/*
+	 * Marksman Mode
+	 */
+	// Set by Camera's default FoV
+	float DefaultFOV;
+	float CurrentFOV;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
+	float MarksmanFOV = 30.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
+	float MarksmanInterpSpeed = 20.f;
+
+	void InterpFOV(float DeltaTime);
 	
 public:	
 

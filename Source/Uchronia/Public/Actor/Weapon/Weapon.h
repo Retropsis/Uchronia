@@ -34,7 +34,10 @@ public:
 	
 	void ShowPickupWidget(const bool bShowWidget) const;
 	virtual void Trigger(const FVector& HitTarget);
-
+	
+	/*
+	 * TODO: Move both CH and FoV stuff to Weapon DataAsset
+	*/
 	/*
 	 * Crosshair Textures
 	 */
@@ -99,6 +102,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	TSubclassOf<ACasing> CasingClass;
+
+	/*
+	 * Marksman Mode
+	 */
+	UPROPERTY(EditAnywhere, Category="Marksman Mode")
+	float MarksmanFOV = 30.f;
+
+	UPROPERTY(EditAnywhere, Category="Marksman Mode")
+	float MarksmanInterpSpeed = 20.f;
 	/*
 	 * End
 	 */
@@ -108,4 +120,6 @@ public:
 	FORCEINLINE USphereComponent* GetOverlapSphere() const { return OverlapSphere; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE AAmmoContainer* GetAmmoContainer() const { return AmmoContainer; }
+	FORCEINLINE float GetMarksmanFOV() const { return MarksmanFOV; }
+	FORCEINLINE float GetMarksmanInterpSpeed() const { return MarksmanInterpSpeed; }
 };
