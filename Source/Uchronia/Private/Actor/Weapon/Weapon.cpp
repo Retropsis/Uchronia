@@ -3,6 +3,7 @@
 #include "Actor/Weapon/Weapon.h"
 
 #include "Actor/Weapon/AmmoContainer.h"
+#include "Actor/Weapon/Casing.h"
 #include "Character/PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -73,7 +74,22 @@ void AWeapon::Trigger(const FVector& HitTarget)
 	if(IsValid(FireAnimation))
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
-	}	
+	}
+	if(CasingClass)
+	{
+		if(const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject")))
+		{
+			const FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+			if(UWorld* World = GetWorld())
+			{
+				World->SpawnActor<ACasing>(
+					CasingClass,
+					SocketTransform.GetLocation(),
+					SocketTransform.GetRotation().Rotator()
+				);
+			}
+		}
+	}
 }
 
 void AWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

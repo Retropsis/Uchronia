@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class ACasing;
 class AAmmoContainer;
 class UWidgetComponent;
 
@@ -77,6 +78,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	TObjectPtr<AAmmoContainer> AmmoContainer;
+
+	UPROPERTY(EditAnywhere, Category="Weapon Properties")
+	TSubclassOf<ACasing> CasingClass;
 	/*
 	 * End
 	 */
