@@ -8,6 +8,8 @@
 
 #define TRACE_LENGTH 80000.f
 
+class APlayerHUD;
+class ACharacterPlayerController;
 class UCharacterAnimInstance;
 class AWeapon;
 
@@ -40,8 +42,12 @@ protected:
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
+	void SetHUDCrosshairs(float DeltaTime);
+
 private:
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
+	TObjectPtr<ACharacterPlayerController> CharacterPlayerController;
+	TObjectPtr<APlayerHUD> PlayerHUD;
 
 	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeapon)
 	TObjectPtr<AWeapon> EquippedWeapon;

@@ -6,8 +6,10 @@
 #include "Character/PlayerCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HUD/PlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/CharacterPlayerController.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -34,6 +36,7 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	SetHUDCrosshairs(DeltaTime);
 }
 
 /*
@@ -73,6 +76,39 @@ void UCombatComponent::MulticastTrigger_Implementation(const FVector_NetQuantize
 	{
 		CharacterAnimInstance->PlayFireMontage(bAiming);
 		EquippedWeapon->Trigger(TraceHitTarget);
+	}
+}
+
+void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
+{
+	if(!IsValid(PlayerCharacter) || !IsValid(PlayerCharacter->Controller)) return;
+	
+	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
+	if(IsValid(CharacterPlayerController))
+	{
+		PlayerHUD = PlayerHUD == nullptr ?  Cast<APlayerHUD>(CharacterPlayerController->GetHUD()) : PlayerHUD;
+		if(IsValid(PlayerHUD))
+		{
+			FHUDPackage HUDPackage;
+			if(EquippedWeapon)
+			{
+				HUDPackage.Crosshair_Center = EquippedWeapon->Crosshair_Center;
+				HUDPackage.Crosshair_Left = EquippedWeapon->Crosshair_Left;
+				HUDPackage.Crosshair_Top = EquippedWeapon->Crosshair_Top;
+				HUDPackage.Crosshair_Right = EquippedWeapon->Crosshair_Right;
+				HUDPackage.Crosshair_Bottom = EquippedWeapon->Crosshair_Bottom;
+			}
+			else
+			{
+				// TODO: Set to Unequipped Crosshairs
+				HUDPackage.Crosshair_Center = nullptr;
+				HUDPackage.Crosshair_Left = nullptr;
+				HUDPackage.Crosshair_Top = nullptr;
+				HUDPackage.Crosshair_Right = nullptr;
+				HUDPackage.Crosshair_Bottom = nullptr;
+			}
+			PlayerHUD->SetHUDPackage(HUDPackage);
+		}
 	}
 }
 

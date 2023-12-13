@@ -25,7 +25,11 @@ AWeapon::AWeapon()
 	SetRootComponent(WeaponMesh);
 	WeaponMesh->SetCollisionResponseToAllChannels(ECR_Block);
 	WeaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	WeaponMesh->SetSimulatePhysics(true);
+	WeaponMesh->SetEnableGravity(true);
 
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphere->SetupAttachment(GetRootComponent());
@@ -124,6 +128,8 @@ void AWeapon::SetWeaponState(const EWeaponState InWeaponState)
 	case EWeaponState::EWS_Equipped:
 		ShowPickupWidget(false);
 		OverlapSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
 		break;
 	case EWeaponState::EWS_Dropped:
 		break;
@@ -139,6 +145,8 @@ void AWeapon::OnRep_WeaponState()
 	case EWeaponState::EWS_Equipped:
 		ShowPickupWidget(false);
 		OverlapSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
 		break;
 	case EWeaponState::EWS_Dropped:
 		break;

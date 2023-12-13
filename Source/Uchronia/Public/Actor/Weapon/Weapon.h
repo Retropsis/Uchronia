@@ -31,9 +31,27 @@ public:
 	AWeapon();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaTime) override;
+	
 	void ShowPickupWidget(const bool bShowWidget) const;
-
 	virtual void Trigger(const FVector& HitTarget);
+
+	/*
+	 * Crosshair Textures
+	 */
+	UPROPERTY(EditAnywhere, Category="Crosshairs")
+	TObjectPtr<UTexture2D> Crosshair_Center;
+	
+	UPROPERTY(EditAnywhere, Category="Crosshairs")
+	TObjectPtr<UTexture2D> Crosshair_Left;
+	
+	UPROPERTY(EditAnywhere, Category="Crosshairs")
+	TObjectPtr<UTexture2D> Crosshair_Top;
+	
+	UPROPERTY(EditAnywhere, Category="Crosshairs")
+	TObjectPtr<UTexture2D> Crosshair_Right;
+	
+	UPROPERTY(EditAnywhere, Category="Crosshairs")
+	TObjectPtr<UTexture2D> Crosshair_Bottom;
 
 protected:
 	virtual void BeginPlay() override;
@@ -68,7 +86,7 @@ private:
 	TObjectPtr<UWidgetComponent> PickupWidget;
 
 	/*
-	 * TODO: Move to Data Asset
+	 * TODO: Move to DataAsset
 	*/
 	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
@@ -84,6 +102,7 @@ private:
 	/*
 	 * End
 	 */
+	
 public:
 	void SetWeaponState(const EWeaponState InWeaponState);
 	FORCEINLINE USphereComponent* GetOverlapSphere() const { return OverlapSphere; }
