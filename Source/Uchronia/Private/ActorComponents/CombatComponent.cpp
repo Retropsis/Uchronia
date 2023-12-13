@@ -92,6 +92,12 @@ void UCombatComponent::Trigger(const bool bPressed)
 		FHitResult HitResult;
 		TraceUnderCrosshairs(HitResult);
 		ServerTrigger(HitResult.ImpactPoint);
+
+		if(IsValid(EquippedWeapon))
+		{
+			// TODO: Weapon Recoil Modifier
+			CrosshairRecoilModifier += .2f;
+		}
 	}
 }
 
@@ -158,7 +164,24 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 				// TODO: Weapon Airborne Recovery Modifier
 				CrosshairAirborneModifier = FMath::FInterpTo(CrosshairAirborneModifier, 0.f, DeltaTime, 30.f);
 			}
-			HUDPackage.CrosshairSpread = CrosshairVelocityModifier + CrosshairAirborneModifier;
+			if(bAiming)
+			{
+				CrosshairMarksmanModifier = FMath::FInterpTo(CrosshairMarksmanModifier, 0.58f, DeltaTime, 30.f);
+			}
+			else
+			{
+				CrosshairMarksmanModifier = FMath::FInterpTo(CrosshairMarksmanModifier, 0.f, DeltaTime, 30.f);
+			}
+			// TODO: Weapon Recoil Recovery
+			CrosshairRecoilModifier = FMath::FInterpTo(CrosshairRecoilModifier, 0.f, DeltaTime, 3.f);
+			
+			// TODO: Try using a min clamp instead
+			HUDPackage.CrosshairSpread =
+				0.5f +
+				CrosshairVelocityModifier +
+				CrosshairAirborneModifier -
+				CrosshairMarksmanModifier +
+				CrosshairRecoilModifier;
 			PlayerHUD->SetHUDPackage(HUDPackage);
 		}
 	}

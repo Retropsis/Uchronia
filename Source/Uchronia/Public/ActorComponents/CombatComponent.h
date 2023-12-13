@@ -76,6 +76,8 @@ private:
 	 */
 	float CrosshairVelocityModifier;
 	float CrosshairAirborneModifier;
+	float CrosshairMarksmanModifier;
+	float CrosshairRecoilModifier;
 
 	FVector HitTarget;
 
