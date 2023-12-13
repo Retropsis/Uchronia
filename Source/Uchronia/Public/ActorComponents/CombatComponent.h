@@ -46,8 +46,10 @@ protected:
 
 private:
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
-	TObjectPtr<ACharacterPlayerController> CharacterPlayerController;
-	TObjectPtr<APlayerHUD> PlayerHUD;
+	UPROPERTY()
+	ACharacterPlayerController* CharacterPlayerController;
+	UPROPERTY()
+	APlayerHUD* PlayerHUD;
 
 	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeapon)
 	TObjectPtr<AWeapon> EquippedWeapon;
