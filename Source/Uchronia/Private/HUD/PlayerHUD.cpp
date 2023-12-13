@@ -7,27 +7,49 @@ void APlayerHUD::DrawHUD()
 {
 	Super::DrawHUD();
 
-	FVector2D ViewportSize;
 	if(GEngine)
 	{
+		FVector2D ViewportSize;
 		GEngine->GameViewport->GetViewportSize(ViewportSize);
 		const FVector2D ViewportCenter(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
 
-		if(IsValid(HUDPackage.Crosshair_Center)) DrawCrosshair(HUDPackage.Crosshair_Center, ViewportCenter);
-		if(IsValid(HUDPackage.Crosshair_Left)) DrawCrosshair(HUDPackage.Crosshair_Left, ViewportCenter);
-		if(IsValid(HUDPackage.Crosshair_Top)) DrawCrosshair(HUDPackage.Crosshair_Top, ViewportCenter);
-		if(IsValid(HUDPackage.Crosshair_Right)) DrawCrosshair(HUDPackage.Crosshair_Right, ViewportCenter);
-		if(IsValid(HUDPackage.Crosshair_Bottom)) DrawCrosshair(HUDPackage.Crosshair_Bottom, ViewportCenter);
+		const float SpreadScaled = CrosshairSpreadMax * HUDPackage.CrosshairSpread;
+
+		if(IsValid(HUDPackage.Crosshair_Center))
+		{
+			const FVector2D Spread(0.f, 0.f);
+			DrawCrosshair(HUDPackage.Crosshair_Center, ViewportCenter, Spread);
+		}
+		if(IsValid(HUDPackage.Crosshair_Left))
+		{
+			const FVector2D Spread(-SpreadScaled, 0.f);
+			DrawCrosshair(HUDPackage.Crosshair_Left, ViewportCenter, Spread);
+		}
+		if(IsValid(HUDPackage.Crosshair_Top))
+		{
+			const FVector2D Spread(0.f, -SpreadScaled);
+			DrawCrosshair(HUDPackage.Crosshair_Top, ViewportCenter, Spread);
+		}
+		if(IsValid(HUDPackage.Crosshair_Right))
+		{
+			const FVector2D Spread(SpreadScaled, 0.f);
+			DrawCrosshair(HUDPackage.Crosshair_Right, ViewportCenter, Spread);
+		}
+		if(IsValid(HUDPackage.Crosshair_Bottom))
+		{
+			const FVector2D Spread(0.f, SpreadScaled);
+			DrawCrosshair(HUDPackage.Crosshair_Bottom, ViewportCenter, Spread);
+		}
 	}
 }
 
-void APlayerHUD::DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter)
+void APlayerHUD::DrawCrosshair(UTexture2D* Texture, const FVector2D& ViewportCenter, const FVector2D& Spread)
 {
 	const float TextureWidth = Texture->GetSizeX();
 	const float TextureHeight = Texture->GetSizeY();
 	const FVector2D TextureDrawPoint(
-		ViewportCenter.X -  (TextureWidth / 2.f),
-		ViewportCenter.Y - (TextureHeight / 2.f)
+		ViewportCenter.X -  (TextureWidth / 2.f) + Spread.X,
+		ViewportCenter.Y - (TextureHeight / 2.f) + Spread.Y
 	);
 	DrawTexture(Texture, TextureDrawPoint.X, TextureDrawPoint.Y,
 		TextureWidth, TextureHeight,

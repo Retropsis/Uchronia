@@ -70,6 +70,12 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	float AimWalkSpeed = 450.f;
+
+	/*
+	 * HUD & Crosshairs
+	 */
+	float CrosshairVelocityModifier;
+	float CrosshairAirborneModifier;
 	
 public:	
 

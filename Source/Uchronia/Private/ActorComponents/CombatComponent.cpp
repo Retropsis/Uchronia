@@ -107,6 +107,26 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 				HUDPackage.Crosshair_Right = nullptr;
 				HUDPackage.Crosshair_Bottom = nullptr;
 			}
+			// Calculate Crosshair Spread
+			// [0, 600] -> [0, 1]
+			// TODO: APB-like spread
+			const FVector2D WalkSpeedRange(0.f, PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed);
+			const FVector2D VelocityMultiplierRange(0.f, 1.f);
+			FVector Velocity = PlayerCharacter->GetVelocity();
+			Velocity.Z = 0.f;
+			CrosshairVelocityModifier = FMath::GetMappedRangeValueClamped(WalkSpeedRange, VelocityMultiplierRange, Velocity.Size());
+
+			if(PlayerCharacter->GetCharacterMovement()->IsFalling())
+			{
+				// TODO: Weapon Airborne Modifier
+				CrosshairAirborneModifier = FMath::FInterpTo(CrosshairAirborneModifier, 2.25f, DeltaTime, 2.25f);
+			}
+			else
+			{
+				// TODO: Weapon Airborne Recovery Modifier
+				CrosshairAirborneModifier = FMath::FInterpTo(CrosshairAirborneModifier, 0.f, DeltaTime, 30.f);
+			}
+			HUDPackage.CrosshairSpread = CrosshairVelocityModifier + CrosshairAirborneModifier;
 			PlayerHUD->SetHUDPackage(HUDPackage);
 		}
 	}
