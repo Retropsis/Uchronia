@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CrosshairInterface.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
-class UCHRONIA_API ABaseCharacter : public ACharacter
+class UCHRONIA_API ABaseCharacter : public ACharacter, public ICrosshairInterface
 {
 	GENERATED_BODY()
 
