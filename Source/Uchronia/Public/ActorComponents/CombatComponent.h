@@ -31,6 +31,7 @@ protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool IsAiming);
 	void Trigger(bool bPressed);
+	void Fire();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool IsAiming);
@@ -94,13 +95,25 @@ private:
 	float DefaultFOV;
 	float CurrentFOV;
 
+	/* TODO: To DataAsset */
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	float MarksmanFOV = 30.f;
 
+	/* TODO: To DataAsset */
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	float MarksmanInterpSpeed = 20.f;
 
 	void InterpFOV(float DeltaTime);
+
+	/*
+	 * Automatic Fire
+	 */
+	FTimerHandle FireIntervalTimer;
+
+	bool bCanFire = true;
+
+	void FireIntervalStart();
+	void FireIntervalEnd();
 	
 public:	
 

@@ -146,7 +146,15 @@ void APlayerCharacter::TriggerButtonPressed(bool bPressed)
 {
 	if(CombatComponent)
 	{
-		CombatComponent->Trigger(bPressed);
+		CombatComponent->Trigger(true);
+	}
+}
+
+void APlayerCharacter::TriggerButtonReleased(bool bPressed)
+{
+	if(CombatComponent)
+	{
+		CombatComponent->Trigger(false);
 	}
 }
 
@@ -326,7 +334,6 @@ void APlayerCharacter::HideCharacterIfCameraClose()
 	if(!IsLocallyControlled()) return;
 	
 	const bool bCameraTooClose = (FollowCamera->GetComponentLocation() - GetActorLocation()).Size() < CameraThreshold;
-	GEngine->AddOnScreenDebugMessage(1, 0, FColor::Blue, FString::Printf(TEXT("%f"),  (FollowCamera->GetComponentLocation() - GetActorLocation()).Size()));
 	GetMesh()->SetVisibility(!bCameraTooClose);
 	if (CombatComponent && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponMesh())
 	{

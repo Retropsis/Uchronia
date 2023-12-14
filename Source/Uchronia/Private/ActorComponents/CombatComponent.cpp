@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/CharacterPlayerController.h"
+#include "TimerManager.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -41,6 +42,9 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	GEngine->AddOnScreenDebugMessage(1, 0, FColor::Cyan, FString::Printf(TEXT("%s"), bTriggerButtonPressed ? TEXT("isPressed") : TEXT("is NOT pressed")));
+	GEngine->AddOnScreenDebugMessage(2, 0, FColor::Cyan, FString::Printf(TEXT("%s"), bCanFire ? TEXT("bCanFire") : TEXT("bCan NOT Fire")));
 
 	if(PlayerCharacter && PlayerCharacter->IsLocallyControlled())
 	{
@@ -87,17 +91,24 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 void UCombatComponent::Trigger(const bool bPressed)
 {
 	bTriggerButtonPressed = bPressed;
-	if(bTriggerButtonPressed)
+	if(bTriggerButtonPressed && IsValid(EquippedWeapon))
 	{
-		FHitResult HitResult;
-		TraceUnderCrosshairs(HitResult);
-		ServerTrigger(HitResult.ImpactPoint);
+		Fire();
+	}
+}
 
-		if(IsValid(EquippedWeapon))
-		{
-			// TODO: Weapon Recoil Modifier
-			CrosshairRecoilModifier += .2f;
-		}
+void UCombatComponent::Fire()
+{
+	if(bCanFire)
+	{
+		bCanFire = false;	
+		ServerTrigger(HitTarget);
+        if(IsValid(EquippedWeapon))
+        {
+        	// TODO: Weapon Recoil Modifier
+        	CrosshairRecoilModifier += .2f;
+        }
+        FireIntervalStart();
 	}
 }
 
@@ -114,6 +125,29 @@ void UCombatComponent::MulticastTrigger_Implementation(const FVector_NetQuantize
 	{
 		CharacterAnimInstance->PlayFireMontage(bAiming);
 		EquippedWeapon->Trigger(TraceHitTarget);
+	}
+}
+
+void UCombatComponent::FireIntervalStart()
+{
+	if(!IsValid(EquippedWeapon) || !IsValid(PlayerCharacter)) return;
+	
+	PlayerCharacter->GetWorldTimerManager().SetTimer(
+		FireIntervalTimer,
+		this,
+		&UCombatComponent::FireIntervalEnd,
+		EquippedWeapon->FireInterval
+	);
+}
+
+void UCombatComponent::FireIntervalEnd()
+{
+	if(!IsValid(EquippedWeapon)) return;
+	
+	bCanFire = true;
+	if(bTriggerButtonPressed && EquippedWeapon->bAutomatic)
+	{
+		Fire();
 	}
 }
 

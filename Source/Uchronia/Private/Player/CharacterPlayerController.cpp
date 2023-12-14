@@ -35,7 +35,8 @@ void ACharacterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
 	EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::DropButtonPressed);	
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::AimButtonPressed);	
-	EnhancedInputComponent->BindAction(TriggerAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonPressed);	
+	EnhancedInputComponent->BindAction(TriggerPressedAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonPressed);	
+	EnhancedInputComponent->BindAction(TriggerReleasedAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonReleased);	
 	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ThrowButtonPressed);	
 	EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ReloadButtonPressed);	
 }
@@ -115,7 +116,17 @@ void ACharacterPlayerController::TriggerButtonPressed(const FInputActionValue& V
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
 	{
+		GEngine->AddOnScreenDebugMessage(3, 0, FColor::Green, FString::Printf(TEXT("%s"), Value.Get<bool>() ? TEXT("TriggerButtonPressed is true") : TEXT("TriggerButtonPressed is false")));
 		PlayerCharacter->TriggerButtonPressed(Value.Get<bool>());
+	}
+}
+
+void ACharacterPlayerController::TriggerButtonReleased(const FInputActionValue& Value)
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		GEngine->AddOnScreenDebugMessage(4, 0, FColor::Red, FString::Printf(TEXT("%s"), Value.Get<bool>() ? TEXT("TriggerButtonReleased is true") : TEXT("TriggerButtonReleased is false")));
+		PlayerCharacter->TriggerButtonReleased(Value.Get<bool>());
 	}
 }
 

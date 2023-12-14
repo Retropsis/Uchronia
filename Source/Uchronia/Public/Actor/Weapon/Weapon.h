@@ -56,6 +56,17 @@ public:
 	UPROPERTY(EditAnywhere, Category="Crosshairs")
 	TObjectPtr<UTexture2D> Crosshair_Bottom;
 
+	/*
+	 * Automatic Fire
+	 */
+	/* TODO: To DataAsset */
+	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
+	float FireInterval = .15f;
+
+	/* TODO: To DataAsset */
+	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
+	bool bAutomatic = false;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -113,7 +124,7 @@ private:
 	float MarksmanInterpSpeed = 20.f;
 	/*
 	 * End
-	 */
+	*/
 	
 public:
 	void SetWeaponState(const EWeaponState InWeaponState);

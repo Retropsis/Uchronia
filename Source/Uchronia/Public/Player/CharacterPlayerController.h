@@ -49,7 +49,10 @@ private:
 	TObjectPtr<UInputAction> AimAction;
 
 	UPROPERTY(EditAnywhere, Category="Input")
-	TObjectPtr<UInputAction> TriggerAction;
+	TObjectPtr<UInputAction> TriggerPressedAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> TriggerReleasedAction;
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> ReloadAction;
@@ -65,6 +68,7 @@ private:
 	void CrouchButtonPressed();
 	void AimButtonPressed(const FInputActionValue& Value);
 	void TriggerButtonPressed(const FInputActionValue& Value);
+	void TriggerButtonReleased(const FInputActionValue& Value);
 	void ReloadButtonPressed(const FInputActionValue& Value);
 	void ThrowButtonPressed(const FInputActionValue& Value);
 };

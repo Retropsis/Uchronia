@@ -33,6 +33,7 @@ public:
 	void EquipWeapon();
 	void Aim(bool bIsAiming);
 	void TriggerButtonPressed(bool bPressed);
+	void TriggerButtonReleased(bool bPressed);
 	
 	/* Combat Interface */
 	virtual void HitReact() override;
