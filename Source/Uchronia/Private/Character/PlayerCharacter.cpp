@@ -5,12 +5,14 @@
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Character/CharacterAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Uchronia/Uchronia.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -38,6 +40,7 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 520.f);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
@@ -123,6 +126,17 @@ void APlayerCharacter::TriggerButtonPressed(bool bPressed)
 	{
 		CombatComponent->Trigger(bPressed);
 	}
+}
+
+void APlayerCharacter::HitReact()
+{
+	MulticastHitReact();
+}
+
+void APlayerCharacter::MulticastHitReact_Implementation()
+{
+	UCharacterAnimInstance* AnimInstance = Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	AnimInstance->PlayHitReactMontage();	
 }
 
 // TODO: Try having this code in AnimInstance instead

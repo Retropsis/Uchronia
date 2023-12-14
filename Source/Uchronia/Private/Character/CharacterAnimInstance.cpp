@@ -101,3 +101,15 @@ void UCharacterAnimInstance::PlayFireMontage(bool bIsAiming)
 		Montage_JumpToSection(SectionName);
 	}
 }
+
+void UCharacterAnimInstance::PlayHitReactMontage()
+{
+	if(PlayerCharacter->GetCombatComponent() == nullptr || PlayerCharacter->GetEquippedWeapon() == nullptr) return;
+	
+	if(IsValid(HitReactMontage))
+	{
+		Montage_Play(HitReactMontage);
+		const FName SectionName("FromFront");
+		Montage_JumpToSection(SectionName);
+	}
+}

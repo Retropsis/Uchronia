@@ -22,6 +22,7 @@ public:
 	virtual  void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayFireMontage(bool bIsAiming);
+	void PlayHitReactMontage();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
@@ -89,6 +90,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Montage")
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Montage")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsLocallyControlled = false;

@@ -31,6 +31,13 @@ public:
 	void EquipWeapon();
 	void Aim(bool bIsAiming);
 	void TriggerButtonPressed(bool bPressed);
+	
+	/* Combat Interface */
+	virtual void HitReact() override;
+	/* Combat Interface */
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHitReact();
 
 protected:
 	// TODO: Could be somewhere else like WidgetController
