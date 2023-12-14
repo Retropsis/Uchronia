@@ -96,4 +96,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsLocallyControlled = false;
+
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	bool bRotateRootBone;
 };

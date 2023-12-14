@@ -27,6 +27,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 
+	virtual void OnRep_ReplicatedMovement() override;
+
 	virtual void Jump() override;
 	void EquipWeapon();
 	void Aim(bool bIsAiming);
@@ -67,6 +69,8 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 
+	float CalculateGroundSpeed();
+	void CalculateAO_Pitch();
 	void AimOffset(float DeltaTime);
 	float AO_Yaw;
 	float InterpAO_Yaw;
@@ -81,7 +85,15 @@ private:
 	 */
 	ETurningInPlace TurningInPlace = ETurningInPlace::ETIP_None;
 	void TurnInPlace(float DeltaTime);
-
+	
+	void SimProxiesTurn();
+	bool bRotateRootBone;
+	float TurnThreshold = 0.5f;
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotation;
+	float ProxyYaw;
+	float TimeSinceLastMovementReplication;
+	
 	/*
 	 * Camera
 	 */
@@ -94,15 +106,18 @@ public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	AWeapon* GetEquippedWeapon();
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return CombatComponent; };
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	bool IsWeaponEquipped() const;
 	bool IsAiming() const;
 
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; };
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; };
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
+	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 	
 	UAnimInstance* GetAnimInstance() const;
 	FVector GetHitTarget() const;
 
-	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };
+
+

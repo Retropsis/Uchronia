@@ -67,8 +67,30 @@ void APlayerCharacter::PostInitializeComponents()
 void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	AimOffset(DeltaSeconds);
+
+	if(GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
+	{
+		AimOffset(DeltaSeconds);
+	}
+	else
+	{
+		TimeSinceLastMovementReplication += DeltaSeconds;
+		if(TimeSinceLastMovementReplication > 0.25f)
+		{
+			OnRep_ReplicatedMovement();
+		}
+		CalculateAO_Pitch();
+	}
 	HideCharacterIfCameraClose();
+}
+
+void APlayerCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
+
+	// if(GetLocalRole() == ROLE_SimulatedProxy)
+	SimProxiesTurn();
+	TimeSinceLastMovementReplication = 0.f;
 }
 
 void APlayerCharacter::Jump()
@@ -142,14 +164,13 @@ void APlayerCharacter::MulticastHitReact_Implementation()
 // TODO: Try having this code in AnimInstance instead
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
-	if(CombatComponent && CombatComponent->EquippedWeapon == nullptr) return; 
-	FVector Velocity = GetVelocity();
-	Velocity.Z = 0.f;
-	const float GroundSpeed = Velocity.Size();
+	if(CombatComponent && CombatComponent->EquippedWeapon == nullptr) return;
+	const float GroundSpeed = CalculateGroundSpeed();
 	const bool bAirborne = GetCharacterMovement()->IsFalling();
 
 	if(GroundSpeed == 0.f && !bAirborne) // standing still not jumping
 	{
+		bRotateRootBone = true;
 		const FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		const FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
@@ -162,12 +183,24 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 	}
 	if(GroundSpeed > 0.f || bAirborne) // running or jumping
 	{
+		bRotateRootBone = false;
 		bUseControllerRotationYaw = true;
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		AO_Yaw = 0.f;
 		TurningInPlace = ETurningInPlace::ETIP_None;
 	}
+	CalculateAO_Pitch();
+}
 
+float APlayerCharacter::CalculateGroundSpeed()
+{
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	return Velocity.Size();
+}
+
+void APlayerCharacter::CalculateAO_Pitch()
+{
 	AO_Pitch = GetBaseAimRotation().Pitch;
 	if(AO_Pitch > 90.f && !IsLocallyControlled())
 	{
@@ -198,6 +231,43 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 			StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		}
 	}
+}
+
+void APlayerCharacter::SimProxiesTurn()
+{
+	if(!IsValid(CombatComponent) || !IsValid(CombatComponent->EquippedWeapon)) return;
+	
+	bRotateRootBone = false;
+
+	if(CalculateGroundSpeed() > 0.f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_None;
+		return;
+	}
+	
+	ProxyRotationLastFrame = ProxyRotation;
+	ProxyRotation = GetActorRotation();
+	ProxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(ProxyRotation, ProxyRotationLastFrame).Yaw;
+
+	UE_LOG(LogTemp, Warning, TEXT("ProxyYaw: %f"), ProxyYaw);
+
+	if (FMath::Abs(ProxyYaw) > TurnThreshold)
+	{
+		if(ProxyYaw > TurnThreshold)
+		{
+			TurningInPlace = ETurningInPlace::ETIP_Right;
+		}
+		else if(ProxyYaw < -TurnThreshold)
+		{
+			TurningInPlace = ETurningInPlace::ETIP_Left;
+		}
+		else
+		{
+			TurningInPlace = ETurningInPlace::ETIP_None;
+		}
+		return;
+	}
+	TurningInPlace = ETurningInPlace::ETIP_None;
 }
 
 /*
