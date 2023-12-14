@@ -13,5 +13,8 @@ UCLASS()
 class UCHRONIA_API AAICharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
+
+public:
+	AAICharacter();
 	
 };

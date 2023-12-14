@@ -27,7 +27,16 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+/* ASC Interface */
+UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+/* ASC Interface */
+
+/* Combat Interface */
 void ABaseCharacter::HitReact()
 {
 }
+/* Combat Interface */
 

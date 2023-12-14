@@ -6,10 +6,14 @@
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "Interaction/CrosshairInterface.h"
+#include "AbilitySystemInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UAttributeSet;
+class UAbilitySystemComponent;
+
 UCLASS()
-class UCHRONIA_API ABaseCharacter : public ACharacter, public ICrosshairInterface, public ICombatInterface
+class UCHRONIA_API ABaseCharacter : public ACharacter, public ICrosshairInterface, public ICombatInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -17,6 +21,9 @@ public:
 	ABaseCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
 	/* Combat Interface */
 	virtual void HitReact() override;
@@ -24,6 +31,12 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
 
 public:	
 
