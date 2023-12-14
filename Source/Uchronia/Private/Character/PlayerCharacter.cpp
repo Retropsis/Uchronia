@@ -65,6 +65,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	AimOffset(DeltaSeconds);
+	HideCharacterIfCameraClose();
 }
 
 void APlayerCharacter::Jump()
@@ -184,6 +185,7 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 		}
 	}
 }
+
 /*
  * End
  */
@@ -233,6 +235,19 @@ FVector APlayerCharacter::GetHitTarget() const
 {
 	if(!IsValid(CombatComponent)) return FVector();
 	return CombatComponent->HitTarget;
+}
+
+void APlayerCharacter::HideCharacterIfCameraClose()
+{
+	if(!IsLocallyControlled()) return;
+	
+	const bool bCameraTooClose = (FollowCamera->GetComponentLocation() - GetActorLocation()).Size() < CameraThreshold;
+	GEngine->AddOnScreenDebugMessage(1, 0, FColor::Blue, FString::Printf(TEXT("%f"),  (FollowCamera->GetComponentLocation() - GetActorLocation()).Size()));
+	GetMesh()->SetVisibility(!bCameraTooClose);
+	if (CombatComponent && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponMesh())
+	{
+		CombatComponent->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = bCameraTooClose;
+	}
 }
 
 /*

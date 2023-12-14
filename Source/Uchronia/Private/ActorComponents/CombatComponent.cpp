@@ -205,7 +205,15 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 	);
 	if(bScreenToWorld)
 	{
-		const FVector Start = CrosshairWorldPosition;
+		FVector Start = CrosshairWorldPosition;
+
+		if(IsValid(PlayerCharacter))
+		{
+			const float DistanceToCharacter = (PlayerCharacter->GetActorLocation() - Start).Size();
+			Start += CrosshairWorldDirection * (DistanceToCharacter + TraceExtent);
+			// UKismetSystemLibrary::DrawDebugSphere(this, Start, 12.f, 12, FLinearColor::Blue);
+		}
+		
 		const FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
 		GetWorld()->LineTraceSingleByChannel(
 			TraceHitResult,

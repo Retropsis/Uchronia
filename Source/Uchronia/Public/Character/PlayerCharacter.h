@@ -75,6 +75,14 @@ private:
 	ETurningInPlace TurningInPlace = ETurningInPlace::ETIP_None;
 	void TurnInPlace(float DeltaTime);
 
+	/*
+	 * Camera
+	 */
+	void HideCharacterIfCameraClose();
+
+	UPROPERTY(EditDefaultsOnly, Category="Camera")
+	float CameraThreshold = 50.f;
+		
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	AWeapon* GetEquippedWeapon();

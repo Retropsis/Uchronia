@@ -71,6 +71,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	float AimWalkSpeed = 450.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
+	float TraceExtent = 100.f;
 
 	/*
 	 * HUD & Crosshair
