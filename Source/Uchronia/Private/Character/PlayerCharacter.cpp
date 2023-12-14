@@ -2,6 +2,7 @@
 
 #include "Character/PlayerCharacter.h"
 
+#include "AbilitySystemComponent.h"
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
 #include "Camera/CameraComponent.h"
@@ -9,9 +10,11 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/CharacterPlayerState.h"
 #include "Uchronia/Uchronia.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -62,6 +65,31 @@ void APlayerCharacter::PostInitializeComponents()
 	{
 		CombatComponent->PlayerCharacter = this;
 	}
+}
+
+void APlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	//~ Server Init Ability Actor Info
+	InitAbilityActorInfo();
+}
+
+void APlayerCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	//~ Client Init Ability Actor Info
+	InitAbilityActorInfo();
+}
+
+void APlayerCharacter::InitAbilityActorInfo()
+{
+	ACharacterPlayerState* CharacterPlayerState = GetPlayerState<ACharacterPlayerState>();
+	check(CharacterPlayerState)
+	CharacterPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(CharacterPlayerState, this);
+	AbilitySystemComponent = CharacterPlayerState->GetAbilitySystemComponent();
+	AttributeSet = CharacterPlayerState->GetAttributeSet();
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -279,6 +307,7 @@ void APlayerCharacter::SimProxiesTurn()
 /*
  * End
  */
+
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {

@@ -16,5 +16,7 @@ class UCHRONIA_API AAICharacter : public ABaseCharacter
 
 public:
 	AAICharacter();
-	
+
+protected:
+	virtual void BeginPlay() override;
 };

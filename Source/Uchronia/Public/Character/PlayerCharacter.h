@@ -26,7 +26,9 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
-
+	virtual void PossessedBy(AController* NewController) override;
+	
+	virtual void OnRep_PlayerState() override;
 	virtual void OnRep_ReplicatedMovement() override;
 
 	virtual void Jump() override;
@@ -35,9 +37,9 @@ public:
 	void TriggerButtonPressed(bool bPressed);
 	void TriggerButtonReleased(bool bPressed);
 	
-	/* Combat Interface */
+	//~ Combat Interface 
 	virtual void HitReact() override;
-	/* Combat Interface */
+	//~ Combat Interface
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastHitReact();
@@ -102,6 +104,11 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Camera")
 	float CameraThreshold = 50.f;
+
+	/*
+	 * Ability System
+	 */
+	void InitAbilityActorInfo();
 		
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
