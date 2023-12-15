@@ -28,3 +28,13 @@ void AEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGamepla
 	TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 }
 
+void AEffectActor::OnBeginOverlap(AActor* TargetActor)
+{
+	
+}
+
+void AEffectActor::OnEndOverlap(AActor* TargetActor)
+{
+	
+}
+
