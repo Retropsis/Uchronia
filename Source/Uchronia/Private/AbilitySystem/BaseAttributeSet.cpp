@@ -5,7 +5,7 @@
 
 UBaseAttributeSet::UBaseAttributeSet()
 {
-	InitHealth(100.f);
+	InitHealth(50.f);
 	InitMaxHealth(100.f);
 }
 
