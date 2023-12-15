@@ -1,7 +1,36 @@
 // Retropsis @ 2023-2024
 
-
 #include "HUD/PlayerHUD.h"
+#include "UI/Widget/BaseUserwidget.h"
+#include "UI/WidgetController/OverlayWidgetController.h"
+
+void APlayerHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
+{
+	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class missing, fill out BP_PlayerHUD"));
+	checkf(OverlayWidgetControllerClass, TEXT("Overlay Widget Controller Class missing, fill out BP_PlayerHUD"));
+	
+	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
+	OverlayWidget = Cast<UBaseUserWidget>(Widget);
+	
+	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
+
+	OverlayWidget->SetWidgetController(WidgetController);
+	
+	OverlayWidget->AddToViewport();
+}
+
+UOverlayWidgetController* APlayerHUD::GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams)
+{
+	if(OverlayWidgetController == nullptr)
+	{
+		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
+		OverlayWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		
+		return OverlayWidgetController;
+	}
+	return OverlayWidgetController;
+}
 
 void APlayerHUD::DrawHUD()
 {

@@ -6,6 +6,12 @@
 #include "GameFramework/HUD.h"
 #include "PlayerHUD.generated.h"
 
+class UAttributeSet;
+class UAbilitySystemComponent;
+class UOverlayWidgetController;
+class UBaseUserWidget;
+struct FWidgetControllerParams;
+
 USTRUCT(BlueprintType)
 struct FHUDPackage
 {
@@ -42,7 +48,25 @@ class UCHRONIA_API APlayerHUD : public AHUD
 public:
 	virtual void DrawHUD() override;
 
+	UPROPERTY()
+	TObjectPtr<UBaseUserWidget> OverlayWidget;
+
+	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+	
+	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
+
+protected:
+	
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UBaseUserWidget> OverlayWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
+	
 	FHUDPackage HUDPackage;
 
 	UPROPERTY(EditDefaultsOnly)

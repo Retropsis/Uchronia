@@ -14,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/CharacterPlayerController.h"
 #include "Player/CharacterPlayerState.h"
 #include "Uchronia/Uchronia.h"
 
@@ -90,6 +91,15 @@ void APlayerCharacter::InitAbilityActorInfo()
 	CharacterPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(CharacterPlayerState, this);
 	AbilitySystemComponent = CharacterPlayerState->GetAbilitySystemComponent();
 	AttributeSet = CharacterPlayerState->GetAttributeSet();
+
+	/* Init Overlay only if PlayerController is not null, only locally controlled needs it */ 
+	if (ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(GetController()))
+	{
+		if (APlayerHUD* PlayerHUD = Cast<APlayerHUD>(CharacterPlayerController->GetHUD()))
+		{
+			PlayerHUD->InitOverlay(CharacterPlayerController, CharacterPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
