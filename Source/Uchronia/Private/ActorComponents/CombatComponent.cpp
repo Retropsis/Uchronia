@@ -42,9 +42,6 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	GEngine->AddOnScreenDebugMessage(1, 0, FColor::Cyan, FString::Printf(TEXT("%s"), bTriggerButtonPressed ? TEXT("isPressed") : TEXT("is NOT pressed")));
-	GEngine->AddOnScreenDebugMessage(2, 0, FColor::Cyan, FString::Printf(TEXT("%s"), bCanFire ? TEXT("bCanFire") : TEXT("bCan NOT Fire")));
 
 	if(PlayerCharacter && PlayerCharacter->IsLocallyControlled())
 	{

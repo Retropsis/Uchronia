@@ -79,10 +79,10 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			
 			// FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(FVector(), RightHandTransform.GetLocation() - PlayerCharacter->GetHitTarget());
 			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(), RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - PlayerCharacter->GetHitTarget()));
+			LookAtRotation.Roll += RightHandRotationRoll; 
+			LookAtRotation.Yaw += RightHandRotationYaw; 
+			LookAtRotation.Pitch += RightHandRotationPitch;
 			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaSeconds, 30.f);
-			// RightHandRotation.Roll += RightHandRotationRoll; 
-			// RightHandRotation.Yaw += RightHandRotationYaw; 
-			// RightHandRotation.Pitch += RightHandRotationPitch;
 		
 			const FTransform MuzzleFlashTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("MuzzleFlash"), RTS_World);
 			const FVector MuzzleX(FRotationMatrix(MuzzleFlashTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::X));
