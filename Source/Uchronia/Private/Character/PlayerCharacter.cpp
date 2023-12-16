@@ -102,6 +102,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 			PlayerHUD->InitOverlay(CharacterPlayerController, CharacterPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+	InitializePrimaryAttributes();
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)

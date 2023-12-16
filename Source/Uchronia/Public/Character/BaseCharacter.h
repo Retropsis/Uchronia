@@ -9,6 +9,7 @@
 #include "AbilitySystemInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -20,7 +21,6 @@ class UCHRONIA_API ABaseCharacter : public ACharacter, public ICrosshairInterfac
 public:
 	ABaseCharacter();
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
@@ -42,6 +42,11 @@ protected:
 	 * Ability System
 	 */
 	virtual void InitAbilityActorInfo();
+
+	void InitializePrimaryAttributes() const;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 
 public:	
 
