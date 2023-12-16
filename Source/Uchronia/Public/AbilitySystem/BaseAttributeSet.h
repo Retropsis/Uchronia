@@ -63,6 +63,28 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
+	/*
+	 * Primary Attributes
+	*/
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Strength, Category="Primary Attributes")
+	FGameplayAttributeData Strength;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Strength);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Toughness, Category="Primary Attributes")
+	FGameplayAttributeData Toughness;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Toughness);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Dexterity, Category="Primary Attributes")
+	FGameplayAttributeData Dexterity;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Dexterity);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Perception, Category="Primary Attributes")
+	FGameplayAttributeData Perception;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Perception);
+	
+	/*
+	 * Vital Attributes
+	 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, Category="Vital Attributes")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Health);
@@ -74,6 +96,18 @@ public:
 	/*
 	 * Replication Notifies
 	 */
+	UFUNCTION()
+	void OnRep_Strength(const FGameplayAttributeData& OldStrength) const;
+	
+	UFUNCTION()
+	void OnRep_Toughness(const FGameplayAttributeData& OldToughness) const;
+	
+	UFUNCTION()
+	void OnRep_Dexterity(const FGameplayAttributeData& OldDexterity) const;
+	
+	UFUNCTION()
+	void OnRep_Perception(const FGameplayAttributeData& OldPerception) const;
+	
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 	
