@@ -108,7 +108,7 @@ private:
 	/*
 	 * Ability System
 	 */
-	void InitAbilityActorInfo();
+	virtual void InitAbilityActorInfo() override;
 		
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);

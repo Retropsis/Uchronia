@@ -19,4 +19,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	/*
+	 * Ability System
+	 */
+	virtual void InitAbilityActorInfo() override;
 };

@@ -3,6 +3,7 @@
 #include "Character/PlayerCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
 #include "Camera/CameraComponent.h"
@@ -89,6 +90,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 	ACharacterPlayerState* CharacterPlayerState = GetPlayerState<ACharacterPlayerState>();
 	check(CharacterPlayerState)
 	CharacterPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(CharacterPlayerState, this);
+	Cast<UBaseAbilitySystemComponent>(CharacterPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = CharacterPlayerState->GetAbilitySystemComponent();
 	AttributeSet = CharacterPlayerState->GetAttributeSet();
 

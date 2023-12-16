@@ -37,6 +37,11 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+	
+	/*
+	 * Ability System
+	 */
+	virtual void InitAbilityActorInfo();
 
 public:	
 
