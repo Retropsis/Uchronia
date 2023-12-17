@@ -16,6 +16,11 @@ class UCHRONIA_API AAICharacter : public ABaseCharacter
 
 public:
 	AAICharacter();
+	
+	/* Combat Interface */
+	virtual int32 GetCharacterLevel() override;
+	virtual void HitReact() override;
+	/* Combat Interface */
 
 protected:
 	virtual void BeginPlay() override;
@@ -24,4 +29,7 @@ protected:
 	 * Ability System
 	 */
 	virtual void InitAbilityActorInfo() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	int32 Level = 1;
 };

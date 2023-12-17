@@ -37,7 +37,8 @@ public:
 	void TriggerButtonPressed(bool bPressed);
 	void TriggerButtonReleased(bool bPressed);
 	
-	//~ Combat Interface 
+	//~ Combat Interface
+	virtual int32 GetCharacterLevel() override;
 	virtual void HitReact() override;
 	//~ Combat Interface
 

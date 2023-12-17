@@ -102,7 +102,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 			PlayerHUD->InitOverlay(CharacterPlayerController, CharacterPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
-	InitializePrimaryAttributes();
+	InitializeDefaultAttributes();
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -197,6 +197,13 @@ void APlayerCharacter::TriggerButtonReleased(bool bPressed)
 	{
 		CombatComponent->Trigger(false);
 	}
+}
+
+int32 APlayerCharacter::GetCharacterLevel()
+{
+	const ACharacterPlayerState* CharacterPlayerState = GetPlayerState<ACharacterPlayerState>();
+	check(CharacterPlayerState);
+	return CharacterPlayerState->GetCharacterLevel();
 }
 
 void APlayerCharacter::HitReact()

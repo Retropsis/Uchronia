@@ -14,6 +14,15 @@ AAICharacter::AAICharacter()
 	AttributeSet = CreateDefaultSubobject<UBaseAttributeSet>(TEXT("AttributeSet"));	
 }
 
+int32 AAICharacter::GetCharacterLevel()
+{
+	return Level;
+}
+
+void AAICharacter::HitReact()
+{
+}
+
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
