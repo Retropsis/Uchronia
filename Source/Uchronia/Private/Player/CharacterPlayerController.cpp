@@ -4,6 +4,7 @@
 #include "Player/CharacterPlayerController.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "BaseGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/PlayerCharacter.h"
 #include "GameplayTagContainer.h"
@@ -49,6 +50,14 @@ void ACharacterPlayerController::SetupInputComponent()
 
 void ACharacterPlayerController::KeybindInputTagPressed(FGameplayTag InputTag)
 {
+	/*
+	 * To Activate some ability if target is undercrosshairs
+	 */
+	/*if(InputTag.MatchesTagExact(FBaseGameplayTags::Get().SomeAbilityTag))
+	{
+		bTargeting = ThisActor == nullptr;
+		GetHitResultUnderCursor()
+	}*/
 	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *InputTag.ToString()));
 }
 
