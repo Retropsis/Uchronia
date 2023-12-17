@@ -7,6 +7,8 @@
 #include "CharacterPlayerController.generated.h"
 
 
+struct FGameplayTag;
+class UInputConfig;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
@@ -24,41 +26,48 @@ public:
 	virtual void SetupInputComponent() override;
 
 private:
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputConfig> InputConfig;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputMappingContext> CharacterContext;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> JumpAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> CrouchAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> EquipAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> DropAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> AimAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> TriggerPressedAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> TriggerReleasedAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> ReloadAction;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> ThrowAction;
+
+	void KeybindInputTagPressed(FGameplayTag InputTag);
+	void KeybindInputTagReleased(FGameplayTag InputTag);
+	void KeybindInputTagHeld(FGameplayTag InputTag);
 	
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);

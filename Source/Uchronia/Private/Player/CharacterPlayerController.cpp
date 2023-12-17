@@ -4,7 +4,8 @@
 #include "Player/CharacterPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/PlayerCharacter.h"
-#include "Input/UEnhancedInputComponent.h"
+#include "GameplayTagContainer.h"
+#include "Input/PlayerInputComponent.h"
 
 ACharacterPlayerController::ACharacterPlayerController()
 {
@@ -26,19 +27,36 @@ void ACharacterPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UPlayerInputComponent* PlayerInputComponent = CastChecked<UPlayerInputComponent>(InputComponent);
 
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Look);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Jump);
-	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::CrouchButtonPressed);
-	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
-	EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::DropButtonPressed);	
-	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::AimButtonPressed);	
-	EnhancedInputComponent->BindAction(TriggerPressedAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonPressed);	
-	EnhancedInputComponent->BindAction(TriggerReleasedAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonReleased);	
-	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ThrowButtonPressed);	
-	EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ReloadButtonPressed);	
+	PlayerInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Move);
+	PlayerInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Look);
+	PlayerInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Jump);
+	PlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::CrouchButtonPressed);
+	PlayerInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
+	PlayerInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::DropButtonPressed);	
+	PlayerInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::AimButtonPressed);	
+	PlayerInputComponent->BindAction(TriggerPressedAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonPressed);	
+	PlayerInputComponent->BindAction(TriggerReleasedAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonReleased);	
+	PlayerInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ThrowButtonPressed);	
+	PlayerInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ReloadButtonPressed);
+
+	PlayerInputComponent->SetupKeybindInputActions(InputConfig, this, &ThisClass::KeybindInputTagPressed, &ThisClass::KeybindInputTagReleased, &ThisClass::KeybindInputTagHeld);
+}
+
+void ACharacterPlayerController::KeybindInputTagPressed(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *InputTag.ToString()));
+}
+
+void ACharacterPlayerController::KeybindInputTagReleased(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Red, FString::Printf(TEXT("%s"), *InputTag.ToString()));
+}
+
+void ACharacterPlayerController::KeybindInputTagHeld(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Orange, FString::Printf(TEXT("%s"), *InputTag.ToString()));
 }
 
 void ACharacterPlayerController::Move(const FInputActionValue& InputActionValue)
