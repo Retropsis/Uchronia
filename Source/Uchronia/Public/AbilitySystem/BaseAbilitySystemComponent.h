@@ -18,6 +18,7 @@ class UCHRONIA_API UBaseAbilitySystemComponent : public UAbilitySystemComponent
 
 public:
 	void AbilityActorInfoSet();
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities);
 
 	FEffectAssetTags EffectAssetTags;
 
