@@ -27,6 +27,7 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
 	/* Combat Interface */
+	virtual FVector GetCombatSocketLocation() override;
 	virtual void HitReact() override;
 	/* Combat Interface */
 	
@@ -56,6 +57,13 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+
+	// TODO: Might need to be more generic
+	UPROPERTY(EditAnywhere, Category="Combat")
+	TObjectPtr<USkeletalMeshComponent> Weapon;
+
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName CombatSocketName;
 
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")

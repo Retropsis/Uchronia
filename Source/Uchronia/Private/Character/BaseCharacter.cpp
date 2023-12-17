@@ -8,6 +8,10 @@ ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetRootComponent());
+	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 }
 
 void ABaseCharacter::BeginPlay()
@@ -59,6 +63,12 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 /* ASC Interface */
 
 /* Combat Interface */
+FVector ABaseCharacter::GetCombatSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(CombatSocketName);
+}
+
 void ABaseCharacter::HitReact()
 {
 }

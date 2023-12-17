@@ -330,10 +330,10 @@ void APlayerCharacter::SimProxiesTurn()
  */
 
 
-void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+void APlayerCharacter::SetOverlappingWeapon(AWeapon* InWeapon)
 {
 	if(OverlappingWeapon) OverlappingWeapon->ShowPickupWidget(false);
-	OverlappingWeapon = Weapon;
+	OverlappingWeapon = InWeapon;
 	if(IsLocallyControlled())
 	{
 		if(OverlappingWeapon) OverlappingWeapon->ShowPickupWidget(true);
