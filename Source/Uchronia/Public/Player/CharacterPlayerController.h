@@ -7,6 +7,7 @@
 #include "CharacterPlayerController.generated.h"
 
 
+class UBaseAbilitySystemComponent;
 struct FGameplayTag;
 class UInputConfig;
 class UInputMappingContext;
@@ -28,6 +29,11 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputConfig> InputConfig;
+
+	UPROPERTY()
+	TObjectPtr<UBaseAbilitySystemComponent> BaseAbilitySystemComponent;
+
+	UBaseAbilitySystemComponent* GetASC();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputMappingContext> CharacterContext;

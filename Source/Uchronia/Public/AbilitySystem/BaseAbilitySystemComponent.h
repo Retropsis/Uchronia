@@ -19,6 +19,8 @@ class UCHRONIA_API UBaseAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	void AbilityActorInfoSet();
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities);
+	void KeybindInputTagHeld(const FGameplayTag& InputTag);
+	void KeybindInputTagReleased(const FGameplayTag& InputTag);
 
 	FEffectAssetTags EffectAssetTags;
 

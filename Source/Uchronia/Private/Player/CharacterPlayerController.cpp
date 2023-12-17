@@ -2,9 +2,12 @@
 
 
 #include "Player/CharacterPlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/PlayerCharacter.h"
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Input/PlayerInputComponent.h"
 
 ACharacterPlayerController::ACharacterPlayerController()
@@ -51,12 +54,16 @@ void ACharacterPlayerController::KeybindInputTagPressed(FGameplayTag InputTag)
 
 void ACharacterPlayerController::KeybindInputTagReleased(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Red, FString::Printf(TEXT("%s"), *InputTag.ToString()));
+	if(GetASC() == nullptr) return;
+	//GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Red, FString::Printf(TEXT("%s"), *InputTag.ToString()));
+	GetASC()->KeybindInputTagReleased(InputTag);
 }
 
 void ACharacterPlayerController::KeybindInputTagHeld(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Orange, FString::Printf(TEXT("%s"), *InputTag.ToString()));
+	if(GetASC() == nullptr) return;
+	//GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Orange, FString::Printf(TEXT("%s"), *InputTag.ToString()));
+	GetASC()->KeybindInputTagHeld(InputTag);
 }
 
 void ACharacterPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -134,7 +141,6 @@ void ACharacterPlayerController::TriggerButtonPressed(const FInputActionValue& V
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
 	{
-		GEngine->AddOnScreenDebugMessage(3, 0, FColor::Green, FString::Printf(TEXT("%s"), Value.Get<bool>() ? TEXT("TriggerButtonPressed is true") : TEXT("TriggerButtonPressed is false")));
 		PlayerCharacter->TriggerButtonPressed(Value.Get<bool>());
 	}
 }
@@ -143,7 +149,6 @@ void ACharacterPlayerController::TriggerButtonReleased(const FInputActionValue& 
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
 	{
-		GEngine->AddOnScreenDebugMessage(4, 0, FColor::Red, FString::Printf(TEXT("%s"), Value.Get<bool>() ? TEXT("TriggerButtonReleased is true") : TEXT("TriggerButtonReleased is false")));
 		PlayerCharacter->TriggerButtonReleased(Value.Get<bool>());
 	}
 }
@@ -156,4 +161,13 @@ void ACharacterPlayerController::ReloadButtonPressed(const FInputActionValue& Va
 void ACharacterPlayerController::ThrowButtonPressed(const FInputActionValue& Value)
 {
 	
+}
+
+UBaseAbilitySystemComponent* ACharacterPlayerController::GetASC()
+{
+	if(BaseAbilitySystemComponent == nullptr)
+	{
+		BaseAbilitySystemComponent = Cast<UBaseAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return BaseAbilitySystemComponent;
 }
