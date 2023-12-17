@@ -3,9 +3,14 @@
 
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 
+#include "BaseGameplayTags.h"
+
 void UBaseAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UBaseAbilitySystemComponent::EffectApplied);
+
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Emerald, FString::Printf(TEXT("%s"), *GameplayTags.Attributes_Secondary_Armor.ToString()));
 }
 
 void UBaseAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities)
