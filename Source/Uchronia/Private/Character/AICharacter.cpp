@@ -2,6 +2,7 @@
 
 #include "Character/AICharacter.h"
 #include "AbilitySystemComponent.h"
+#include "UchroniaBlueprintFunctionLibrary.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "Components/WidgetComponent.h"
@@ -36,6 +37,7 @@ void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
+	
 
 	if(UBaseUserWidget* BaseUserWidget =  Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -59,7 +61,6 @@ void AAICharacter::BeginPlay()
 		OnHealthChanged.Broadcast(BaseAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BaseAS->GetMaxHealth());
 	}
-	
 }
 
 void AAICharacter::InitAbilityActorInfo()
@@ -68,4 +69,9 @@ void AAICharacter::InitAbilityActorInfo()
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
 	InitializeDefaultAttributes();
+}
+
+void AAICharacter::InitializeDefaultAttributes() const
+{
+	UUchroniaBlueprintFunctionLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);	
 }
