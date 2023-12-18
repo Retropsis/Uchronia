@@ -3,6 +3,7 @@
 
 #include "GameAssetManager.h"
 #include "BaseGameplayTags.h"
+#include "AbilitySystemGlobals.h"
 
 UGameAssetManager& UGameAssetManager::Get()
 {
@@ -15,4 +16,7 @@ void UGameAssetManager::StartInitialLoading()
 {
 	Super::StartInitialLoading();
 	FBaseGameplayTags::InitializeNativeGameplayTags();
+
+	// This is required to use Target Data
+	//UAbilitySystemGlobals::Get().InitGlobalData();
 }
