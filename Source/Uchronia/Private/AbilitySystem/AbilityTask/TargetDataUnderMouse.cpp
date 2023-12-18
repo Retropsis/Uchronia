@@ -1,6 +1,7 @@
 // Retropsis @ 2023-2024
 
 #include "AbilitySystem/AbilityTask/TargetDataUnderMouse.h"
+#include "AbilitySystemComponent.h"
 
 UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGameplayAbility* OwningAbility)
 {
@@ -11,6 +12,21 @@ UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGamepl
 
 void UTargetDataUnderMouse::Activate()
 {
+	const bool bIsLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
+	if(bIsLocallyControlled)
+	{
+		SendMouseCursorData();
+	}
+	else
+	{
+		// TODO: On Server, listen for target data
+	}
+}
+
+void UTargetDataUnderMouse::SendMouseCursorData()
+{
+	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent.Get());
+	
 	//APlayerCharacter* PlayerCharacter = Ability->GetCurrentActorInfo()->AvatarActor.Get();
 	const APlayerController* PlayerController = Ability->GetCurrentActorInfo()->PlayerController.Get();
 	FHitResult CursorHit;
@@ -21,6 +37,20 @@ void UTargetDataUnderMouse::Activate()
 	const FVector2D ViewportCenter(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
 	FCollisionQueryParams CollisionQueryParams;
 	PlayerController->GetHitResultAtScreenPosition(ViewportCenter, ECC_Visibility, CollisionQueryParams, CursorHit);
-	
-	ValidData.Broadcast(CursorHit.Location);
+
+	FGameplayAbilityTargetDataHandle DataHandle;
+	FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();
+	Data->HitResult = CursorHit;
+	DataHandle.Add(Data);
+
+	AbilitySystemComponent->ServerSetReplicatedTargetData(
+		GetAbilitySpecHandle(),
+		GetActivationPredictionKey(),
+		DataHandle, FGameplayTag(),
+		AbilitySystemComponent->ScopedPredictionKey
+	);
+	if (ShouldBroadcastAbilityTaskDelegates())
+	{
+		ValidData.Broadcast(DataHandle);	
+	}
 }
