@@ -1,6 +1,9 @@
 // Retropsis @ 2023-2024
 
 #include "Actor/Weapon/Projectile.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Interaction/CombatInterface.h"
@@ -51,9 +54,18 @@ void AProjectile::BeginPlay()
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit)
 {
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Hit: %s"), *OtherActor->GetName()), true, true, FLinearColor::Blue, 3.f);
 	if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(OtherActor))
 	{
 		CombatInterface->HitReact();
+	}
+	if(HasAuthority())
+	{
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
+		
 	}
 	Destroy();
 }
@@ -61,6 +73,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 void AProjectile::Destroyed()
 {
 	Super::Destroyed();
+	// TODO: See GAS 122. if this doesn't work completely
 	if(ImpactParticles)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorTransform());

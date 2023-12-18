@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/AbilityTask/TargetDataUnderMouse.h"
 #include "AbilitySystemComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGameplayAbility* OwningAbility)
 {
@@ -43,7 +44,13 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 	GEngine->GameViewport->GetViewportSize(ViewportSize);
 	const FVector2D ViewportCenter(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
 	FCollisionQueryParams CollisionQueryParams;
+	// TODO: Need to fill in if hitting the sky
 	PlayerController->GetHitResultAtScreenPosition(ViewportCenter, ECC_Visibility, CollisionQueryParams, CursorHit);
+	UKismetSystemLibrary::DrawDebugLine(PlayerController, CursorHit.TraceStart, CursorHit.TraceEnd, FLinearColor::Blue, 5.f);
+	if (!CursorHit.bBlockingHit)
+	{
+		CursorHit.Location = CursorHit.TraceEnd;
+	}
 
 	FGameplayAbilityTargetDataHandle DataHandle;
 	FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();

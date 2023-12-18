@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
@@ -18,6 +19,9 @@ public:
 	AProjectile();
 	// virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;
+
+	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn))
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 
 protected:
 	virtual void BeginPlay() override;
@@ -38,6 +42,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> Tracer;
 
+	// TODO: Might need to change to Niagara 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> ImpactParticles;
 

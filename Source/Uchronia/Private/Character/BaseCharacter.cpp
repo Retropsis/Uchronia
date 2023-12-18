@@ -3,10 +3,15 @@
 #include "Character/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetRootComponent());

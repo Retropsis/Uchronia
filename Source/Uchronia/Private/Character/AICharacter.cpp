@@ -4,9 +4,13 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "Uchronia/Uchronia.h"
 
 AAICharacter::AAICharacter()
 {
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	
 	AbilitySystemComponent = CreateDefaultSubobject<UBaseAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
@@ -33,4 +37,6 @@ void AAICharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+
+	InitializeDefaultAttributes();
 }

@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/Ability/ProjectileAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Actor/Weapon/Projectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -13,7 +15,7 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileAbility::SpawnProjectile()
+void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if(!bIsServer) return;
@@ -22,10 +24,13 @@ void UProjectileAbility::SpawnProjectile()
 	if(CombatInterface)
 	{
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		// TODO: Can decide on pitch here
+		// Rotation.Pitch = 0.f;
 
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
-		// TODO: Set Projectile Rotation
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 		
 		AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
 			ProjectileClass,
@@ -35,7 +40,9 @@ void UProjectileAbility::SpawnProjectile()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 		);
 
-		// TODO: Give Projectile a Gameplay Effect Spec for causing damage
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+		Projectile->DamageEffectSpecHandle = SpecHandle;
 		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
