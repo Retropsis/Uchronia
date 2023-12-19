@@ -117,9 +117,17 @@ public:
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxHealth);
 
-	/*
-	 * Potential other Attributes: Blood, Thirst, Hunger, Engineering
-	 */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxHunger, Category="Secondary Attributes")
+	FGameplayAttributeData MaxHunger;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxHunger);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxThirst, Category="Secondary Attributes")
+	FGameplayAttributeData MaxThirst;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxThirst);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxBlood, Category="Secondary Attributes")
+	FGameplayAttributeData MaxBlood;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxBlood);
 	
 	/*
 	 * Vital Attributes
@@ -127,10 +135,19 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, Category="Vital Attributes")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Health);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Hunger, Category="Vital Attributes")
+	FGameplayAttributeData Hunger;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Hunger);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Thirst, Category="Vital Attributes")
+	FGameplayAttributeData Thirst;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Thirst);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Blood, Category="Vital Attributes")
+	FGameplayAttributeData Blood;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Blood);
 
-	/*
-	 * Potential other Vital: Blood, Thirst, Hunger
-	*/
 	
 	/*
 	 * Meta Attributes
@@ -180,7 +197,26 @@ public:
 	
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
+	
+	UFUNCTION()
+	void OnRep_MaxHunger(const FGameplayAttributeData& OldMaxHunger) const;
+	
+	UFUNCTION()
+	void OnRep_Hunger(const FGameplayAttributeData& OldHunger) const;
+	
+	UFUNCTION()
+	void OnRep_MaxThirst(const FGameplayAttributeData& OldMaxThirst) const;
+	
+	UFUNCTION()
+	void OnRep_Thirst(const FGameplayAttributeData& OldThirst) const;
+	
+	UFUNCTION()
+	void OnRep_MaxBlood(const FGameplayAttributeData& OldMaxBlood) const;
+	
+	UFUNCTION()
+	void OnRep_Blood(const FGameplayAttributeData& OldBlood) const;
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
+	void ShowFloatingText(const FEffectProperties& Props, float Damage) const;
 };

@@ -5,9 +5,10 @@
 #include "BaseGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
-#include "ActorComponents/CombatComponent.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/CharacterPlayerController.h"
 
 UBaseAttributeSet::UBaseAttributeSet()
 {
@@ -29,9 +30,16 @@ void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, CriticalHitResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, HealthRegeneration, COND_None, REPNOTIFY_Always);
+	// TODO: Hunger, Thirst, Blood Variance (Regen/Loss)
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxHunger, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxThirst, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxBlood, COND_None, REPNOTIFY_Always);
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Hunger, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Thirst, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Blood, COND_None, REPNOTIFY_Always);
 }
 
 // TODO: Investigate PreAttributeBaseChange as it seems it should be this one instead
@@ -105,11 +113,22 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			}
 			else
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, FString::Printf(TEXT("Not Fatal")));
 				FGameplayTagContainer TagContainer;
 				TagContainer.AddTag(FBaseGameplayTags::Get().Effects_HitReact);
 				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
+			ShowFloatingText(Props, LocalIncomingDamage);
+		}
+	}
+}
+
+void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, const float Damage) const
+{
+	if(Props.SourceCharacter != Props.TargetCharacter)
+	{
+		if (ACharacterPlayerController* PC = Cast<ACharacterPlayerController>(Props.SourceCharacter->Controller))
+		{
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
 		}
 	}
 }
@@ -177,4 +196,34 @@ void UBaseAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) co
 void UBaseAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MaxHealth, OldMaxHealth);
+}
+
+void UBaseAttributeSet::OnRep_Hunger(const FGameplayAttributeData& OldHunger) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, Hunger, OldHunger);
+}
+
+void UBaseAttributeSet::OnRep_MaxHunger(const FGameplayAttributeData& OldMaxHunger) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MaxHunger, OldMaxHunger);
+}
+
+void UBaseAttributeSet::OnRep_Thirst(const FGameplayAttributeData& OldThirst) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, Thirst, OldThirst);
+}
+
+void UBaseAttributeSet::OnRep_MaxThirst(const FGameplayAttributeData& OldMaxThirst) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MaxThirst, OldMaxThirst);
+}
+
+void UBaseAttributeSet::OnRep_Blood(const FGameplayAttributeData& OldBlood) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, Blood, OldBlood);
+}
+
+void UBaseAttributeSet::OnRep_MaxBlood(const FGameplayAttributeData& OldMaxBlood) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MaxBlood, OldMaxBlood);
 }

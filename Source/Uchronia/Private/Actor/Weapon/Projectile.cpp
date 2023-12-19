@@ -54,7 +54,6 @@ void AProjectile::BeginPlay()
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit)
 {
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Hit: %s"), *OtherActor->GetName()), true, true, FLinearColor::Blue, 3.f);
 	if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(OtherActor))
 	{
 		CombatInterface->HitReact();

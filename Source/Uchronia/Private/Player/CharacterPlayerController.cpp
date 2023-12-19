@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Input/PlayerInputComponent.h"
+#include "UI/Widget/DamageTextComponent.h"
 
 ACharacterPlayerController::ACharacterPlayerController()
 {
@@ -62,14 +63,12 @@ void ACharacterPlayerController::KeybindInputTagPressed(FGameplayTag InputTag)
 void ACharacterPlayerController::KeybindInputTagReleased(FGameplayTag InputTag)
 {
 	if(GetASC() == nullptr) return;
-	//GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Red, FString::Printf(TEXT("%s"), *InputTag.ToString()));
 	GetASC()->KeybindInputTagReleased(InputTag);
 }
 
 void ACharacterPlayerController::KeybindInputTagHeld(FGameplayTag InputTag)
 {
 	if(GetASC() == nullptr) return;
-	//GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Orange, FString::Printf(TEXT("%s"), *InputTag.ToString()));
 	GetASC()->KeybindInputTagHeld(InputTag);
 }
 
@@ -170,6 +169,24 @@ void ACharacterPlayerController::ThrowButtonPressed(const FInputActionValue& Val
 	
 }
 
+/*
+ * UI
+ */
+void ACharacterPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+{
+	if(IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageText->SetDamageText(DamageAmount);
+	}
+}
+
+/*
+ * ACCESSORS
+ */
 UBaseAbilitySystemComponent* ACharacterPlayerController::GetASC()
 {
 	if(BaseAbilitySystemComponent == nullptr)

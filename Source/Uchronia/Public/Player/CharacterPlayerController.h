@@ -7,6 +7,7 @@
 #include "CharacterPlayerController.generated.h"
 
 
+class UDamageTextComponent;
 class UBaseAbilitySystemComponent;
 struct FGameplayTag;
 class UInputConfig;
@@ -25,6 +26,9 @@ public:
 	ACharacterPlayerController();
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -70,6 +74,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> ThrowAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 
 	void KeybindInputTagPressed(FGameplayTag InputTag);
 	void KeybindInputTagReleased(FGameplayTag InputTag);
