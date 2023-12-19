@@ -130,7 +130,14 @@ public:
 
 	/*
 	 * Potential other Vital: Blood, Thirst, Hunger
-	 */
+	*/
+	
+	/*
+	 * Meta Attributes
+	*/
+	UPROPERTY(BlueprintReadOnly, Category="Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, IncomingDamage);
 
 	/*
 	 * Replication Notifies

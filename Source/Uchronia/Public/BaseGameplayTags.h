@@ -27,8 +27,14 @@ public:
  FGameplayTag Attributes_Secondary_CriticalHitResistance;
  FGameplayTag Attributes_Secondary_HealthRegeneration;
  FGameplayTag Attributes_Secondary_MaxHealth;
+ FGameplayTag Attributes_Secondary_MaxHunger;
+ FGameplayTag Attributes_Secondary_MaxThirst;
+ FGameplayTag Attributes_Secondary_MaxBlood;
  
  FGameplayTag Attributes_Vital_Health;
+ FGameplayTag Attributes_Vital_Hunger;
+ FGameplayTag Attributes_Vital_Thirst;
+ FGameplayTag Attributes_Vital_Blood;
 
  FGameplayTag InputTag_LMB;
  FGameplayTag InputTag_RMB;
@@ -54,7 +60,9 @@ public:
  FGameplayTag InputTag_Q;
  FGameplayTag InputTag_LShift;
  FGameplayTag InputTag_LCtrl;
- FGameplayTag InputTag_LAlt;;
+ FGameplayTag InputTag_LAlt;
+ 
+ FGameplayTag Damage;
  
 protected:
 

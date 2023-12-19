@@ -6,6 +6,7 @@
 #include "Actor/Weapon/Weapon.h"
 #include "ProjectileWeapon.generated.h"
 
+class UGameplayEffect;
 class AAmmoContainer;
 class AProjectile;
 /**
@@ -19,10 +20,12 @@ class UCHRONIA_API AProjectileWeapon : public AWeapon
 public:
 	virtual void Trigger(const FVector& HitTarget) override;
 	
-private:
-
+protected:
 	// TODO: Move this to Container
 	UPROPERTY(EditAnywhere, Category="Container Properties")
 	TSubclassOf<AProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 };

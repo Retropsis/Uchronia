@@ -27,11 +27,17 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Secondary_CriticalHitResistance = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.CriticalHitResistance"), FString("Reduces critical damage"));
 	GameplayTags.Attributes_Secondary_HealthRegeneration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.HealthRegeneration"), FString("Amount of health points regenerated periodically"));
 	GameplayTags.Attributes_Secondary_MaxHealth = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxHealth"), FString("Amount of maximum health points"));
+	GameplayTags.Attributes_Secondary_MaxHunger = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxHunger"), FString("Amount of maximum hunger points"));
+	GameplayTags.Attributes_Secondary_MaxThirst = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxThirst"), FString("Amount of maximum thirst points"));
+	GameplayTags.Attributes_Secondary_MaxBlood = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxBlood"), FString("Amount of maximum blood points"));
 
 	/*
 	 * Vital Attributes
 	 */
 	GameplayTags.Attributes_Vital_Health = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Health"), FString("Amount of health points"));
+	GameplayTags.Attributes_Vital_Hunger = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Hunger"), FString("Amount of hunger points"));
+	GameplayTags.Attributes_Vital_Thirst = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Thirst"), FString("Amount of thirst points"));
+	GameplayTags.Attributes_Vital_Blood = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Blood"), FString("Amount of blood points"));
 	
 	/*
 	 * Input Tags for Keybinding
@@ -63,4 +69,6 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_LShift = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LShift"), FString("InputTag.LShift"));
 	GameplayTags.InputTag_LCtrl = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LCtrl"), FString("InputTag.LCtrl"));
 	GameplayTags.InputTag_LAlt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LAlt"), FString("InputTag.LAlt"));
+	
+	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), FString("Damage"));
 }
