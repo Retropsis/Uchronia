@@ -29,7 +29,11 @@ public:
 	/* Combat Interface */
 	virtual FVector GetCombatSocketLocation() override;
 	virtual void HitReact() override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	/* Combat Interface */
+	
+	UPROPERTY(EditDefaultsOnly, Category="Montage")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 	
 protected:
 	virtual void BeginPlay() override;

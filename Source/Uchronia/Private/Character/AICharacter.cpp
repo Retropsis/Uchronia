@@ -2,10 +2,12 @@
 
 #include "Character/AICharacter.h"
 #include "AbilitySystemComponent.h"
+#include "BaseGameplayTags.h"
 #include "UchroniaBlueprintFunctionLibrary.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Uchronia/Uchronia.h"
 #include "UI/Widget/BaseUserwidget.h"
 
@@ -24,18 +26,11 @@ AAICharacter::AAICharacter()
 	HealthBar->SetupAttachment(GetRootComponent());
 }
 
-int32 AAICharacter::GetCharacterLevel()
-{
-	return Level;
-}
-
-void AAICharacter::HitReact()
-{
-}
-
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	
 	InitAbilityActorInfo();
 	
 
@@ -58,6 +53,8 @@ void AAICharacter::BeginPlay()
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
+		FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+		AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
 		OnHealthChanged.Broadcast(BaseAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BaseAS->GetMaxHealth());
 	}
@@ -74,4 +71,21 @@ void AAICharacter::InitAbilityActorInfo()
 void AAICharacter::InitializeDefaultAttributes() const
 {
 	UUchroniaBlueprintFunctionLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);	
+}
+
+// Called through CombatInterface
+void AAICharacter::HitReact()
+{
+}
+
+// Called through Tag Event
+void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+}
+
+int32 AAICharacter::GetCharacterLevel()
+{
+	return Level;
 }

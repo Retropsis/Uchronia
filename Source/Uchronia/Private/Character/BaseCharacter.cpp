@@ -3,6 +3,7 @@
 #include "Character/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Character/AIAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -77,5 +78,14 @@ FVector ABaseCharacter::GetCombatSocketLocation()
 void ABaseCharacter::HitReact()
 {
 }
+
+UAnimMontage* ABaseCharacter::GetHitReactMontage_Implementation()
+{
+	// TODO: Mode this to AnimInstance
+	return HitReactMontage;
+	// if(const UAIAnimInstance* AIAnimInstance = Cast<UAIAnimInstance>(GetMesh()->GetAnimInstance())) return AIAnimInstance->GetHitReactMontage();
+	// return nullptr;
+}
+
 /* Combat Interface */
 

@@ -69,6 +69,15 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_LShift = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LShift"), FString("InputTag.LShift"));
 	GameplayTags.InputTag_LCtrl = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LCtrl"), FString("InputTag.LCtrl"));
 	GameplayTags.InputTag_LAlt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LAlt"), FString("InputTag.LAlt"));
-	
+
+	/*
+	 * Damage
+	 */
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), FString("Damage"));
+
+	/*
+	 * Effects
+	 */
+	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Effects.HitReact"), FString("Effect HitReact"));
+	
 }

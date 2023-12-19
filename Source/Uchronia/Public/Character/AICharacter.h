@@ -25,11 +25,22 @@ public:
 	virtual void HitReact() override;
 	/* Combat Interface */
 
+	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
+
+	/*
+	 * AI Behavior Variables
+	 */
+	UPROPERTY(BlueprintReadOnly, Category="AI|Combat")
+	bool bHitReacting = false;
+	
+	UPROPERTY(BlueprintReadOnly, Category="AI|Movement")
+	float BaseWalkSpeed = 250.f;
 
 protected:
 	virtual void BeginPlay() override;
