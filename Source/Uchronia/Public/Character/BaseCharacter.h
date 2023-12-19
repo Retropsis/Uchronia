@@ -29,8 +29,12 @@ public:
 	/* Combat Interface */
 	virtual FVector GetCombatSocketLocation() override;
 	virtual void HitReact() override;
+	virtual void Die() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	/* Combat Interface */
+
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Montage")
 	TObjectPtr<UAnimMontage> HitReactMontage;
@@ -43,6 +47,9 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(EditAnywhere, Category="Combat")
+	float DespawnLifeSpan = 30.f;
 	
 	/*
 	 * Ability System

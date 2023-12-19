@@ -27,9 +27,9 @@ AWeapon::AWeapon()
 	WeaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	// WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	// WeaponMesh->SetSimulatePhysics(true);
-	// WeaponMesh->SetEnableGravity(true);
+	WeaponMesh->SetSimulatePhysics(true);
+	WeaponMesh->SetEnableGravity(true);
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphere->SetupAttachment(GetRootComponent());

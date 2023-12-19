@@ -5,7 +5,9 @@
 #include "BaseGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
+#include "ActorComponents/CombatComponent.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 
 UBaseAttributeSet::UBaseAttributeSet()
 {
@@ -95,7 +97,11 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			const bool bFatal = NewHealth <= 0.f;
 			if(bFatal)
 			{
-				
+				ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
+				if (CombatInterface)
+				{
+					CombatInterface->Die();
+				}
 			}
 			else
 			{

@@ -23,6 +23,7 @@ public:
 	virtual int32 GetCharacterLevel();
 	virtual FVector GetCombatSocketLocation();
 	virtual void HitReact() = 0;
+	virtual void Die() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();

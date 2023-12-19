@@ -79,6 +79,28 @@ void ABaseCharacter::HitReact()
 {
 }
 
+void ABaseCharacter::Die()
+{
+	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	MulticastHandleDeath();
+}
+
+
+void ABaseCharacter::MulticastHandleDeath_Implementation()
+{
+	// TODO: do this to the EquippedWeapon instead
+	Weapon->SetSimulatePhysics(true);
+	Weapon->SetEnableGravity(true);
+	Weapon->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 UAnimMontage* ABaseCharacter::GetHitReactMontage_Implementation()
 {
 	// TODO: Mode this to AnimInstance

@@ -77,6 +77,12 @@ void AAICharacter::HitReact()
 {
 }
 
+void AAICharacter::Die()
+{
+	SetLifeSpan(DespawnLifeSpan);
+	Super::Die();
+}
+
 // Called through Tag Event
 void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
