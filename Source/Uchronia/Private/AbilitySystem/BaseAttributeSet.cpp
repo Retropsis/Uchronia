@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "BaseGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
@@ -95,6 +96,13 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			if(bFatal)
 			{
 				
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, FString::Printf(TEXT("Not Fatal")));
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FBaseGameplayTags::Get().Effects_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
 		}
 	}

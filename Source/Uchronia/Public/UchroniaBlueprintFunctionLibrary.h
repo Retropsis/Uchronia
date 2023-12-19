@@ -19,4 +19,7 @@ class UCHRONIA_API UUchroniaBlueprintFunctionLibrary : public UBlueprintFunction
 public:
 	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|CharacterClassDefaults")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
+
+	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|CharacterClassDefaults")
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
 };
