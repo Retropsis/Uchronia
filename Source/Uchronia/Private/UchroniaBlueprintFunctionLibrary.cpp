@@ -2,8 +2,8 @@
 
 
 #include "UchroniaBlueprintFunctionLibrary.h"
-
 #include "AbilitySystemComponent.h"
+#include "AbilityTypes.h"
 #include "Game/UchroniaGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -47,4 +47,38 @@ UCharacterClassInfo* UUchroniaBlueprintFunctionLibrary::GetCharacterClassInfo(co
 	AUchroniaGameMode* UchroniaGameMode = Cast<AUchroniaGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if(UchroniaGameMode == nullptr) return nullptr;
 	return UchroniaGameMode->CharacterClassInfo;
+}
+
+bool UUchroniaBlueprintFunctionLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FUchroniaGameplayEffectContext* UchroniaEffectContext = static_cast<const FUchroniaGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return UchroniaEffectContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool UUchroniaBlueprintFunctionLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FUchroniaGameplayEffectContext* UchroniaEffectContext = static_cast<const FUchroniaGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return UchroniaEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void UUchroniaBlueprintFunctionLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool InIsBlockedHit)
+{
+	if (FUchroniaGameplayEffectContext* UchroniaEffectContext = static_cast<FUchroniaGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		UchroniaEffectContext->SetIsBlockedHit(InIsBlockedHit);
+	}
+}
+
+void UUchroniaBlueprintFunctionLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool InIsCriticalHit)
+{
+	if (FUchroniaGameplayEffectContext* UchroniaEffectContext = static_cast<FUchroniaGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		UchroniaEffectContext->SetIsCriticalHit(InIsCriticalHit);
+	}
 }

@@ -25,4 +25,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|CharacterClassDefaults")
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category="UchroniaBlueprintFunctionLibrary|GameplayEffects")
+	static bool IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintPure, Category="UchroniaBlueprintFunctionLibrary|GameplayEffects")
+	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|GameplayEffects")
+	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& FGameplayEffectContextHandle& EffectContextHandle, bool InIsBlockedHit);
+
+	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|GameplayEffects")
+	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& FGameplayEffectContextHandle& EffectContextHandle, bool InIsCriticalHit);
 };
