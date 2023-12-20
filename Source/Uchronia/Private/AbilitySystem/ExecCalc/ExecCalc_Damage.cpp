@@ -65,7 +65,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvaluationParams.TargetTags = TargetTags;
 
 	// Get Damage Set By Caller Magnitude
-	float Damage = Spec.GetSetByCallerMagnitude(FBaseGameplayTags::Get().Damage);
+	float Damage = 0.f;
+	for (FGameplayTag DamageTypeTag : FBaseGameplayTags::Get().DamageTypes)
+	{
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag);
+		Damage += DamageTypeValue;
+	}
 
 	// Capture Block Chance on Target, determine if block is successful
 	
@@ -120,7 +125,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	const float EffectiveCriticalHitChance = SourceCriticalHitChance - TargetCriticalHitResistance * CriticalHitResistanceCoefficient;
 	const bool bCriticalHit = FMath::RandRange(1, 100) < EffectiveCriticalHitChance;
-	UUchroniaBlueprintFunctionLibrary::SetIsBlockedHit(EffectContextHandle, bCriticalHit);
+	UUchroniaBlueprintFunctionLibrary::SetIsCriticalHit(EffectContextHandle, bCriticalHit);
 	Damage = bCriticalHit ? Damage * 2.f + SourceCriticalHitDamage : Damage;
 	
 	// Damage Output

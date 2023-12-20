@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "UchroniaBlueprintFunctionLibrary.generated.h"
@@ -33,8 +34,8 @@ public:
 	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
 
 	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|GameplayEffects")
-	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& FGameplayEffectContextHandle& EffectContextHandle, bool InIsBlockedHit);
+	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool InIsBlockedHit);
 
 	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|GameplayEffects")
-	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& FGameplayEffectContextHandle& EffectContextHandle, bool InIsCriticalHit);
+	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool InIsCriticalHit);
 };

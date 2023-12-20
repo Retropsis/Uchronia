@@ -76,9 +76,14 @@ void AProjectileWeapon::Trigger(const FVector& HitTarget)
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, 1.0f, SourceASC->MakeEffectContext());
 
 		const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, 25.f);
-		Projectile->DamageEffectSpecHandle = SpecHandle;
+
+		for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
+		{
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(1.f);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+		}
 		
+		Projectile->DamageEffectSpecHandle = SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 	

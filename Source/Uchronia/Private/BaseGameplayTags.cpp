@@ -71,9 +71,15 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_LAlt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LAlt"), FString("InputTag.LAlt"));
 
 	/*
-	 * Damage
+	 * Damage Types
 	 */
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), FString("Damage"));
+	GameplayTags.DamageTypes.Add(GameplayTags.Damage);
+	GameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Fire"), FString("Fire Damage"));
+	GameplayTags.DamageTypes.Add(GameplayTags.Damage_Fire);
+	GameplayTags.Damage_Hard = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Hard"), FString("Damage to machines"));
+	GameplayTags.DamageTypes.Add(GameplayTags.Damage_Hard);
+
 
 	/*
 	 * Effects

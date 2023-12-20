@@ -62,9 +62,17 @@ public:
  FGameplayTag InputTag_LCtrl;
  FGameplayTag InputTag_LAlt;
  
- FGameplayTag Damage;
  
  FGameplayTag Effects_HitReact;
+
+ /*
+  * Damage Types
+  */
+ FGameplayTag Damage;
+ FGameplayTag Damage_Fire;
+ FGameplayTag Damage_Hard;
+
+ TArray<FGameplayTag> DamageTypes;
  
 protected:
 

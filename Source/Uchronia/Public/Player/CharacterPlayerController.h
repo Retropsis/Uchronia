@@ -28,7 +28,7 @@ public:
 	virtual void SetupInputComponent() override;
 
 	UFUNCTION(Client, Reliable)
-	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")

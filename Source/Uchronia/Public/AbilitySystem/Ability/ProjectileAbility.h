@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Ability/BaseGameplayAbility.h"
+#include "DamageGameplayAbility.h"
 #include "ProjectileAbility.generated.h"
 
 class UNiagaraSystem;
@@ -12,7 +12,7 @@ class AProjectile;
  * 
  */
 UCLASS()
-class UCHRONIA_API UProjectileAbility : public UBaseGameplayAbility
+class UCHRONIA_API UProjectileAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
 
@@ -24,7 +24,4 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AProjectile> ProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 };

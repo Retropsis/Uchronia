@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "ScalableFloat.h"
 #include "Actor/Weapon/Weapon.h"
 #include "ProjectileWeapon.generated.h"
 
@@ -27,5 +29,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Damage")
+	TMap<FGameplayTag, FScalableFloat> DamageTypes;
 	
 };
