@@ -31,7 +31,10 @@ void AAICharacter::BeginPlay()
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
-	UUchroniaBlueprintFunctionLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	if(HasAuthority())
+	{
+		UUchroniaBlueprintFunctionLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	}
 
 	if(UBaseUserWidget* BaseUserWidget =  Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -64,7 +67,10 @@ void AAICharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
-	InitializeDefaultAttributes();
+	if(HasAuthority())
+	{
+		InitializeDefaultAttributes();		
+	}
 }
 
 void AAICharacter::InitializeDefaultAttributes() const

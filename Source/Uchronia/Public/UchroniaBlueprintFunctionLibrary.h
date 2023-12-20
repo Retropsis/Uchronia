@@ -22,4 +22,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|CharacterClassDefaults")
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+
+	UFUNCTION(BlueprintCallable, Category="UchroniaBlueprintFunctionLibrary|CharacterClassDefaults")
+	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
 };

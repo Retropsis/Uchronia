@@ -22,6 +22,7 @@ enum class ECharacterClass : uint8
 	Critter,
 	Elite,
 	Leviathan,
+	// Sentinel, Observer, Scout
 };
 
 USTRUCT(BlueprintType)
@@ -56,6 +57,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Common Class Defaults")
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
+
+	UPROPERTY(EditDefaultsOnly, Category="Common Class Defaults|Damage")
+	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
 
 	FCharacterClassDefaultInfo GetClassDefaultInfo(ECharacterClass CharacterClass);
 };
