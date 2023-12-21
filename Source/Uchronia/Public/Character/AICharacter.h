@@ -8,6 +8,8 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class ABaseAIController;
+class UBehaviorTree;
 class UWidgetComponent;
 /**
  * 
@@ -19,6 +21,7 @@ class UCHRONIA_API AAICharacter : public ABaseCharacter
 
 public:
 	AAICharacter();
+	virtual void PossessedBy(AController* NewController) override;
 	
 	/* Combat Interface */
 	virtual int32 GetCharacterLevel() override;
@@ -45,6 +48,15 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	/*
+	 * AI
+	 */
+	UPROPERTY(EditAnywhere, Category="AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<ABaseAIController> BaseAIController;
 
 	/*
 	 * Ability System

@@ -6,6 +6,9 @@
 #include "UchroniaBlueprintFunctionLibrary.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "AI/BaseAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Uchronia/Uchronia.h"
@@ -24,6 +27,16 @@ AAICharacter::AAICharacter()
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
 	HealthBar->SetupAttachment(GetRootComponent());
+}
+
+void AAICharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if(!HasAuthority()) return;
+	
+	BaseAIController = Cast<ABaseAIController>(NewController);
+	BaseAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	BaseAIController->RunBehaviorTree(BehaviorTree);
 }
 
 void AAICharacter::BeginPlay()
