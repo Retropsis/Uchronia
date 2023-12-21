@@ -38,6 +38,15 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Vital_Hunger = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Hunger"), FString("Amount of hunger points"));
 	GameplayTags.Attributes_Vital_Thirst = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Thirst"), FString("Amount of thirst points"));
 	GameplayTags.Attributes_Vital_Blood = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Blood"), FString("Amount of blood points"));
+
+	/*
+	 * Resistances
+	 */
+	GameplayTags.Attributes_Resistance_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Physical"), FString("Physical Resistance"));
+	GameplayTags.Attributes_Resistance_Hard = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Hard"), FString("Hard Resistance"));
+	GameplayTags.Attributes_Resistance_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Fire"), FString("Fire Resistance"));
+	GameplayTags.Attributes_Resistance_Poison = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Poison"), FString("Poison Resistance"));
+	GameplayTags.Attributes_Resistance_Bleed = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Bleed"), FString("Bleed Resistance"));
 	
 	/*
 	 * Input Tags for Keybinding
@@ -74,13 +83,19 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Damage Types
 	 */
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), FString("Damage"));
-	GameplayTags.DamageTypes.Add(GameplayTags.Damage);
 	GameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Fire"), FString("Fire Damage"));
-	GameplayTags.DamageTypes.Add(GameplayTags.Damage_Fire);
+	GameplayTags.Damage_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Physical"), FString("Physical Damage"));
+	GameplayTags.Damage_Poison = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Poison"), FString("Poison Damage Type"));
+	GameplayTags.Damage_Bleed = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Bleed"), FString("Bleed Damage Type"));
 	GameplayTags.Damage_Hard = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Hard"), FString("Damage to machines"));
-	GameplayTags.DamageTypes.Add(GameplayTags.Damage_Hard);
 
-
+	//~ DamageTypesToResistances
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Physical, GameplayTags.Attributes_Resistance_Physical);
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Fire, GameplayTags.Attributes_Resistance_Fire);
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Poison, GameplayTags.Attributes_Resistance_Poison);
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Bleed, GameplayTags.Attributes_Resistance_Bleed);
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Hard, GameplayTags.Attributes_Resistance_Hard);
+	
 	/*
 	 * Effects
 	 */

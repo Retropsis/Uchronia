@@ -147,6 +147,29 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Blood, Category="Vital Attributes")
 	FGameplayAttributeData Blood;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Blood);
+	
+	/*
+	 * Resistance Attributes
+	 */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_FireResistance, Category="Resistance Attributes")
+	FGameplayAttributeData FireResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, FireResistance);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_PhysicalResistance, Category="Resistance Attributes")
+	FGameplayAttributeData PhysicalResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, PhysicalResistance);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_PoisonResistance, Category="Resistance Attributes")
+	FGameplayAttributeData PoisonResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, PoisonResistance);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BleedResistance, Category="Resistance Attributes")
+	FGameplayAttributeData BleedResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, BleedResistance);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_HardResistance, Category="Resistance Attributes")
+	FGameplayAttributeData HardResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, HardResistance);
 
 	
 	/*
@@ -215,6 +238,21 @@ public:
 	
 	UFUNCTION()
 	void OnRep_Blood(const FGameplayAttributeData& OldBlood) const;
+	
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const;
+	
+	UFUNCTION()
+	void OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const;
+	
+	UFUNCTION()
+	void OnRep_PoisonResistance(const FGameplayAttributeData& OldPoisonResistance) const;
+	
+	UFUNCTION()
+	void OnRep_BleedResistance(const FGameplayAttributeData& OldBleedResistance) const;
+	
+	UFUNCTION()
+	void OnRep_HardResistance(const FGameplayAttributeData& OldHardResistance) const;
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;

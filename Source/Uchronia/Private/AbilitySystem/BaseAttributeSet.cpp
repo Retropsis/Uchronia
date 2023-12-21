@@ -8,7 +8,6 @@
 #include "UchroniaBlueprintFunctionLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/CharacterPlayerController.h"
 
 UBaseAttributeSet::UBaseAttributeSet()
@@ -41,7 +40,15 @@ void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Hunger, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Thirst, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Blood, COND_None, REPNOTIFY_Always);
+	
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, FireResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, PhysicalResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, PoisonResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, BleedResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, HardResistance, COND_None, REPNOTIFY_Always);
 }
+
+// TODO: TagsToAttributes from AttributeMenu Section
 
 // TODO: Investigate PreAttributeBaseChange as it seems it should be this one instead
 void UBaseAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -51,6 +58,18 @@ void UBaseAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 	if(Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+	}
+	if(Attribute == GetHungerAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHunger());
+	}
+	if(Attribute == GetThirstAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxThirst());
+	}
+	if(Attribute == GetBloodAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxBlood());
 	}
 }
 
@@ -93,6 +112,18 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	if(Data.EvaluatedData.Attribute == GetHungerAttribute())
+	{
+		SetHunger(FMath::Clamp(GetHunger(), 0.f, GetMaxHunger()));
+	}
+	if(Data.EvaluatedData.Attribute == GetThirstAttribute())
+	{
+		SetThirst(FMath::Clamp(GetThirst(), 0.f, GetMaxThirst()));
+	}
+	if(Data.EvaluatedData.Attribute == GetBloodAttribute())
+	{
+		SetBlood(FMath::Clamp(GetBlood(), 0.f, GetMaxBlood()));
 	}
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
@@ -228,4 +259,29 @@ void UBaseAttributeSet::OnRep_Blood(const FGameplayAttributeData& OldBlood) cons
 void UBaseAttributeSet::OnRep_MaxBlood(const FGameplayAttributeData& OldMaxBlood) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MaxBlood, OldMaxBlood);
+}
+
+void UBaseAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, FireResistance, OldFireResistance);
+}
+
+void UBaseAttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, PhysicalResistance, OldPhysicalResistance);
+}
+
+void UBaseAttributeSet::OnRep_PoisonResistance(const FGameplayAttributeData& OldPoisonResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, PoisonResistance, OldPoisonResistance);
+}
+
+void UBaseAttributeSet::OnRep_BleedResistance(const FGameplayAttributeData& OldBleedResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, BleedResistance, OldBleedResistance);
+}
+
+void UBaseAttributeSet::OnRep_HardResistance(const FGameplayAttributeData& OldHardResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, HardResistance, OldHardResistance);
 }

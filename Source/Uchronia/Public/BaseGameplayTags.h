@@ -31,6 +31,12 @@ public:
  FGameplayTag Attributes_Secondary_MaxThirst;
  FGameplayTag Attributes_Secondary_MaxBlood;
  
+ FGameplayTag Attributes_Resistance_Physical;
+ FGameplayTag Attributes_Resistance_Fire;
+ FGameplayTag Attributes_Resistance_Hard;
+ FGameplayTag Attributes_Resistance_Poison;
+ FGameplayTag Attributes_Resistance_Bleed;
+ 
  FGameplayTag Attributes_Vital_Health;
  FGameplayTag Attributes_Vital_Hunger;
  FGameplayTag Attributes_Vital_Thirst;
@@ -62,7 +68,6 @@ public:
  FGameplayTag InputTag_LCtrl;
  FGameplayTag InputTag_LAlt;
  
- 
  FGameplayTag Effects_HitReact;
 
  /*
@@ -70,9 +75,12 @@ public:
   */
  FGameplayTag Damage;
  FGameplayTag Damage_Fire;
+ FGameplayTag Damage_Poison;
+ FGameplayTag Damage_Bleed;
+ FGameplayTag Damage_Physical;
  FGameplayTag Damage_Hard;
 
- TArray<FGameplayTag> DamageTypes;
+ TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
  
 protected:
 
