@@ -31,6 +31,7 @@ void AAICharacter::BeginPlay()
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
+	
 	if(HasAuthority())
 	{
 		UUchroniaBlueprintFunctionLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
