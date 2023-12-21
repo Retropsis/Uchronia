@@ -80,6 +80,11 @@ public:
  FGameplayTag Damage_Physical;
  FGameplayTag Damage_Hard;
 
+ /*
+  * Abilities
+  */
+ FGameplayTag Abilities_Attack;
+
  TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
  
 protected:

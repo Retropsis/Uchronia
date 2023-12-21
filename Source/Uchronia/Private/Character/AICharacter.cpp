@@ -57,7 +57,7 @@ void AAICharacter::BeginPlay()
 	
 	if(HasAuthority())
 	{
-		UUchroniaBlueprintFunctionLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+		UUchroniaBlueprintFunctionLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 	}
 
 	if(UBaseUserWidget* BaseUserWidget =  Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
@@ -118,6 +118,7 @@ void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	if(!HasAuthority()) return;
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 }
 
