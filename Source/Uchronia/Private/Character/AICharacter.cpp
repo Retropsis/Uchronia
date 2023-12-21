@@ -22,6 +22,12 @@ AAICharacter::AAICharacter()
 	AbilitySystemComponent = CreateDefaultSubobject<UBaseAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	// Movement Tweaks
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	
 	AttributeSet = CreateDefaultSubobject<UBaseAttributeSet>(TEXT("AttributeSet"));
 
@@ -37,6 +43,10 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController = Cast<ABaseAIController>(NewController);
 	BaseAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
 	BaseAIController->RunBehaviorTree(BehaviorTree);
+	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
+
+	// TODO: Define which classes are Ranged or have some way to check it
+	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass == ECharacterClass::Soldier);
 }
 
 void AAICharacter::BeginPlay()
@@ -108,6 +118,7 @@ void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 }
 
 int32 AAICharacter::GetCharacterLevel()
