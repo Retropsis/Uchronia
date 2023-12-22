@@ -100,17 +100,22 @@ void ABaseCharacter::MulticastHandleDeath_Implementation()
 	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Dissolve();
+	bDead = true;
 }
 
+bool ABaseCharacter::IsDead_Implementation() const
+{
+	return bDead;
+}
+
+/* Combat Interface */
 UAnimMontage* ABaseCharacter::GetHitReactMontage_Implementation()
 {
-	// TODO: Mode this to AnimInstance
+	// TODO: Move this to AnimInstance
 	return HitReactMontage;
 	// if(const UAIAnimInstance* AIAnimInstance = Cast<UAIAnimInstance>(GetMesh()->GetAnimInstance())) return AIAnimInstance->GetHitReactMontage();
 	// return nullptr;
 }
-
-/* Combat Interface */
 
 void ABaseCharacter::Dissolve()
 {
@@ -126,4 +131,9 @@ void ABaseCharacter::Dissolve()
 		Weapon->SetMaterial(0, DynamicMatInst);
 		StartWeaponDissolveTimeline(DynamicMatInst);
 	}
+}
+
+AActor* ABaseCharacter::GetAvatar_Implementation()
+{
+	return this;
 }
