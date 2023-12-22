@@ -69,7 +69,7 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 /* ASC Interface */
 
 /* Combat Interface */
-FVector ABaseCharacter::GetCombatSocketLocation()
+FVector ABaseCharacter::GetCombatSocketLocation_Implementation()
 {
 	check(Weapon);
 	return Weapon->GetSocketLocation(CombatSocketName);

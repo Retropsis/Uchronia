@@ -27,7 +27,7 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
 	/* Combat Interface */
-	virtual FVector GetCombatSocketLocation() override;
+	virtual FVector GetCombatSocketLocation_Implementation() override;
 	virtual void HitReact() override;
 	virtual void Die() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;

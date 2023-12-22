@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Character/BaseCharacter.h"
+#include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
@@ -15,13 +16,18 @@ class UWidgetComponent;
  * 
  */
 UCLASS()
-class UCHRONIA_API AAICharacter : public ABaseCharacter
+class UCHRONIA_API AAICharacter : public ABaseCharacter, public IEnemyInterface
 {
 	GENERATED_BODY()
 
 public:
 	AAICharacter();
 	virtual void PossessedBy(AController* NewController) override;
+	
+	//~ Enemy Interface
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	virtual AActor* GetCombatTarget_Implementation() const override;
+	//~ Enemy Interface
 	
 	/* Combat Interface */
 	virtual int32 GetCharacterLevel() override;
@@ -57,6 +63,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<ABaseAIController> BaseAIController;
+
+	UPROPERTY(BlueprintReadWrite, Category="AI|Combat")
+	TObjectPtr<AActor> CombatTarget;
 
 	/*
 	 * Ability System

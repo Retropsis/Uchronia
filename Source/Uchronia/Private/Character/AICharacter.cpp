@@ -126,3 +126,16 @@ int32 AAICharacter::GetCharacterLevel()
 {
 	return Level;
 }
+
+/*
+ * Enemy Interface
+ */
+void AAICharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+}
+
+AActor* AAICharacter::GetCombatTarget_Implementation() const
+{
+	return CombatTarget;
+}
