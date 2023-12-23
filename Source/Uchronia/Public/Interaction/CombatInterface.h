@@ -3,8 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
+
+class UNiagaraSystem;
+
+USTRUCT(BlueprintType)
+struct FTaggedMontage
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UAnimMontage* Montage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag MontageTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USoundBase* ImpactSound = nullptr;
+};
 
 UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
@@ -25,7 +43,7 @@ public:
 	virtual void Die() = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FVector GetCombatSocketLocation();
+	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();
@@ -38,4 +56,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	AActor* GetAvatar();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	TArray<FTaggedMontage> GetAttackMontages();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UNiagaraSystem* GetSoftBodyImpact();
 };

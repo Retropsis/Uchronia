@@ -46,7 +46,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 
 	// TODO: Define which classes are Ranged or have some way to check it
-	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass == ECharacterClass::Soldier);
+	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass == ECharacterClass::Soldier || CharacterClass == ECharacterClass::Leviathan);
 }
 
 void AAICharacter::BeginPlay()
@@ -110,6 +110,7 @@ void AAICharacter::HitReact()
 void AAICharacter::Die()
 {
 	SetLifeSpan(DespawnLifeSpan);
+	if(BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
 	Super::Die();
 }
 
@@ -118,8 +119,11 @@ void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
-	if(!HasAuthority()) return;
-	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
+	// if(!HasAuthority()) return;
+	if(BaseAIController && BaseAIController->GetBlackboardComponent())
+	{
+		BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
+	}
 }
 
 int32 AAICharacter::GetCharacterLevel()

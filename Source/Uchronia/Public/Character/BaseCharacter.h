@@ -9,6 +9,7 @@
 #include "AbilitySystemInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UNiagaraSystem;
 class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
@@ -27,19 +28,24 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
 	/* Combat Interface */
-	virtual FVector GetCombatSocketLocation_Implementation() override;
+	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual void HitReact() override;
 	virtual void Die() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
+	virtual UNiagaraSystem* GetSoftBodyImpact_Implementation() override;
 	/* Combat Interface */
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 	
-	UPROPERTY(EditDefaultsOnly, Category="Montage")
+	UPROPERTY(EditDefaultsOnly, Category="Combat|Montages")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	UPROPERTY(EditAnywhere, Category="Combat|Montages")
+	TArray<FTaggedMontage> AttackMontages;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -74,11 +80,17 @@ protected:
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	// TODO: Might need to be more generic
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	FName CombatSocketName;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName LeftHandSocketName;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName RightHandSocketName;
 
 	/*
 	 * Dissolve Effect
@@ -96,6 +108,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+	/*
+	 * VFX
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UNiagaraSystem* SoftBodyImpact;
 
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")

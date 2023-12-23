@@ -2,6 +2,7 @@
 
 #include "Character/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "BaseGameplayTags.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Character/AIAnimInstance.h"
 #include "Components/CapsuleComponent.h"
@@ -15,7 +16,7 @@ ABaseCharacter::ABaseCharacter()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetRootComponent());
+	Weapon->SetupAttachment(GetMesh(), FName("LeftHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 }
@@ -69,10 +70,23 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 /* ASC Interface */
 
 /* Combat Interface */
-FVector ABaseCharacter::GetCombatSocketLocation_Implementation()
+FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-	check(Weapon);
-	return Weapon->GetSocketLocation(CombatSocketName);
+	// TODO: Make it data driven, TMap
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if(MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon) && IsValid(Weapon))
+	{
+		return Weapon->GetSocketLocation(CombatSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Hand_Left))
+	{
+		return GetMesh()->GetSocketLocation(LeftHandSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Hand_Right))
+	{
+		return GetMesh()->GetSocketLocation(RightHandSocketName);
+	}
+	return FVector();
 }
 
 void ABaseCharacter::HitReact()
@@ -136,4 +150,14 @@ void ABaseCharacter::Dissolve()
 AActor* ABaseCharacter::GetAvatar_Implementation()
 {
 	return this;
+}
+
+TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
+{
+	return AttackMontages;
+}
+
+UNiagaraSystem* ABaseCharacter::GetSoftBodyImpact_Implementation()
+{
+	return SoftBodyImpact;
 }

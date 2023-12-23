@@ -20,7 +20,8 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if(!bIsServer) return;
 
-	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo());
+	// TODO: Might want to use another socket than weapon, maybe hands, mouth, other device
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FBaseGameplayTags::Get().Montage_Attack_Weapon);
 	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 	// TODO: Can decide on pitch here
 	// Rotation.Pitch = 0.f;

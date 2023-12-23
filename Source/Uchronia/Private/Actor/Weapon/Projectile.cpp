@@ -4,6 +4,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "UchroniaBlueprintFunctionLibrary.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Interaction/CombatInterface.h"
@@ -54,7 +55,13 @@ void AProjectile::BeginPlay()
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
+	if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
+
+	// TODO: May or Not want to do this
+	// if(!UUchroniaBlueprintFunctionLibrary::IsHostile(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
+	// {
+	// 	return;
+	// }
 	
 	if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(OtherActor))
 	{

@@ -106,4 +106,10 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Attack"), FString("Melee Attack Ability"));
 	
+	/*
+	 * Montages
+	 */
+	GameplayTags.Montage_Attack_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.Weapon"), FString("Montage Attack Weapon"));
+	GameplayTags.Montage_Attack_Hand_Left = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.Hand.Left"), FString("Montage Attack Hand Left"));
+	GameplayTags.Montage_Attack_Hand_Right = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.Hand.Right"), FString("Montage Attack Hand Right"));
 }
