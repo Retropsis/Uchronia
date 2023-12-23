@@ -74,15 +74,15 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 {
 	// TODO: Make it data driven, TMap
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	if(MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon) && IsValid(Weapon))
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(Weapon))
 	{
 		return Weapon->GetSocketLocation(CombatSocketName);
 	}
-	if(MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Hand_Left))
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Hand_Left))
 	{
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
 	}
-	if(MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Hand_Right))
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Hand_Right))
 	{
 		return GetMesh()->GetSocketLocation(RightHandSocketName);
 	}
@@ -160,4 +160,16 @@ TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
 UNiagaraSystem* ABaseCharacter::GetSoftBodyImpact_Implementation()
 {
 	return SoftBodyImpact;
+}
+
+FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+	for(FTaggedMontage TaggedMontage : AttackMontages)
+	{
+		if(TaggedMontage.MontageTag == MontageTag)
+		{
+			return TaggedMontage;
+		}
+	}
+	return FTaggedMontage();
 }
