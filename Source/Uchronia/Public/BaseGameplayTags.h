@@ -91,6 +91,11 @@ public:
  FGameplayTag CombatSocket_Weapon;
  FGameplayTag CombatSocket_Hand_Left;
  FGameplayTag CombatSocket_Hand_Right;
+ FGameplayTag CombatSocket_Tail;
+ FGameplayTag CombatSocket_Head;
+ FGameplayTag CombatSocket_Horn;
+ FGameplayTag CombatSocket_Foot_Left;
+ FGameplayTag CombatSocket_Foot_Right;
 
  /*
   * Montage

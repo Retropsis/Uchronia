@@ -92,6 +92,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Combat")
 	FName RightHandSocketName;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName TailSocketName;
 
 	/*
 	 * Dissolve Effect
@@ -113,8 +116,14 @@ protected:
 	/*
 	 * VFX
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat|VFX")
 	UNiagaraSystem* SoftBodyImpact;
+	
+	/*
+	 * SFX
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat|SFX")
+	USoundBase* DeathSound;
 
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")

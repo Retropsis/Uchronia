@@ -4,8 +4,8 @@
 #include "AbilitySystemComponent.h"
 #include "BaseGameplayTags.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
-#include "Character/AIAnimInstance.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -73,6 +73,7 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
 	// TODO: Make it data driven, TMap
+	// TODO: Expand to other sockets
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(Weapon))
 	{
@@ -85,6 +86,10 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Hand_Right))
 	{
 		return GetMesh()->GetSocketLocation(RightHandSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Tail))
+	{
+		return GetMesh()->GetSocketLocation(TailSocketName);
 	}
 	return FVector();
 }
@@ -114,6 +119,7 @@ void ABaseCharacter::MulticastHandleDeath_Implementation()
 	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Dissolve();
+	if(DeathSound) UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
 	bDead = true;
 }
 

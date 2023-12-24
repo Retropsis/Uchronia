@@ -112,6 +112,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Weapon"), FString("CombatSocket Weapon"));
 	GameplayTags.CombatSocket_Hand_Left = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Hand.Left"), FString("CombatSocket Hand Left"));
 	GameplayTags.CombatSocket_Hand_Right = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Hand.Right"), FString("CombatSocket Hand Right"));
+	GameplayTags.CombatSocket_Tail = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Tail"), FString("CombatSocket Tail"));
+	GameplayTags.CombatSocket_Head = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Head"), FString("CombatSocket Head"));
+	GameplayTags.CombatSocket_Horn = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Horn"), FString("CombatSocket Horn"));
+	GameplayTags.CombatSocket_Foot_Left = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Foot.Left"), FString("CombatSocket Foot Left"));
+	GameplayTags.CombatSocket_Foot_Right = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Foot.Right"), FString("CombatSocket Foot Right"));
 	
 	/*
 	 * MontagesSockets
