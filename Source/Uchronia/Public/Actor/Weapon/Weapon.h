@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WeaponTypes.h"
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
@@ -123,7 +124,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	TSubclassOf<ACasing> CasingClass;
 
-	// TOTO: Should be its own container class
+	// TODO: Should be its own container class
 	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Ammo)
 	int32 Ammo;
 
@@ -133,7 +134,10 @@ private:
 	void SpendRound();
 
 	UPROPERTY(EditAnywhere)
-	int32 MagCapacity;
+	int32 MagCapacity = 8;
+
+	UPROPERTY(EditDefaultsOnly)
+	EWeaponType WeaponType;
 	/*  */
 
 	/*
@@ -157,4 +161,5 @@ public:
 	FORCEINLINE float GetMarksmanInterpSpeed() const { return MarksmanInterpSpeed; }
 	FORCEINLINE bool HasAmmo() const { return Ammo > 0; }
 	FORCEINLINE bool IsFull() const { return Ammo == MagCapacity; }
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 };

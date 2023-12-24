@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actor/Weapon/WeaponTypes.h"
 #include "Components/ActorComponent.h"
 #include "HUD/PlayerHUD.h"
 #include "CombatComponent.generated.h"
@@ -32,6 +33,7 @@ protected:
 	void SetAiming(bool IsAiming);
 	void Trigger(bool bPressed);
 	void Fire();
+	void Reload();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool IsAiming);
@@ -116,6 +118,20 @@ private:
 	void FireIntervalEnd();
 
 	bool CanFire();
+
+	UPROPERTY(ReplicatedUsing=OnRep_CarriedAmmo)
+	int32 CarriedAmmo;
+	
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+
+	TMap<EWeaponType, int32> CarriedAmmoMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 Starting9mmAmmo = 16;
+	
+	void InitializeCarriedAmmo();
+	
 	
 public:	
 

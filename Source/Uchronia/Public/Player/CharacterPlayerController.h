@@ -32,8 +32,10 @@ public:
 	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 
 	void SetHUDWeaponAmmo(int32 Ammo);
+	void SetHUDWeaponCarriedAmmo(int32 Ammo);
 	
 	FOnAmmoAmountChangedSignature OnAmmoAmountChanged;
+	FOnAmmoAmountChangedSignature OnCarriedAmmoAmountChanged;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")

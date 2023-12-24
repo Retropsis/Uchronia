@@ -23,6 +23,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
+	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 }
 
 void UCombatComponent::BeginPlay()
@@ -35,6 +36,10 @@ void UCombatComponent::BeginPlay()
 		{
 			DefaultFOV = PlayerCharacter->GetFollowCamera()->FieldOfView;
 			CurrentFOV = DefaultFOV;
+		}
+		if(PlayerCharacter->HasAuthority())
+		{
+			InitializeCarriedAmmo();
 		}
 	}
 }
@@ -289,6 +294,7 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	{
 		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		PlayerCharacter->bUseControllerRotationYaw = true;
+		EquippedWeapon->SetHUDAmmo();
 	}
 }
 
@@ -310,7 +316,36 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	EquippedWeapon->SetOwner(PlayerCharacter); // is replicated
 	EquippedWeapon->SetHUDAmmo();
 
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+	
+	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
+	if(CharacterPlayerController)
+	{
+		CharacterPlayerController->SetHUDWeaponCarriedAmmo(CarriedAmmo);
+	}
 	PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	PlayerCharacter->bUseControllerRotationYaw = true;
 }
 
+void UCombatComponent::OnRep_CarriedAmmo()
+{
+	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
+	if(CharacterPlayerController)
+	{
+		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Carried Ammo: [%d]"), CarriedAmmo), true, true, FLinearColor::Blue, 3.f);
+		CharacterPlayerController->SetHUDWeaponCarriedAmmo(CarriedAmmo);
+	}
+}
+
+void UCombatComponent::InitializeCarriedAmmo()
+{
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_9mm, Starting9mmAmmo);
+}
+
+void UCombatComponent::Reload()
+{
+	
+}

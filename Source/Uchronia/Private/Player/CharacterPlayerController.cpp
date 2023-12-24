@@ -191,6 +191,11 @@ void ACharacterPlayerController::SetHUDWeaponAmmo(int32 Ammo)
 	OnAmmoAmountChanged.Broadcast(Ammo);
 }
 
+void ACharacterPlayerController::SetHUDWeaponCarriedAmmo(int32 Ammo)
+{
+	OnCarriedAmmoAmountChanged.Broadcast(Ammo);
+}
+
 /*
  * ACCESSORS
  */

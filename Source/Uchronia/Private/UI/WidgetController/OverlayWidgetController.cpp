@@ -1,7 +1,6 @@
 // Retropsis @ 2023-2024
 
 #include "UI/WidgetController/OverlayWidgetController.h"
-
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "Player/CharacterPlayerController.h"
@@ -28,13 +27,17 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		{
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
 		});
-	ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(PlayerController);
-	if(CharacterPlayerController)
+	if(ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(PlayerController))
 	{
 		CharacterPlayerController->OnAmmoAmountChanged.AddLambda(
 			[this](int32 NewCount)
 			{
 				OnWeaponAmmoAmountChanged.Broadcast(NewCount);
+			});
+		CharacterPlayerController->OnCarriedAmmoAmountChanged.AddLambda(
+			[this](int32 NewCount)
+			{
+				OnWeaponCarriedAmmoChanged.Broadcast(NewCount);
 			});
 	}
 

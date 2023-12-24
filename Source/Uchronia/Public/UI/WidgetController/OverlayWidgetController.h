@@ -54,6 +54,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Overlay|Debug")
 	FOnWeaponAmmoAmountChangedSignature OnWeaponAmmoAmountChanged;
 
+	UPROPERTY(BlueprintAssignable, Category="Overlay|Debug")
+	FOnWeaponAmmoAmountChangedSignature OnWeaponCarriedAmmoChanged;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
