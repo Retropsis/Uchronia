@@ -8,7 +8,9 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/CharacterPlayerController.h"
 
 /*
  * This should be the base weapon and not used as BP,
@@ -27,9 +29,9 @@ AWeapon::AWeapon()
 	WeaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	WeaponMesh->SetSimulatePhysics(true);
-	WeaponMesh->SetEnableGravity(true);
-	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// WeaponMesh->SetSimulatePhysics(true);
+	// WeaponMesh->SetEnableGravity(true);
+	// WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphere->SetupAttachment(GetRootComponent());
@@ -51,6 +53,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWeapon, WeaponState);
+	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::BeginPlay()
@@ -65,12 +68,6 @@ void AWeapon::BeginPlay()
 		OverlapSphere->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnSphereEndOverlap);
 	}
 	if (PickupWidget) PickupWidget->SetVisibility(false);
-}
-
-void AWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AWeapon::Trigger(const FVector& HitTarget)
@@ -92,6 +89,56 @@ void AWeapon::Trigger(const FVector& HitTarget)
 					SocketTransform.GetRotation().Rotator()
 				);
 			}
+		}
+	}
+	SpendRound();
+}
+
+void AWeapon::Drop()
+{
+	SetWeaponState(EWeaponState::EWS_Dropped);
+	const FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
+	WeaponMesh->DetachFromComponent(DetachRules);
+	SetOwner(nullptr); 
+	OwnerCharacter = nullptr;
+	OwnerController = nullptr;
+}
+
+void AWeapon::SpendRound()
+{
+	--Ammo;
+	SetHUDAmmo();
+}
+
+void AWeapon::OnRep_Ammo()
+{
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("%d"), Ammo));
+	SetHUDAmmo();
+}
+
+void AWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	if(Owner == nullptr)
+	{
+		OwnerCharacter = nullptr;
+		OwnerController = nullptr;
+	}
+	else
+	{
+		SetHUDAmmo();
+	}
+}
+
+void AWeapon::SetHUDAmmo()
+{
+	OwnerCharacter = OwnerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()) : OwnerCharacter;
+	if(OwnerCharacter)
+	{
+		OwnerController = OwnerController == nullptr ? Cast<ACharacterPlayerController>(OwnerCharacter->Controller) : OwnerController;
+		if (OwnerController)
+		{
+			OwnerController->SetHUDWeaponAmmo(Ammo);
 		}
 	}
 }
@@ -132,6 +179,10 @@ void AWeapon::SetWeaponState(const EWeaponState InWeaponState)
 		WeaponMesh->SetEnableGravity(false);
 		break;
 	case EWeaponState::EWS_Dropped:
+		if(HasAuthority()) OverlapSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	default: ;
 	}
@@ -149,8 +200,10 @@ void AWeapon::OnRep_WeaponState()
 		WeaponMesh->SetEnableGravity(false);
 		break;
 	case EWeaponState::EWS_Dropped:
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	default: ;
 	}
 }
-

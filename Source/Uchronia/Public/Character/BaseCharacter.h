@@ -37,6 +37,8 @@ public:
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	virtual UNiagaraSystem* GetSoftBodyImpact_Implementation() override;
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual int32 GetMinionCount_Implementation() override;
+	virtual void IncrementMinionCount_Implementation(int32 Amount) override;
 	/* Combat Interface */
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -58,7 +60,7 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
-	float DespawnLifeSpan = 30.f;
+	float DespawnLifeSpan = 3.f;
 
 	bool bDead = false;
 	
@@ -66,7 +68,6 @@ protected:
 	 * Ability System
 	 */
 	virtual void InitAbilityActorInfo();
-	
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 	virtual  void InitializeDefaultAttributes() const;
 	void AddCharacterAbilities();
@@ -95,6 +96,11 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Combat")
 	FName TailSocketName;
+
+	/*
+	 * Minions
+	 */
+	int32 MinionCount = 0;
 
 	/*
 	 * Dissolve Effect

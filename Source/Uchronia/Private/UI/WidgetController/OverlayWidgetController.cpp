@@ -4,6 +4,7 @@
 
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "Player/CharacterPlayerController.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -27,6 +28,15 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		{
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
 		});
+	ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(PlayerController);
+	if(CharacterPlayerController)
+	{
+		CharacterPlayerController->OnAmmoAmountChanged.AddLambda(
+			[this](int32 NewCount)
+			{
+				OnWeaponAmmoAmountChanged.Broadcast(NewCount);
+			});
+	}
 
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)

@@ -148,6 +148,7 @@ void UCombatComponent::FireIntervalEnd()
 	}
 }
 
+// TODO: Could have its own WidgetController and Widget
 void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 {
 	if(!IsValid(PlayerCharacter) || !IsValid(PlayerCharacter->Controller)) return;
@@ -288,6 +289,10 @@ void UCombatComponent::OnRep_EquippedWeapon()
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(PlayerCharacter == nullptr || WeaponToEquip == nullptr) return;
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->Drop();
+	}
 
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
@@ -297,6 +302,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		RightHandSocket->AttachActor(EquippedWeapon, PlayerCharacter->GetMesh());
 	}
 	EquippedWeapon->SetOwner(PlayerCharacter); // is replicated
+	EquippedWeapon->SetHUDAmmo();
 
 	PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	PlayerCharacter->bUseControllerRotationYaw = true;

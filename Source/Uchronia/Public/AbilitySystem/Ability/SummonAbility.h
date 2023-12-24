@@ -15,8 +15,11 @@ class UCHRONIA_API USummonAbility : public UBaseGameplayAbility
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Ability|Summoning")
 	TArray<FVector> GetSpawnLocations();
+
+	UFUNCTION(BlueprintPure, Category="Ability|Summoning")
+	TSubclassOf<APawn> GetRandomMinionClass();
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Summoning")
 	int32 NumMinions = 5;

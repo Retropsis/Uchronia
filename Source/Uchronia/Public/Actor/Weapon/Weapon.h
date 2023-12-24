@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class ACharacterPlayerController;
+class APlayerCharacter;
 class ACasing;
 class AAmmoContainer;
 class UWidgetComponent;
@@ -30,10 +32,11 @@ class UCHRONIA_API AWeapon : public AActor
 public:	
 	AWeapon();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	virtual void Tick(float DeltaTime) override;
-	
 	void ShowPickupWidget(const bool bShowWidget) const;
 	virtual void Trigger(const FVector& HitTarget);
+	virtual void Drop();
+	virtual void OnRep_Owner() override;
+	void SetHUDAmmo();
 	
 	/*
 	 * TODO: Move both CH and FoV stuff to Weapon DataAsset
@@ -87,6 +90,12 @@ protected:
 		int32 OtherBodyIndex);
 
 private:
+	UPROPERTY()
+	APlayerCharacter* OwnerCharacter;
+	
+	UPROPERTY()
+	ACharacterPlayerController* OwnerController;
+	
 	UPROPERTY(ReplicatedUsing=OnRep_WeaponState, VisibleAnywhere, Category="Weapon Properties")
 	EWeaponState WeaponState;
 
@@ -113,6 +122,19 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	TSubclassOf<ACasing> CasingClass;
+
+	// TOTO: Should be its own container class
+	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Ammo)
+	int32 Ammo;
+
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	void SpendRound();
+
+	UPROPERTY(EditAnywhere)
+	int32 MagCapacity;
+	/*  */
 
 	/*
 	 * Marksman Mode

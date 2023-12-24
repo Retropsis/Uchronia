@@ -7,6 +7,7 @@
 #include "Character/PlayerCharacter.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "HUD/PlayerHUD.h"
 #include "Input/PlayerInputComponent.h"
 #include "UI/Widget/DamageTextComponent.h"
 
@@ -46,6 +47,7 @@ void ACharacterPlayerController::SetupInputComponent()
 
 	PlayerInputComponent->SetupKeybindInputActions(InputConfig, this, &ThisClass::KeybindInputTagPressed, &ThisClass::KeybindInputTagReleased, &ThisClass::KeybindInputTagHeld);
 }
+
 
 void ACharacterPlayerController::KeybindInputTagPressed(FGameplayTag InputTag)
 {
@@ -182,6 +184,11 @@ void ACharacterPlayerController::ShowDamageNumber_Implementation(float DamageAmo
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
 	}
+}
+
+void ACharacterPlayerController::SetHUDWeaponAmmo(int32 Ammo)
+{
+	OnAmmoAmountChanged.Broadcast(Ammo);
 }
 
 /*

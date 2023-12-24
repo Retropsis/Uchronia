@@ -42,6 +42,8 @@ public:
 	virtual void HitReact() override;
 	//~ Combat Interface
 
+	virtual void MulticastHandleDeath() override;
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastHitReact();
 

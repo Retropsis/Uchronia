@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "CharacterPlayerController.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAmmoAmountChangedSignature, int32);
 
 class UDamageTextComponent;
 class UBaseAbilitySystemComponent;
@@ -29,6 +30,10 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
+
+	void SetHUDWeaponAmmo(int32 Ammo);
+	
+	FOnAmmoAmountChangedSignature OnAmmoAmountChanged;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")

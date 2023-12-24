@@ -105,6 +105,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Abilities
 	 */
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Attack"), FString("Melee Attack Ability"));
+	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Summon"), FString("Summoning Ability"));
+	GameplayTags.Abilities_FirstAid = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.FirstAid"), FString("First Aid Ability"));
 	
 	/*
 	 * Combat Sockets

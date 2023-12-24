@@ -389,6 +389,15 @@ void APlayerCharacter::HideCharacterIfCameraClose()
 	}
 }
 
+void APlayerCharacter::MulticastHandleDeath()
+{
+	Super::MulticastHandleDeath();
+	if(ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(GetController()))
+	{
+		CharacterPlayerController->SetHUDWeaponAmmo(0);
+	}
+}
+
 /*
 *
 */
