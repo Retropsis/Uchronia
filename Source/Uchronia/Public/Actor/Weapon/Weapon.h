@@ -155,4 +155,6 @@ public:
 	FORCEINLINE AAmmoContainer* GetAmmoContainer() const { return AmmoContainer; }
 	FORCEINLINE float GetMarksmanFOV() const { return MarksmanFOV; }
 	FORCEINLINE float GetMarksmanInterpSpeed() const { return MarksmanInterpSpeed; }
+	FORCEINLINE bool HasAmmo() const { return Ammo > 0; }
+	FORCEINLINE bool IsFull() const { return Ammo == MagCapacity; }
 };

@@ -114,6 +114,8 @@ private:
 
 	void FireIntervalStart();
 	void FireIntervalEnd();
+
+	bool CanFire();
 	
 public:	
 

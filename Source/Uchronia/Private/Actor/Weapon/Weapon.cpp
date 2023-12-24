@@ -106,13 +106,13 @@ void AWeapon::Drop()
 
 void AWeapon::SpendRound()
 {
-	--Ammo;
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
 	SetHUDAmmo();
 }
 
 void AWeapon::OnRep_Ammo()
 {
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("%d"), Ammo));
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("%d"), Ammo), true, true, FLinearColor::Blue, 3.f);
 	SetHUDAmmo();
 }
 

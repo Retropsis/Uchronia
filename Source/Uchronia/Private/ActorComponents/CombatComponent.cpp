@@ -96,7 +96,7 @@ void UCombatComponent::Trigger(const bool bPressed)
 
 void UCombatComponent::Fire()
 {
-	if(bCanFire)
+	if(CanFire())
 	{
 		bCanFire = false;	
 		ServerTrigger(HitTarget);
@@ -107,6 +107,12 @@ void UCombatComponent::Fire()
         }
         FireIntervalStart();
 	}
+}
+
+bool UCombatComponent::CanFire()
+{
+	if(EquippedWeapon == nullptr) return false;
+	return EquippedWeapon->HasAmmo() && bCanFire;
 }
 
 void UCombatComponent::ServerTrigger_Implementation(const FVector_NetQuantize& TraceHitTarget)
