@@ -22,6 +22,7 @@ public:
 	virtual  void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayFireMontage(bool bIsAiming);
+	void PlayReloadMontage();
 	void PlayHitReactMontage();
 
 protected:
@@ -92,6 +93,9 @@ protected:
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Montage")
+	TObjectPtr<UAnimMontage> ReloadMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Montage")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -99,4 +103,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bRotateRootBone;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	bool bUseFABRIK;
 };

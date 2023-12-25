@@ -90,6 +90,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			UKismetSystemLibrary::DrawDebugLine(this, MuzzleFlashTransform.GetLocation(), PlayerCharacter->GetHitTarget(), FLinearColor::Red);
 		}
 	}
+	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading;
 }
 
 void UCharacterAnimInstance::PlayFireMontage(bool bIsAiming)
@@ -99,6 +100,25 @@ void UCharacterAnimInstance::PlayFireMontage(bool bIsAiming)
 	{
 		Montage_Play(FireWeaponMontage);
 		const FName SectionName = bIsAiming ? FName("TwoHands_Aim") : FName("TwoHands_Hip");
+		Montage_JumpToSection(SectionName);
+	}
+}
+
+void UCharacterAnimInstance::PlayReloadMontage()
+{
+	if(PlayerCharacter->GetCombatComponent() == nullptr || PlayerCharacter->GetEquippedWeapon() == nullptr) return;
+	if(IsValid(ReloadMontage))
+	{
+		Montage_Play(ReloadMontage);
+		FName SectionName;
+		switch (EquippedWeapon->GetWeaponType())
+		{
+		case EWeaponType::EWT_9mm:
+			SectionName = FName("Pistol");
+			break;
+		case EWeaponType::EWT_MAX:
+			break;
+		}
 		Montage_JumpToSection(SectionName);
 	}
 }

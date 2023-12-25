@@ -24,6 +24,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
+	DOREPLIFETIME(UCombatComponent, CombatState);
 }
 
 void UCombatComponent::BeginPlay()
@@ -127,9 +128,9 @@ void UCombatComponent::ServerTrigger_Implementation(const FVector_NetQuantize& T
 
 void UCombatComponent::MulticastTrigger_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
 	if(EquippedWeapon == nullptr) return;
-	if(IsValid(PlayerCharacter) && CharacterAnimInstance)
+	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
+	if(CharacterAnimInstance)
 	{
 		CharacterAnimInstance->PlayFireMontage(bAiming);
 		EquippedWeapon->Trigger(TraceHitTarget);
@@ -347,5 +348,43 @@ void UCombatComponent::InitializeCarriedAmmo()
 
 void UCombatComponent::Reload()
 {
-	
+	// if(EquippedWeapon == nullptr) return;
+	if(CarriedAmmo > 0 && CombatState != ECombatState::ECS_Reloading)
+	{
+		ServerReload();
+	}
+}
+
+void UCombatComponent::ServerReload_Implementation()
+{
+	CombatState = ECombatState::ECS_Reloading;
+	HandleReload();
+}
+
+void UCombatComponent::HandleReload()
+{
+	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
+	if(CharacterAnimInstance)
+	{
+		CharacterAnimInstance->PlayReloadMontage();
+	}
+}
+
+void UCombatComponent::ReloadEnd()
+{
+	if(PlayerCharacter && PlayerCharacter->HasAuthority())
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
+}
+
+void UCombatComponent::OnRep_CombatState()
+{
+	switch (CombatState) {
+	case ECombatState::ECS_Unoccupied:
+		break;
+	case ECombatState::ECS_Reloading:
+		HandleReload();
+		break;
+	}
 }

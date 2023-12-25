@@ -165,6 +165,14 @@ void APlayerCharacter::EquipWeapon()
 	}
 }
 
+void APlayerCharacter::Reload()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->Reload();
+	}	
+}
+
 void APlayerCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(CombatComponent)
@@ -375,6 +383,12 @@ FVector APlayerCharacter::GetHitTarget() const
 {
 	if(!IsValid(CombatComponent)) return FVector();
 	return CombatComponent->HitTarget;
+}
+
+ECombatState APlayerCharacter::GetCombatState() const
+{
+	if(!IsValid(CombatComponent)) return ECombatState::ECS_MAX;
+	return CombatComponent->CombatState;
 }
 
 void APlayerCharacter::HideCharacterIfCameraClose()

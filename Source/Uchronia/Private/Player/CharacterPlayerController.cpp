@@ -163,7 +163,10 @@ void ACharacterPlayerController::TriggerButtonReleased(const FInputActionValue& 
 
 void ACharacterPlayerController::ReloadButtonPressed(const FInputActionValue& Value)
 {
-	
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->Reload();
+	}
 }
 
 void ACharacterPlayerController::ThrowButtonPressed(const FInputActionValue& Value)

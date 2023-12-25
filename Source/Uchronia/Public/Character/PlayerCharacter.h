@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Character/BaseCharacter.h"
 #include "Types/AnimationStates.h"
+#include "Types/CombatState.h"
 #include "PlayerCharacter.generated.h"
 
 class UCombatComponent;
@@ -33,6 +34,7 @@ public:
 
 	virtual void Jump() override;
 	void EquipWeapon();
+	void Reload();
 	void Aim(bool bIsAiming);
 	void TriggerButtonPressed(bool bPressed);
 	void TriggerButtonReleased(bool bPressed);
@@ -69,7 +71,7 @@ private:
 	/*
 	 * Combat
 	 */
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	TObjectPtr<UCombatComponent> CombatComponent;
 
 	UFUNCTION(Server, Reliable)
@@ -128,7 +130,7 @@ public:
 	
 	UAnimInstance* GetAnimInstance() const;
 	FVector GetHitTarget() const;
-
+	ECombatState GetCombatState() const;
 };
 
 
