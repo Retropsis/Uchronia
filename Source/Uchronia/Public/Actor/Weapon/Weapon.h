@@ -3,10 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "ScalableFloat.h"
 #include "WeaponTypes.h"
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class UGameplayEffect;
+class AProjectile;
 class ACharacterPlayerController;
 class APlayerCharacter;
 class ACasing;
@@ -112,6 +116,16 @@ protected:
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
+	
+	// TODO: Move this to Container
+	UPROPERTY(EditAnywhere, Category="Container Properties")
+	TSubclassOf<AProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Damage")
+	TMap<FGameplayTag, FScalableFloat> DamageTypes;
 
 private:
 	UPROPERTY()

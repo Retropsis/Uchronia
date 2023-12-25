@@ -146,6 +146,12 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	int32 StartingRocketAmmo = 0;
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 StartingLaserAmmo = 0;
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 StartingSubmachineGunAmmo = 0;
 	/*
 	 *
 	 */
