@@ -7,9 +7,17 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystemInstanceController.h"
+#include "Actor/Weapon/RocketMovementComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+ARocket::ARocket()
+{
+	RocketMovementComponent = CreateDefaultSubobject<URocketMovementComponent>("RocketMovementComponent");
+	RocketMovementComponent->bRotationFollowsVelocity = true;
+	RocketMovementComponent->SetIsReplicated(true);
+}
 
 void ARocket::BeginPlay()
 {
@@ -49,6 +57,11 @@ void ARocket::BeginPlay()
 void ARocket::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                     FVector NormalImpulse, const FHitResult& Hit)
 {
+	if(OtherActor == GetOwner())
+	{
+		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Hit Owner")), true, true, FLinearColor::Blue, 3.f);
+		return;
+	}
 	const APawn* FiringPawn = GetInstigator();
 	if(FiringPawn && HasAuthority())
 	{

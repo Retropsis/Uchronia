@@ -29,8 +29,8 @@ AProjectile::AProjectile()
 	ProjectileMesh->SetupAttachment(GetRootComponent());
 	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	// ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	// ProjectileMovementComponent->bRotationFollowsVelocity = true;
 }
 
 void AProjectile::BeginPlay()

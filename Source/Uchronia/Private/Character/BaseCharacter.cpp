@@ -19,6 +19,9 @@ ABaseCharacter::ABaseCharacter()
 	Weapon->SetupAttachment(GetMesh(), FName("LeftHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	// TODO: Investigate
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+
 }
 
 void ABaseCharacter::BeginPlay()
