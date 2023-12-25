@@ -31,6 +31,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UBoxComponent> CollisionBox;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
 
 private:
 	UPROPERTY(VisibleAnywhere)

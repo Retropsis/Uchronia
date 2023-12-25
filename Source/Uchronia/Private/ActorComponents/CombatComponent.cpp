@@ -371,6 +371,7 @@ void UCombatComponent::OnRep_CarriedAmmo()
 void UCombatComponent::InitializeCarriedAmmo()
 {
 	CarriedAmmoMap.Emplace(EWeaponType::EWT_9mm, Starting9mmAmmo);
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_Rocket, StartingRocketAmmo);
 }
 
 void UCombatComponent::Reload()

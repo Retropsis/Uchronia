@@ -25,6 +25,10 @@ AProjectile::AProjectile()
 	CollisionBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh, ECR_Block);
 
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Mesh");
+	ProjectileMesh->SetupAttachment(GetRootComponent());
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 }
@@ -62,7 +66,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	// {
 	// 	return;
 	// }
-	
+
+	// TODO: if Explosion could have a bigger HitReact
 	if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(OtherActor))
 	{
 		CombatInterface->HitReact();
@@ -73,7 +78,6 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		{
 			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 		}
-		
 	}
 	Destroy();
 }

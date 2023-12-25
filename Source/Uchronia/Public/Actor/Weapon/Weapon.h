@@ -82,6 +82,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> EmptyContainerSound;
 
+	/*
+	 *
+	 */
+	UPROPERTY(EditAnywhere, Category = "WeaponRotationCorrection") 
+	float RightHandRotationRoll = -90.f;
+	
+	UPROPERTY(EditAnywhere, Category = "WeaponRotationCorrection") 
+	float RightHandRotationYaw = 0.f;
+	
+	UPROPERTY(EditAnywhere, Category = "WeaponRotationCorrection") 
+	float RightHandRotationPitch = -89.f;
+	
 protected:
 	virtual void BeginPlay() override;
 

@@ -138,8 +138,17 @@ private:
 
 	TMap<EWeaponType, int32> CarriedAmmoMap;
 
+	/*
+	 * TODO: Probably for DEV ONLY
+	 */
 	UPROPERTY(EditDefaultsOnly)
 	int32 Starting9mmAmmo = 16;
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 StartingRocketAmmo = 0;
+	/*
+	 *
+	 */
 	
 	UPROPERTY(ReplicatedUsing=OnRep_CombatState)
 	ECombatState CombatState = ECombatState::ECS_Unoccupied;
