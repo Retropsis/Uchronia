@@ -106,4 +106,10 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category="Combat")
 	bool bUseFABRIK;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	bool bUseAimOffsets;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	bool bTransformRightHand;
 };

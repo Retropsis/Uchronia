@@ -72,6 +72,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")
 	bool bAutomatic = false;
 
+	/*
+	 * Sound
+	 */
+	/* TODO: To DataAsset */
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<USoundBase> EquipSound;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<USoundBase> EmptyContainerSound;
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -118,7 +118,16 @@ void UCombatComponent::Fire()
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr) return false;
-	return EquippedWeapon->HasAmmo() && bCanFire && CombatState == ECombatState::ECS_Unoccupied;
+	
+	if(!EquippedWeapon->HasAmmo())
+	{
+		if(EquippedWeapon->EmptyContainerSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, EquippedWeapon->EmptyContainerSound, PlayerCharacter->GetActorLocation());
+		}
+		return false;
+	}
+	return /*EquippedWeapon->HasAmmo() &&*/ bCanFire && CombatState == ECombatState::ECS_Unoccupied;
 }
 
 void UCombatComponent::ServerTrigger_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -289,16 +298,9 @@ void UCombatComponent::ServerSetAiming_Implementation(const bool IsAiming)
 	}
 }
 
-void UCombatComponent::OnRep_EquippedWeapon()
-{
-	if(IsValid(EquippedWeapon) && IsValid(PlayerCharacter))
-	{
-		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-		PlayerCharacter->bUseControllerRotationYaw = true;
-		EquippedWeapon->SetHUDAmmo();
-	}
-}
-
+/*
+ * Equipping START
+ */
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(PlayerCharacter == nullptr || WeaponToEquip == nullptr) return;
@@ -321,16 +323,41 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	{
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
 	}
-	
 	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
 	if(CharacterPlayerController)
 	{
 		CharacterPlayerController->SetHUDWeaponCarriedAmmo(CarriedAmmo);
 	}
+
+	if(EquippedWeapon->EquipSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, EquippedWeapon->EquipSound, PlayerCharacter->GetActorLocation());
+	}
+	
 	PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	PlayerCharacter->bUseControllerRotationYaw = true;
 }
 
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if(IsValid(EquippedWeapon) && IsValid(PlayerCharacter))
+	{
+		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		PlayerCharacter->bUseControllerRotationYaw = true;
+		EquippedWeapon->SetHUDAmmo();
+		if(EquippedWeapon->EquipSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, EquippedWeapon->EquipSound, PlayerCharacter->GetActorLocation());
+		}
+	}
+}
+/*
+ * Equipping END
+ */
+
+/*
+ * Ammo START
+ */
 void UCombatComponent::OnRep_CarriedAmmo()
 {
 	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
