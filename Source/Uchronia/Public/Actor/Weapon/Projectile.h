@@ -32,8 +32,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UBoxComponent> CollisionBox;
 	
+	/*
+	 * TODO: Should be DataAsset
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
+
+	// TODO: Might need to change to Niagara 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UParticleSystem> ImpactParticles;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> ImpactSound;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -44,13 +54,6 @@ private:
 	 */
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> Tracer;
-
-	// TODO: Might need to change to Niagara 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UParticleSystem> ImpactParticles;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> ImpactSound;
 	/* End */
 	
 	TObjectPtr<UParticleSystemComponent> TracerComponent;
