@@ -54,8 +54,9 @@ protected:
 	void ReloadEnd();
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
-
 	void SetHUDCrosshairs(float DeltaTime);
+
+	int32 AmountToReload();
 
 private:
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
@@ -127,6 +128,7 @@ private:
 	void FireIntervalEnd();
 	bool CanFire();
 	void InitializeCarriedAmmo();
+	void UpdateAmmoValues();
 
 	UPROPERTY(ReplicatedUsing=OnRep_CarriedAmmo)
 	int32 CarriedAmmo;

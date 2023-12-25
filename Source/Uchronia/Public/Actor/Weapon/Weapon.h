@@ -37,6 +37,7 @@ public:
 	virtual void Trigger(const FVector& HitTarget);
 	virtual void Drop();
 	virtual void OnRep_Owner() override;
+	void AddRounds(int32 RoundsToAdd);
 	void SetHUDAmmo();
 	
 	/*
@@ -162,4 +163,6 @@ public:
 	FORCEINLINE bool HasAmmo() const { return Ammo > 0; }
 	FORCEINLINE bool IsFull() const { return Ammo == MagCapacity; }
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
+	FORCEINLINE int32 GetAmmo() const { return Ammo; } 
+	FORCEINLINE int32 GetMagCapacity() const { return MagCapacity; } 
 };

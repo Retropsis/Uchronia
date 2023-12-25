@@ -118,7 +118,7 @@ void UCombatComponent::Fire()
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr) return false;
-	return EquippedWeapon->HasAmmo() && bCanFire;
+	return EquippedWeapon->HasAmmo() && bCanFire && CombatState == ECombatState::ECS_Unoccupied;
 }
 
 void UCombatComponent::ServerTrigger_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -130,7 +130,7 @@ void UCombatComponent::MulticastTrigger_Implementation(const FVector_NetQuantize
 {
 	if(EquippedWeapon == nullptr) return;
 	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
-	if(CharacterAnimInstance)
+	if(CharacterAnimInstance && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		CharacterAnimInstance->PlayFireMontage(bAiming);
 		EquippedWeapon->Trigger(TraceHitTarget);
@@ -375,16 +375,59 @@ void UCombatComponent::ReloadEnd()
 	if(PlayerCharacter && PlayerCharacter->HasAuthority())
 	{
 		CombatState = ECombatState::ECS_Unoccupied;
+		UpdateAmmoValues();
 	}
+	if (bTriggerButtonPressed)
+	{
+		Fire();
+	}
+}
+
+void UCombatComponent::UpdateAmmoValues()
+{
+	if(!IsValid(EquippedWeapon)) return;
+	
+	int32 ReloadAmount = AmountToReload();
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= ReloadAmount;
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+	// Updating Weapon Type Carried Ammo to HUD
+	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
+	if(CharacterPlayerController)
+	{
+		CharacterPlayerController->SetHUDWeaponCarriedAmmo(CarriedAmmo);
+	}
+	EquippedWeapon->AddRounds(ReloadAmount);
+}
+
+int32 UCombatComponent::AmountToReload()
+{
+	if(EquippedWeapon == nullptr) return 0;
+	const int32 RoomInMag = EquippedWeapon->GetMagCapacity() - EquippedWeapon->GetAmmo();
+	
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		const int32 AmountCarried = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+		const int32 Least = FMath::Min(RoomInMag, AmountCarried);
+		return FMath::Clamp(RoomInMag, 0, Least);
+	}
+	return 0;
 }
 
 void UCombatComponent::OnRep_CombatState()
 {
 	switch (CombatState) {
 	case ECombatState::ECS_Unoccupied:
+		if(bTriggerButtonPressed)
+		{
+			Fire();
+		}
 		break;
 	case ECombatState::ECS_Reloading:
 		HandleReload();
 		break;
+	default: ;
 	}
 }
