@@ -4,7 +4,6 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "UchroniaBlueprintFunctionLibrary.h"
-#include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystemInstanceController.h"
 #include "Actor/Weapon/RocketMovementComponent.h"
@@ -25,18 +24,7 @@ void ARocket::BeginPlay()
 	
 	if(!HasAuthority()) CollisionBox->OnComponentHit.AddDynamic(this, &ARocket::OnHit);
 	
-	if(TrailSystem)
-	{
-		// TODO: Could specify a socket name to be more precise
-		TrailSystemComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			TrailSystem,
-			GetRootComponent(),
-			TrailSocketName,
-			GetActorLocation(),
-			GetActorRotation(),
-			EAttachLocation::KeepWorldPosition,
-			false);
-	}
+	SpawnTrailSystem();
 	if(ProjectileLoopSound && ProjectileLoopAttenuation)
 	{
 		ProjectileLoopComponent = UGameplayStatics::SpawnSoundAttached(
@@ -62,35 +50,8 @@ void ARocket::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Hit Owner")), true, true, FLinearColor::Blue, 3.f);
 		return;
 	}
-	const APawn* FiringPawn = GetInstigator();
-	if(FiringPawn && HasAuthority())
-	{
-		if(const AController* FiringController = FiringPawn->GetController())
-		{
-			TArray<AActor*> Overlaps;
-			TArray<AActor*> ActorsToIgnore;
-			// UGameplayStatics::ApplyRadialDamageWithFalloff() TODO: Function to check for full functionality
-			UUchroniaBlueprintFunctionLibrary::GetLivePlayersWithinRadius(
-				this,
-				Overlaps,
-				ActorsToIgnore,
-				500.f,
-				GetActorLocation()
-			);
-			// TODO: Apply FallOff, InnerRadius
-			if(HasAuthority())
-			{
-				for(AActor* Overlap : Overlaps)
-				{
-					if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Overlap))
-					{
-						TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
-					}
-				}
-			}
-		}
-	}
-	GetWorldTimerManager().SetTimer(DestroyTimer,this, &ARocket::DestroyTimeEnd, DestroyTime);
+	ApplyRadialDamageWithFalloff();
+	DestroyTimerStart();
 	
 	if(ImpactParticles)
 	{
@@ -104,11 +65,6 @@ void ARocket::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 	CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	if(TrailSystemComponent && TrailSystemComponent->GetSystemInstanceController()) TrailSystemComponent->GetSystemInstanceController()->Deactivate();
 	if(ProjectileLoopComponent && ProjectileLoopComponent->IsPlaying())  ProjectileLoopComponent->Stop();
-}
-
-void ARocket::DestroyTimeEnd()
-{
-	Destroy();
 }
 
 void ARocket::Destroyed()

@@ -59,7 +59,7 @@ void ACharacterPlayerController::KeybindInputTagPressed(FGameplayTag InputTag)
 		bTargeting = ThisActor == nullptr;
 		GetHitResultUnderCursor()
 	}*/
-	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *InputTag.ToString()));
+	// GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *InputTag.ToString()));
 }
 
 void ACharacterPlayerController::KeybindInputTagReleased(FGameplayTag InputTag)

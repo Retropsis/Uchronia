@@ -156,6 +156,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	int32 StartingHighCaliberRifleAmmo = 0;
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 StartingGrenadeLauncherAmmo = 0;
 	/*
 	 *
 	 */

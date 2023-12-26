@@ -7,8 +7,6 @@
 #include "Rocket.generated.h"
 
 class URocketMovementComponent;
-class UNiagaraComponent;
-class UNiagaraSystem;
 /**
  * 
  */
@@ -24,27 +22,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	virtual void DestroyTimeEnd();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URocketMovementComponent> RocketMovementComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category="Projectile Properties")
 	float DamageOuterRadius = 500.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Projectile Properties")
-	TObjectPtr<UNiagaraSystem> TrailSystem;
-
-	UPROPERTY()
-	TObjectPtr<UNiagaraComponent> TrailSystemComponent;
-
-	UPROPERTY(EditDefaultsOnly, Category="Projectile Properties")
-	FName TrailSocketName = FName("TrailSystemSocket");
-
-	FTimerHandle DestroyTimer;
-
-	UPROPERTY(EditDefaultsOnly, Category="Projectile Properties")
-	float DestroyTime = 3.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Projectile Properties")
 	TObjectPtr<USoundBase> ProjectileLoopSound;
