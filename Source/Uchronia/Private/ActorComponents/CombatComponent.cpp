@@ -368,14 +368,6 @@ void UCombatComponent::OnRep_CarriedAmmo()
 	}
 }
 
-void UCombatComponent::InitializeCarriedAmmo()
-{
-	CarriedAmmoMap.Emplace(EWeaponType::EWT_9mm, Starting9mmAmmo);
-	CarriedAmmoMap.Emplace(EWeaponType::EWT_Rocket, StartingRocketAmmo);
-	CarriedAmmoMap.Emplace(EWeaponType::EWT_Laser, StartingLaserAmmo);
-	CarriedAmmoMap.Emplace(EWeaponType::EWT_SubmachineGun, StartingSubmachineGunAmmo);
-}
-
 void UCombatComponent::Reload()
 {
 	// if(EquippedWeapon == nullptr) return;
@@ -460,4 +452,16 @@ void UCombatComponent::OnRep_CombatState()
 		break;
 	default: ;
 	}
+}
+
+/*
+ * For DEV ONLY
+ */
+void UCombatComponent::InitializeCarriedAmmo()
+{
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_9mm, Starting9mmAmmo);
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_Rocket, StartingRocketAmmo);
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_Laser, StartingLaserAmmo);
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_SubmachineGun, StartingSubmachineGunAmmo);
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_Shotgun, StartingShotgunAmmo);
 }

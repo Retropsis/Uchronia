@@ -9,8 +9,6 @@
 #include "Types/CombatState.h"
 #include "CombatComponent.generated.h"
 
-#define TRACE_LENGTH 80000.f
-
 class APlayerHUD;
 class ACharacterPlayerController;
 class UCharacterAnimInstance;
@@ -152,6 +150,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	int32 StartingSubmachineGunAmmo = 0;
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 StartingShotgunAmmo = 0;
 	/*
 	 *
 	 */

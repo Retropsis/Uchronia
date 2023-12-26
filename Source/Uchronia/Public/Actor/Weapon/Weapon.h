@@ -143,6 +143,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
 	TObjectPtr<USphereComponent> OverlapSphere;
 
+	UPROPERTY(EditDefaultsOnly, Category="Weapon Properties")
+	float OverlapSphereRadius = 100.f;
+
 	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
 	TObjectPtr<UWidgetComponent> PickupWidget;
 

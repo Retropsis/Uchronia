@@ -127,6 +127,9 @@ void UCharacterAnimInstance::PlayReloadMontage()
 		case EWeaponType::EWT_SubmachineGun:
 			SectionName = FName("Pistol");
 			break;
+		case EWeaponType::EWT_Shotgun:
+			SectionName = FName("Pistol");
+			break;
 		case EWeaponType::EWT_MAX:
 			break;
 		default: ;

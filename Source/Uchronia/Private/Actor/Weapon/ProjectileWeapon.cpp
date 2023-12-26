@@ -8,6 +8,7 @@
 #include "Actor/Weapon/Projectile.h"
 #include "Character/PlayerCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // void AProjectileWeapon::Trigger(const FVector& HitTarget)
 // {
@@ -86,5 +87,19 @@ void AProjectileWeapon::Trigger(const FVector& HitTarget)
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}
+}
+
+FVector AProjectileWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget)
+{
+	FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
+	FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
+	FVector RandomVector = UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(0.f, SphereRadius);
+	FVector EndLocation = SphereCenter + RandomVector;
+	FVector ToEndLocation = EndLocation - TraceStart;
 	
+	DrawDebugSphere(GetWorld(), SphereCenter, SphereRadius, 12, FColor::Red, false, 5.f);
+	DrawDebugSphere(GetWorld(), EndLocation, 4.f, 12, FColor::White, false, 5.f);
+	DrawDebugLine(GetWorld(), TraceStart, FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size()), FColor::Cyan, false, 3.f);
+
+	return FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size());
 }
