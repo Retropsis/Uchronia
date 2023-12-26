@@ -63,16 +63,6 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 /*
  * Combat Functionality
  */
-void UCombatComponent::SetAiming(const bool IsAiming)
-{
-	bAiming = IsAiming;
-	ServerSetAiming(IsAiming);
-	if(IsValid(PlayerCharacter))
-	{
-		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = bAiming ? AimWalkSpeed : BaseWalkSpeed;
-	}
-}
-
 void UCombatComponent::InterpFOV(float DeltaTime)
 {
 	if(!IsValid(EquippedWeapon)) return;
@@ -285,6 +275,27 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		else
 		{
 			HUDPackage.CrosshairColor = FLinearColor::White;			
+		}
+	}
+}
+
+void UCombatComponent::SetAiming(const bool IsAiming)
+{
+	if(!IsValid(PlayerCharacter) || !IsValid(EquippedWeapon)) return;
+	
+	bAiming = IsAiming;
+	ServerSetAiming(IsAiming);
+	if(IsValid(PlayerCharacter))
+	{
+		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = bAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
+	// TODO: Need to check from DataAsset Info instead
+	if(PlayerCharacter->IsLocallyControlled() && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_HighCaliberRifle)
+	{
+		CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
+		if(CharacterPlayerController)
+		{
+				CharacterPlayerController->AimDownSights(bAiming);
 		}
 	}
 }

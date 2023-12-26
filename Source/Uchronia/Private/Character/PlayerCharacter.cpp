@@ -409,6 +409,13 @@ void APlayerCharacter::MulticastHandleDeath()
 	if(ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(GetController()))
 	{
 		CharacterPlayerController->SetHUDWeaponAmmo(0);
+
+		bool bHideAimDownSights = IsLocallyControlled() && CombatComponent && CombatComponent->bAiming &&
+			CombatComponent->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_HighCaliberRifle;
+		if(bHideAimDownSights)
+		{
+			CharacterPlayerController->AimDownSights(false);
+		}
 	}
 }
 
