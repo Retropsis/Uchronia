@@ -17,58 +17,47 @@ void AHitScanWeapon::Trigger(const FVector& HitTarget)
 	{
 		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
 		FVector Start = SocketTransform.GetLocation();
-		FVector End = Start + (HitTarget - Start)  * 1.25f;
-
-		if (UWorld* World = GetWorld())
+		
+		FHitResult ScanHit;
+		WeaponTraceHit(Start, HitTarget, ScanHit);
+		if (HasAuthority())
 		{
-			FHitResult ScanHit;
-			World->LineTraceSingleByChannel(ScanHit, Start, End, ECC_Visibility);
+			const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
+			const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, 1.0f, SourceASC->MakeEffectContext());
+    
+			const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+    
+			for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
+			{
+				const float ScaledDamage = Pair.Value.GetValueAtLevel(1.f);
+				UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+			}
+			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ScanHit.GetActor()))
+			{
+				TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
+		}
+		ApplyWeaponEffects(SocketTransform, ScanHit);
+	}
+}
 
-			// TODO: Need a valid BeamEnd when hitting the sky
-			FVector BeamEnd = End;
-			if (ScanHit.bBlockingHit)
+void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutTraceHit)
+{
+	// TODO: Need a valid HitTarget when hitting the sky ?
+	if(UWorld* World = GetWorld())
+	{
+		FVector End = bUseScatter ? TraceEndWithScatter(TraceStart, HitTarget) : TraceStart + (HitTarget - TraceStart)  * 1.25f;
+		World->LineTraceSingleByChannel(OutTraceHit, TraceStart, End, ECC_Visibility);
+		FVector BeamEnd = End;
+		if(OutTraceHit.bBlockingHit)
+		{
+			BeamEnd = OutTraceHit.ImpactPoint;
+		}
+		if (BeamParticles)
+		{
+			if(UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(World, BeamParticles, TraceStart, FRotator::ZeroRotator, true))
 			{
-				BeamEnd = ScanHit.ImpactPoint;
-				if (HasAuthority())
-				{
-                    const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
-                    const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, 1.0f, SourceASC->MakeEffectContext());
-    
-                    const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-    
-                    for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
-                    {
-                    	const float ScaledDamage = Pair.Value.GetValueAtLevel(1.f);
-                    	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
-                    }
-                    if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ScanHit.GetActor()))
-                    {
-                    	TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-                    }
-				}
-				if (ImpactParticles)
-				{
-					UGameplayStatics::SpawnEmitterAtLocation(World, ImpactParticles, ScanHit.ImpactPoint, ScanHit.ImpactNormal.Rotation());
-				}
-				if(ImpactSound)
-				{
-					UGameplayStatics::PlaySoundAtLocation(World, ImpactSound, ScanHit.ImpactPoint);
-				}
-				if (BeamParticles)
-				{
-					if(UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(World, BeamParticles, SocketTransform))
-					{
-						Beam->SetVectorParameter(FName("Target"), BeamEnd);
-					}
-				}
-			}
-			if(MuzzleFlash)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleFlash, SocketTransform);
-			}
-			if(FireSound)
-			{
-				UGameplayStatics::PlaySoundAtLocation(World, FireSound, SocketTransform.GetLocation());
+				Beam->SetVectorParameter(FName("Target"), BeamEnd);
 			}
 		}
 	}
@@ -82,9 +71,30 @@ FVector AHitScanWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVe
 	FVector EndLocation = SphereCenter + RandomVector;
 	FVector ToEndLocation = EndLocation - TraceStart;
 	
-	DrawDebugSphere(GetWorld(), SphereCenter, SphereRadius, 12, FColor::Red, false, 5.f);
-	DrawDebugSphere(GetWorld(), EndLocation, 4.f, 12, FColor::White, false, 5.f);
-	DrawDebugLine(GetWorld(), TraceStart, FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size()), FColor::Cyan, false, 3.f);
+	// DrawDebugSphere(GetWorld(), SphereCenter, SphereRadius, 12, FColor::Red, false, 5.f);
+	// DrawDebugSphere(GetWorld(), EndLocation, 4.f, 12, FColor::White, false, 5.f);
+	// DrawDebugLine(GetWorld(), TraceStart, FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size()), FColor::Cyan, false, 3.f);
 	
 	return FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size());
+}
+
+void AHitScanWeapon::ApplyWeaponEffects(FTransform SocketTransform, FHitResult ScanHit)
+{
+	UWorld* World = GetWorld();
+	if (ImpactParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(World, ImpactParticles, ScanHit.ImpactPoint, ScanHit.ImpactNormal.Rotation());
+	}
+	if(ImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(World, ImpactSound, ScanHit.ImpactPoint);
+	}
+	if(MuzzleFlash)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleFlash, SocketTransform);
+	}
+	if(FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(World, FireSound, SocketTransform.GetLocation());
+	}
 }

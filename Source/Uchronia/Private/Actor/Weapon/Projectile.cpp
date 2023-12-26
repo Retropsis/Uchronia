@@ -67,6 +67,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	// 	return;
 	// }
 
+	DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 15.f, 12, FColor::Red, false, 3.f);
+
 	// TODO: if Explosion could have a bigger HitReact
 	if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(OtherActor))
 	{

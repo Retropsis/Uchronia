@@ -56,7 +56,9 @@ void AProjectileWeapon::Trigger(const FVector& HitTarget)
 		// TODO: Get MuzzleFlash from CombatInterface
 		// const FVector SocketLocation = CombatInterface->GetCombatSocketLocation(); 
 		const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
-		const FVector ToTarget = HitTarget - SocketTransform.GetLocation(); // From MuzzleFlashSocket to ImpactLocation
+		FVector EndLocation = bUseScatter ? TraceEndWithScatter(SocketTransform.GetLocation(), HitTarget) : SocketTransform.GetLocation() + (HitTarget - SocketTransform.GetLocation())  * 1.25f;
+		const FVector ToTarget = EndLocation - SocketTransform.GetLocation(); // From MuzzleFlashSocket to ImpactLocation
+		// const FVector ToTarget = HitTarget - SocketTransform.GetLocation(); // From MuzzleFlashSocket to ImpactLocation
 		const FRotator TargetRotation = ToTarget.Rotation();
 		// TODO: Can decide on pitch here
 		// Rotation.Pitch = 0.f;
@@ -83,7 +85,6 @@ void AProjectileWeapon::Trigger(const FVector& HitTarget)
 			const float ScaledDamage = Pair.Value.GetValueAtLevel(1.f);
 			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
 		}
-		
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}
@@ -102,4 +103,26 @@ FVector AProjectileWeapon::TraceEndWithScatter(const FVector& TraceStart, const 
 	DrawDebugLine(GetWorld(), TraceStart, FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size()), FColor::Cyan, false, 3.f);
 
 	return FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size());
+}
+
+void AProjectileWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutTraceHit)
+{
+	if(UWorld* World = GetWorld())
+	{
+		FVector End = bUseScatter ? TraceEndWithScatter(TraceStart, HitTarget) : TraceStart + (HitTarget - TraceStart)  * 1.25f;
+		World->LineTraceSingleByChannel(OutTraceHit, TraceStart, End, ECC_Visibility);
+		// TODO: Need a valid BeamEnd when hitting the sky
+		FVector BeamEnd = End;
+		if(OutTraceHit.bBlockingHit)
+		{
+			BeamEnd = OutTraceHit.ImpactPoint;
+		}
+		// if (BeamParticles)
+		// {
+		// 	if(UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(World, BeamParticles, TraceStart, FRotator::ZeroRotator, true))
+		// 	{
+		// 		Beam->SetVectorParameter(FName("Target"), BeamEnd);
+		// 	}
+		// }
+	}
 }

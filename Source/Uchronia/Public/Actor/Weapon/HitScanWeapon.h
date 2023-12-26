@@ -15,10 +15,12 @@ class UCHRONIA_API AHitScanWeapon : public AWeapon
 	GENERATED_BODY()
 
 public:
+	void ApplyWeaponEffects(FTransform SocketTransform, FHitResult ScanHit);
 	virtual void Trigger(const FVector& HitTarget) override;
 
 protected:
 	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget);
+	void WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutTraceHit);
 	
 	// TODO: Really need to be in DataAsset + AmmoContainer
 	// TODO: Might need to change to Niagara 
