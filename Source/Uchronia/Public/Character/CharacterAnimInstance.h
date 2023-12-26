@@ -24,6 +24,7 @@ public:
 	void PlayFireMontage(bool bIsAiming);
 	void PlayReloadMontage();
 	void PlayHitReactMontage();
+	void JumpToReloadEnd();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")

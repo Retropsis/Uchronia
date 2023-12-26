@@ -4,6 +4,7 @@
 
 #include "Actor/Weapon/AmmoContainer.h"
 #include "Actor/Weapon/Casing.h"
+#include "ActorComponents/CombatComponent.h"
 #include "Character/PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -123,6 +124,11 @@ void AWeapon::AddRounds(int32 RoundsToAdd)
 void AWeapon::OnRep_Ammo()
 {
 	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("%d"), Ammo), true, true, FLinearColor::Blue, 3.f);
+	OwnerCharacter = OwnerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()) : OwnerCharacter;
+	if(IsValid(OwnerCharacter) && OwnerCharacter->GetCombatComponent() && IsFull())
+	{
+		OwnerCharacter->GetCombatComponent()->JumpToReloadEnd();
+	}
 	SetHUDAmmo();
 }
 

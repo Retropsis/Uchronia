@@ -108,6 +108,11 @@ void UCombatComponent::Fire()
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr) return false;
+
+	if(EquippedWeapon->HasAmmo() && bCanFire && CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun)
+	{
+		return true;
+	}
 	
 	if(!EquippedWeapon->HasAmmo())
 	{
@@ -129,6 +134,13 @@ void UCombatComponent::MulticastTrigger_Implementation(const FVector_NetQuantize
 {
 	if(EquippedWeapon == nullptr) return;
 	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
+	if(CharacterAnimInstance && CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun)
+	{
+		CharacterAnimInstance->PlayFireMontage(bAiming);
+		EquippedWeapon->Trigger(TraceHitTarget);
+		CombatState = ECombatState::ECS_Unoccupied;
+		return;
+	}
 	if(CharacterAnimInstance && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		CharacterAnimInstance->PlayFireMontage(bAiming);
@@ -315,6 +327,7 @@ void UCombatComponent::ServerSetAiming_Implementation(const bool IsAiming)
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(PlayerCharacter == nullptr || WeaponToEquip == nullptr) return;
+	if(CombatState != ECombatState::ECS_Unoccupied) return;
 	if(EquippedWeapon)
 	{
 		EquippedWeapon->Drop();
@@ -377,12 +390,19 @@ void UCombatComponent::OnRep_CarriedAmmo()
 		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Carried Ammo: [%d]"), CarriedAmmo), true, true, FLinearColor::Blue, 3.f);
 		CharacterPlayerController->SetHUDWeaponCarriedAmmo(CarriedAmmo);
 	}
+	bool bJumpToReloadEnd = CombatState == ECombatState::ECS_Reloading &&
+		IsValid(EquippedWeapon) && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun &&
+			CarriedAmmo == 0;
+	if(bJumpToReloadEnd)
+	{
+		JumpToReloadEnd();
+	}
 }
 
 void UCombatComponent::Reload()
 {
 	// if(EquippedWeapon == nullptr) return;
-	if(CarriedAmmo > 0 && CombatState != ECombatState::ECS_Reloading)
+	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		ServerReload();
 	}
@@ -400,6 +420,14 @@ void UCombatComponent::HandleReload()
 	if(CharacterAnimInstance)
 	{
 		CharacterAnimInstance->PlayReloadMontage();
+	}
+}
+
+void UCombatComponent::AddSingleRound()
+{
+	if(PlayerCharacter && PlayerCharacter->HasAuthority())
+	{
+		UpdateSingleAmmoValue();
 	}
 }
 
@@ -435,6 +463,39 @@ void UCombatComponent::UpdateAmmoValues()
 	EquippedWeapon->AddRounds(ReloadAmount);
 }
 
+// TODO: Refacto this and UpdateAmmoValues with params
+void UCombatComponent::UpdateSingleAmmoValue()
+{
+	if(!IsValid(EquippedWeapon)) return;
+	
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= 1;
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+	// Updating Weapon Type Carried Ammo to HUD
+	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
+	if(CharacterPlayerController)
+	{
+		CharacterPlayerController->SetHUDWeaponCarriedAmmo(CarriedAmmo);
+	}
+	EquippedWeapon->AddRounds(1);
+	bCanFire = true;
+	if(EquippedWeapon->IsFull() || CarriedAmmo == 0)
+	{
+		JumpToReloadEnd();
+	}
+}
+
+void UCombatComponent::JumpToReloadEnd()
+{
+	CharacterAnimInstance = CharacterAnimInstance ? CharacterAnimInstance : Cast<UCharacterAnimInstance>(PlayerCharacter->GetAnimInstance());
+	if(CharacterAnimInstance)
+	{
+		CharacterAnimInstance->JumpToReloadEnd();
+	}
+}
+
 int32 UCombatComponent::AmountToReload()
 {
 	if(EquippedWeapon == nullptr) return 0;
@@ -461,8 +522,31 @@ void UCombatComponent::OnRep_CombatState()
 	case ECombatState::ECS_Reloading:
 		HandleReload();
 		break;
+	case ECombatState::ECS_Throwing:
+		break;
 	default: ;
 	}
+}
+
+void UCombatComponent::Throw()
+{
+	if(CombatState != ECombatState::ECS_Unoccupied) return;
+	CombatState = ECombatState::ECS_Throwing;
+}
+
+void UCombatComponent::ServerThrow_Implementation()
+{
+	CombatState = ECombatState::ECS_Throwing;
+}
+
+void UCombatComponent::ThrowStart()
+{
+	CombatState = ECombatState::ECS_Throwing;
+}
+
+void UCombatComponent::ThrowEnd()
+{
+	CombatState = ECombatState::ECS_Unoccupied;
 }
 
 /*

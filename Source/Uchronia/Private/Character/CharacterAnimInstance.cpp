@@ -90,9 +90,9 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			UKismetSystemLibrary::DrawDebugLine(this, MuzzleFlashTransform.GetLocation(), PlayerCharacter->GetHitTarget(), FLinearColor::Red);
 		}
 	}
-	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading;
-	bUseAimOffsets = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading;
-	bTransformRightHand = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading;
+	bUseFABRIK = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied;
+	bUseAimOffsets = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied;
+	bTransformRightHand = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied;
 }
 
 void UCharacterAnimInstance::PlayFireMontage(bool bIsAiming)
@@ -119,19 +119,19 @@ void UCharacterAnimInstance::PlayReloadMontage()
 			SectionName = FName("Pistol");
 			break;
 		case EWeaponType::EWT_Rocket:
-			SectionName = FName("Pistol");
+			SectionName = FName("RocketLauncher");
 			break;
 		case EWeaponType::EWT_Laser:
-			SectionName = FName("Pistol");
+			SectionName = FName("Rifle");
 			break;
 		case EWeaponType::EWT_SubmachineGun:
 			SectionName = FName("Pistol");
 			break;
 		case EWeaponType::EWT_Shotgun:
-			SectionName = FName("Pistol");
+			SectionName = FName("Shotgun");
 			break;
 		case EWeaponType::EWT_HighCaliberRifle:
-			SectionName = FName("Pistol");
+			SectionName = FName("RocketLauncher");
 			break;
 		case EWeaponType::EWT_GrenadeLauncher:
 			SectionName = FName("Pistol");
@@ -141,6 +141,15 @@ void UCharacterAnimInstance::PlayReloadMontage()
 		default: ;
 		}
 		Montage_JumpToSection(SectionName);
+	}
+}
+
+// TODO: Probably need to adapt for different weapons if needed
+void UCharacterAnimInstance::JumpToReloadEnd()
+{
+	if(IsValid(ReloadMontage))
+	{
+		Montage_JumpToSection(FName("ReloadEnd"));
 	}
 }
 

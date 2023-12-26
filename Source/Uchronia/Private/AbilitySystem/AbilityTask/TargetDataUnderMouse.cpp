@@ -46,7 +46,7 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 	FCollisionQueryParams CollisionQueryParams;
 	// TODO: Need to fill in if hitting the sky
 	PlayerController->GetHitResultAtScreenPosition(ViewportCenter, ECC_Visibility, CollisionQueryParams, CursorHit);
-	UKismetSystemLibrary::DrawDebugLine(PlayerController, CursorHit.TraceStart, CursorHit.TraceEnd, FLinearColor::Blue, 5.f);
+	// UKismetSystemLibrary::DrawDebugLine(PlayerController, CursorHit.TraceStart, CursorHit.TraceEnd, FLinearColor::Blue, 5.f);
 	if (!CursorHit.bBlockingHit)
 	{
 		CursorHit.Location = CursorHit.TraceEnd;

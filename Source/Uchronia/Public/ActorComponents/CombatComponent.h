@@ -26,6 +26,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	void JumpToReloadEnd();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowStart();
+	
+	UFUNCTION(BlueprintCallable)
+	void ThrowEnd();
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,6 +40,11 @@ protected:
 	void Trigger(bool bPressed);
 	void Fire();
 	void Reload();
+	
+	void Throw();
+
+	UFUNCTION(Server, Reliable)
+	void ServerThrow();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool IsAiming);
@@ -47,6 +59,9 @@ protected:
 	void ServerReload();
 
 	void HandleReload();
+
+	UFUNCTION(BlueprintCallable)
+	void AddSingleRound();
 
 	UFUNCTION(BlueprintCallable)
 	void ReloadEnd();
@@ -127,6 +142,7 @@ private:
 	bool CanFire();
 	void InitializeCarriedAmmo();
 	void UpdateAmmoValues();
+	void UpdateSingleAmmoValue();
 
 	UPROPERTY(ReplicatedUsing=OnRep_CarriedAmmo)
 	int32 CarriedAmmo;

@@ -27,9 +27,6 @@ protected:
 	TObjectPtr<URocketMovementComponent> RocketMovementComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category="Projectile Properties")
-	float DamageOuterRadius = 500.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Projectile Properties")
 	TObjectPtr<USoundBase> ProjectileLoopSound;
 
 	UPROPERTY()
