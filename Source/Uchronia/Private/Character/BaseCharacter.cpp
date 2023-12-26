@@ -22,6 +22,10 @@ ABaseCharacter::ABaseCharacter()
 	// TODO: Investigate
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
+	ThrownItem = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ThrownItem"));
+	// ThrownItem->SetupAttachment(GetMesh(), ThrownItemSocketName);
+	ThrownItem->SetupAttachment(GetMesh(), FName("ThrownItemSocket"));
+	ThrownItem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABaseCharacter::BeginPlay()

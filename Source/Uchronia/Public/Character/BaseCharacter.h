@@ -86,6 +86,12 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
+	TObjectPtr<USkeletalMeshComponent> ThrownItem;
+
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName ThrownItemSocketName;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
 	FName CombatSocketName;
 	
 	UPROPERTY(EditAnywhere, Category="Combat")

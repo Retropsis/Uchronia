@@ -25,6 +25,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void UpdateCarriedAmmo();
+	void PlayEquipSound();
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void JumpToReloadEnd();
 
@@ -40,8 +42,10 @@ protected:
 	void Trigger(bool bPressed);
 	void Fire();
 	void Reload();
-	
 	void Throw();
+	void DropEquippedWeapon() const;
+
+	void AttachActorToSocket(AActor* ActorToAttach, FName Socket) const;
 
 	UFUNCTION(Server, Reliable)
 	void ServerThrow();

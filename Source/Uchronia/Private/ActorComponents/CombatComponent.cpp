@@ -328,21 +328,29 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(PlayerCharacter == nullptr || WeaponToEquip == nullptr) return;
 	if(CombatState != ECombatState::ECS_Unoccupied) return;
-	if(EquippedWeapon)
-	{
-		EquippedWeapon->Drop();
-	}
-
+	
+	DropEquippedWeapon();
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-	const USkeletalMeshSocket* RightHandSocket = PlayerCharacter->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-	if(RightHandSocket)
-	{
-		RightHandSocket->AttachActor(EquippedWeapon, PlayerCharacter->GetMesh());
-	}
+	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
 	EquippedWeapon->SetOwner(PlayerCharacter); // is replicated
 	EquippedWeapon->SetHUDAmmo();
+	UpdateCarriedAmmo();
+	PlayEquipSound();
+	
+	PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+	PlayerCharacter->bUseControllerRotationYaw = true;
+}
 
+void UCombatComponent::DropEquippedWeapon() const
+{
+	if(EquippedWeapon) EquippedWeapon->Drop();
+}
+
+void UCombatComponent::UpdateCarriedAmmo()
+{
+	if(!IsValid(EquippedWeapon)) return;
+	
 	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
 	{
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
@@ -352,27 +360,26 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	{
 		CharacterPlayerController->SetHUDWeaponCarriedAmmo(CarriedAmmo);
 	}
+}
 
-	if(EquippedWeapon->EquipSound)
+void UCombatComponent::PlayEquipSound()
+{
+	if(IsValid(PlayerCharacter) && EquippedWeapon->EquipSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, EquippedWeapon->EquipSound, PlayerCharacter->GetActorLocation());
 	}
-	
-	PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-	PlayerCharacter->bUseControllerRotationYaw = true;
 }
 
 void UCombatComponent::OnRep_EquippedWeapon()
 {
 	if(IsValid(EquippedWeapon) && IsValid(PlayerCharacter))
 	{
+		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
 		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		PlayerCharacter->bUseControllerRotationYaw = true;
 		EquippedWeapon->SetHUDAmmo();
-		if(EquippedWeapon->EquipSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, EquippedWeapon->EquipSound, PlayerCharacter->GetActorLocation());
-		}
+		PlayEquipSound();
 	}
 }
 /*
@@ -523,6 +530,7 @@ void UCombatComponent::OnRep_CombatState()
 		HandleReload();
 		break;
 	case ECombatState::ECS_Throwing:
+		AttachActorToSocket(EquippedWeapon, FName("LeftHandSocket"));
 		break;
 	default: ;
 	}
@@ -537,16 +545,36 @@ void UCombatComponent::Throw()
 void UCombatComponent::ServerThrow_Implementation()
 {
 	CombatState = ECombatState::ECS_Throwing;
+	// TODO: Could be AbilityTask responsibility ?
+	AttachActorToSocket(EquippedWeapon, FName("LeftHandSocket"));
 }
 
 void UCombatComponent::ThrowStart()
 {
 	CombatState = ECombatState::ECS_Throwing;
+	// TODO: Could be AbilityTask responsibility ?
+	AttachActorToSocket(EquippedWeapon, FName("LeftHandSocket"));
+	ServerThrow();
 }
 
 void UCombatComponent::ThrowEnd()
 {
 	CombatState = ECombatState::ECS_Unoccupied;
+	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
+}
+
+/*
+ * Utility
+ */
+// TODO: Could be some library function specific to PlayerCharacter
+void UCombatComponent::AttachActorToSocket(AActor* ActorToAttach, const FName Socket) const
+{
+	if(!IsValid(PlayerCharacter) || PlayerCharacter->GetMesh() == nullptr || ActorToAttach == nullptr) return;
+	
+	if(const USkeletalMeshSocket* SocketToAttach= PlayerCharacter->GetMesh()->GetSocketByName(Socket))
+	{
+		SocketToAttach->AttachActor(ActorToAttach, PlayerCharacter->GetMesh());
+	}
 }
 
 /*
