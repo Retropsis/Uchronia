@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actor/Weapon/Weapon.h"
+#include "RangeWeapon.h"
 #include "HitScanWeapon.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UCHRONIA_API AHitScanWeapon : public AWeapon
+class UCHRONIA_API AHitScanWeapon : public ARangeWeapon
 {
 	GENERATED_BODY()
 

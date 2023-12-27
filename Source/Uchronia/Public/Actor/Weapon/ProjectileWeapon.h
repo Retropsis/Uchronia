@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actor/Weapon/Weapon.h"
+#include "RangeWeapon.h"
 #include "ProjectileWeapon.generated.h"
 
 class UGameplayEffect;
@@ -13,7 +13,7 @@ class AProjectile;
  *  Weapon spawning a physical projectile, including rocket and grenade launchers 
  */
 UCLASS()
-class UCHRONIA_API AProjectileWeapon : public AWeapon
+class UCHRONIA_API AProjectileWeapon : public ARangeWeapon
 {
 	GENERATED_BODY()
 
