@@ -610,6 +610,15 @@ void UCombatComponent::ShowThrowableItem(const bool bShowItem) const
 	}
 }
 
+void UCombatComponent::PickupAmmunition(const EWeaponType WeaponType, int32 Amount)
+{
+	if(CarriedAmmoMap.Contains(WeaponType))
+	{
+		CarriedAmmoMap[WeaponType] = FMath::Clamp(CarriedAmmoMap[WeaponType] + Amount, 0, MaxCarriedAmmo);
+		UpdateCarriedAmmo();
+	}
+}
+
 /*
  * For DEV ONLY
  */

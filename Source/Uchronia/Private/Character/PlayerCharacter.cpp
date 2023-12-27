@@ -360,6 +360,13 @@ void APlayerCharacter::SimProxiesTurn()
  * End
  */
 
+//~ Loot Interface ~
+void APlayerCharacter::LootAmmunition(const EWeaponType WeaponType, const int32 Amount)
+{
+	CombatComponent->PickupAmmunition(WeaponType, Amount);
+}
+//~ Loot Interface End ~
+
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* InWeapon)
 {

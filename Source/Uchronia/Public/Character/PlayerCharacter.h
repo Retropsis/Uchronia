@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BaseCharacter.h"
+#include "Interaction/LootInterface.h"
 #include "Types/AnimationStates.h"
 #include "Types/CombatState.h"
 #include "PlayerCharacter.generated.h"
@@ -18,7 +19,7 @@ class USpringArmComponent;
  * 
  */
 UCLASS()
-class UCHRONIA_API APlayerCharacter : public ABaseCharacter
+class UCHRONIA_API APlayerCharacter : public ABaseCharacter, public ILootInterface
 {
 	GENERATED_BODY()
 
@@ -45,6 +46,10 @@ public:
 	virtual int32 GetGrenadeCount_Implementation() override;
 	virtual void IncrementGrenadeCount_Implementation() override;
 	//~ Combat Interface
+
+	//~ Loot Interface
+	virtual void LootAmmunition(EWeaponType WeaponType, int32 Amount) override;
+	//~ Loot Interface
 
 	virtual void MulticastHandleDeath() override;
 

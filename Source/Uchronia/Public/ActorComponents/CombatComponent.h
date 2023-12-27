@@ -39,6 +39,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ThrowEnd();
 
+	void PickupAmmunition(EWeaponType WeaponType, int32 Amount);
+
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool IsAiming);
@@ -160,6 +162,9 @@ private:
 	void OnRep_CarriedAmmo();
 
 	TMap<EWeaponType, int32> CarriedAmmoMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 MaxCarriedAmmo = 90;
 
 	/*
 	 * TODO: Probably for DEV ONLY

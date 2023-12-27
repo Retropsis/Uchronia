@@ -19,6 +19,7 @@ APickup::APickup()
 	OverlapSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	OverlapSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	OverlapSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	// OverlapSphere->AddLocalOffset(FVector(0.f, 0.f, 80.f)); 
 
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickupMesh"));
 	PickupMesh->SetupAttachment(OverlapSphere);
