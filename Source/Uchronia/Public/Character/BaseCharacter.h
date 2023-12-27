@@ -86,7 +86,7 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
-	TObjectPtr<USkeletalMeshComponent> ThrownItem;
+	TObjectPtr<UStaticMeshComponent> ThrowableItem;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	FName ThrownItemSocketName;
@@ -142,5 +142,5 @@ private:
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 
 public:	
-
+	FORCEINLINE UStaticMeshComponent* GetThrowableItem() const { return ThrowableItem; }
 };

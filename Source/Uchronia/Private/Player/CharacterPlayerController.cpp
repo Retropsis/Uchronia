@@ -187,14 +187,19 @@ void ACharacterPlayerController::ShowDamageNumber_Implementation(float DamageAmo
 	}
 }
 
-void ACharacterPlayerController::SetHUDWeaponAmmo(int32 Ammo)
+void ACharacterPlayerController::SetHUDWeaponAmmo(int32 Ammo) const
 {
 	OnAmmoAmountChanged.Broadcast(Ammo);
 }
 
-void ACharacterPlayerController::SetHUDWeaponCarriedAmmo(int32 Ammo)
+void ACharacterPlayerController::SetHUDWeaponCarriedAmmo(int32 Ammo) const
 {
 	OnCarriedAmmoAmountChanged.Broadcast(Ammo);
+}
+
+void ACharacterPlayerController::SetHUDGrenadeCount(int32 GrenadeCount) const
+{
+	OnGrenadeAmountChanged.Broadcast(GrenadeCount);
 }
 
 /*

@@ -76,6 +76,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	//~ Server Init Ability Actor Info
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+	CombatComponent->UpdateHUDGrenades();
 }
 
 void APlayerCharacter::OnRep_PlayerState()
@@ -84,6 +85,7 @@ void APlayerCharacter::OnRep_PlayerState()
 
 	//~ Client Init Ability Actor Info
 	InitAbilityActorInfo();
+	CombatComponent->UpdateHUDGrenades();
 }
 
 void APlayerCharacter::InitAbilityActorInfo()
@@ -213,6 +215,27 @@ int32 APlayerCharacter::GetCharacterLevel()
 	const ACharacterPlayerState* CharacterPlayerState = GetPlayerState<ACharacterPlayerState>();
 	check(CharacterPlayerState);
 	return CharacterPlayerState->GetCharacterLevel();
+}
+
+int32 APlayerCharacter::GetGrenadeCount_Implementation()
+{
+	if(CombatComponent)
+	{
+		return CombatComponent->GrenadeCount;
+	}
+	return 0;
+}
+
+void APlayerCharacter::IncrementGrenadeCount_Implementation()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->GrenadeCount = FMath::Clamp(CombatComponent->GrenadeCount - 1, 0 , CombatComponent->MaxGrenadeCount);
+		if(ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(GetController()))
+		{
+			CharacterPlayerController->SetHUDGrenadeCount(CombatComponent->GrenadeCount);
+		}
+	}
 }
 
 void APlayerCharacter::HitReact()

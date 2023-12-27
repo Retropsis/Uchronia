@@ -74,4 +74,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void IncrementMinionCount(int32 Amount);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int32 GetGrenadeCount();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void IncrementGrenadeCount();
 };

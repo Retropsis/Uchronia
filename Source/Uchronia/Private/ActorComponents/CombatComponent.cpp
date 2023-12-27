@@ -25,6 +25,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);
+	DOREPLIFETIME(UCombatComponent, GrenadeCount);
 }
 
 void UCombatComponent::BeginPlay()
@@ -409,7 +410,8 @@ void UCombatComponent::OnRep_CarriedAmmo()
 void UCombatComponent::Reload()
 {
 	// if(EquippedWeapon == nullptr) return;
-	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied)
+	//TODO: Design choice if we can reload even full
+	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied /*&& EquippedWeapon && !EquippedWeapon->IsFull()*/)
 	{
 		ServerReload();
 	}
@@ -531,6 +533,7 @@ void UCombatComponent::OnRep_CombatState()
 		break;
 	case ECombatState::ECS_Throwing:
 		AttachActorToSocket(EquippedWeapon, FName("LeftHandSocket"));
+		ShowThrowableItem(true);
 		break;
 	default: ;
 	}
@@ -540,6 +543,7 @@ void UCombatComponent::Throw()
 {
 	if(CombatState != ECombatState::ECS_Unoccupied) return;
 	CombatState = ECombatState::ECS_Throwing;
+	ShowThrowableItem(true);
 }
 
 void UCombatComponent::ServerThrow_Implementation()
@@ -547,6 +551,7 @@ void UCombatComponent::ServerThrow_Implementation()
 	CombatState = ECombatState::ECS_Throwing;
 	// TODO: Could be AbilityTask responsibility ?
 	AttachActorToSocket(EquippedWeapon, FName("LeftHandSocket"));
+	ShowThrowableItem(true);
 }
 
 void UCombatComponent::ThrowStart()
@@ -554,13 +559,33 @@ void UCombatComponent::ThrowStart()
 	CombatState = ECombatState::ECS_Throwing;
 	// TODO: Could be AbilityTask responsibility ?
 	AttachActorToSocket(EquippedWeapon, FName("LeftHandSocket"));
+	ShowThrowableItem(true);
 	ServerThrow();
+}
+
+void UCombatComponent::ThrowItem()
+{
+	ShowThrowableItem(false);
 }
 
 void UCombatComponent::ThrowEnd()
 {
 	CombatState = ECombatState::ECS_Unoccupied;
 	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
+}
+
+void UCombatComponent::UpdateHUDGrenades()
+{
+	CharacterPlayerController = CharacterPlayerController == nullptr ?  Cast<ACharacterPlayerController>(PlayerCharacter->Controller) : CharacterPlayerController;
+	if(CharacterPlayerController)
+	{
+		CharacterPlayerController->SetHUDGrenadeCount(GrenadeCount);
+	}
+}
+
+void UCombatComponent::OnRep_GrenadeCount()
+{
+	UpdateHUDGrenades();
 }
 
 /*
@@ -574,6 +599,14 @@ void UCombatComponent::AttachActorToSocket(AActor* ActorToAttach, const FName So
 	if(const USkeletalMeshSocket* SocketToAttach= PlayerCharacter->GetMesh()->GetSocketByName(Socket))
 	{
 		SocketToAttach->AttachActor(ActorToAttach, PlayerCharacter->GetMesh());
+	}
+}
+
+void UCombatComponent::ShowThrowableItem(const bool bShowItem) const
+{
+	if(IsValid(PlayerCharacter) && PlayerCharacter->GetThrowableItem())
+	{
+		PlayerCharacter->GetThrowableItem()->SetVisibility(bShowItem);
 	}
 }
 

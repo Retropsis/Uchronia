@@ -34,11 +34,13 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 
-	void SetHUDWeaponAmmo(int32 Ammo);
-	void SetHUDWeaponCarriedAmmo(int32 Ammo);
+	void SetHUDWeaponAmmo(int32 Ammo) const;
+	void SetHUDWeaponCarriedAmmo(int32 Ammo) const;
+	void SetHUDGrenadeCount(int32 GrenadeCount) const;
 	
 	FOnAmmoAmountChangedSignature OnAmmoAmountChanged;
 	FOnAmmoAmountChangedSignature OnCarriedAmmoAmountChanged;
+	FOnAmmoAmountChangedSignature OnGrenadeAmountChanged;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")

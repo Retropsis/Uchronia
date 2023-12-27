@@ -7,6 +7,7 @@
 #include "BaseGameplayTags.h"
 #include "Actor/Weapon/Projectile.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                          const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
@@ -32,12 +33,18 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);
 	SpawnTransform.SetRotation(Rotation.Quaternion());
-		
+
+	AActor* AvatarActor = GetAvatarActorFromActorInfo();
+	AActor* OwningActor = GetOwningActorFromActorInfo();
+	// UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Instigator: [%s]"), *AvatarActor->GetInstigator()->GetName()), true, true, FLinearColor::Red, 5.f);
+	// UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Instigator: [%s]"), *OwningActor->GetInstigator()->GetName()), true, true, FLinearColor::Red, 5.f);
+	
 	AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
 		ProjectileClass,
 		SpawnTransform,
 		GetOwningActorFromActorInfo(),
-		Cast<APawn>(GetOwningActorFromActorInfo()),
+		Cast<APawn>(AvatarActor),
+		// Cast<APawn>(GetOwningActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 

@@ -96,6 +96,7 @@ void AProjectile::SpawnTrailSystem()
 
 void AProjectile::ApplyRadialDamageWithFalloff()
 {
+	// const APawn* FiringPawn = Cast<APawn>(DamageEffectSpecHandle.Data.Get()->GetContext().GetInstigator());
 	const APawn* FiringPawn = GetInstigator();
 	if(FiringPawn && HasAuthority())
 	{

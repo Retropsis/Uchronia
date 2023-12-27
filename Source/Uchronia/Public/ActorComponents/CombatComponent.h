@@ -34,6 +34,9 @@ public:
 	void ThrowStart();
 	
 	UFUNCTION(BlueprintCallable)
+	void ThrowItem();
+	
+	UFUNCTION(BlueprintCallable)
 	void ThrowEnd();
 
 protected:
@@ -44,6 +47,7 @@ protected:
 	void Reload();
 	void Throw();
 	void DropEquippedWeapon() const;
+	void ShowThrowableItem(bool bShowItem) const;
 
 	void AttachActorToSocket(AActor* ActorToAttach, FName Socket) const;
 
@@ -147,6 +151,7 @@ private:
 	void InitializeCarriedAmmo();
 	void UpdateAmmoValues();
 	void UpdateSingleAmmoValue();
+	void UpdateHUDGrenades();
 
 	UPROPERTY(ReplicatedUsing=OnRep_CarriedAmmo)
 	int32 CarriedAmmo;
@@ -179,6 +184,15 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	int32 StartingGrenadeLauncherAmmo = 0;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_GrenadeCount)
+	int32 GrenadeCount = 4;
+
+	UFUNCTION()
+	void OnRep_GrenadeCount();
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 MaxGrenadeCount = 4;
 	/*
 	 *
 	 */

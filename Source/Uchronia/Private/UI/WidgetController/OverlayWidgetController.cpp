@@ -39,6 +39,11 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			{
 				OnWeaponCarriedAmmoChanged.Broadcast(NewCount);
 			});
+		CharacterPlayerController->OnGrenadeAmountChanged.AddLambda(
+			[this](int32 NewCount)
+			{
+				OnGrenadeCountChanged.Broadcast(NewCount);
+			});
 	}
 
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(

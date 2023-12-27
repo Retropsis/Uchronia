@@ -42,6 +42,8 @@ public:
 	//~ Combat Interface
 	virtual int32 GetCharacterLevel() override;
 	virtual void HitReact() override;
+	virtual int32 GetGrenadeCount_Implementation() override;
+	virtual void IncrementGrenadeCount_Implementation() override;
 	//~ Combat Interface
 
 	virtual void MulticastHandleDeath() override;
