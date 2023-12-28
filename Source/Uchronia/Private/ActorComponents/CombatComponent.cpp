@@ -11,6 +11,9 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/CharacterPlayerController.h"
 #include "TimerManager.h"
+#include "Actor/Weapon/MeleeWeapon.h"
+#include "Actor/Weapon/RangeWeapon.h"
+#include "Components/BoxComponent.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -22,6 +25,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UCombatComponent, EquippedMeleeWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);
@@ -325,19 +329,33 @@ void UCombatComponent::ServerSetAiming_Implementation(const bool IsAiming)
 /*
  * Equipping START
  */
-void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
+void UCombatComponent::EquipWeapon(AWeapon*  WeaponToEquip)
 {
 	if(PlayerCharacter == nullptr || WeaponToEquip == nullptr) return;
 	if(CombatState != ECombatState::ECS_Unoccupied) return;
 	
 	DropEquippedWeapon();
-	EquippedWeapon = WeaponToEquip;
-	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
-	EquippedWeapon->SetOwner(PlayerCharacter); // is replicated
-	EquippedWeapon->SetHUDAmmo();
-	UpdateCarriedAmmo();
-	PlayEquipSound();
+	if(ARangeWeapon* RangedWeaponToEquip = Cast<ARangeWeapon>(WeaponToEquip))
+	{
+		EquippedWeapon = RangedWeaponToEquip;
+		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
+		EquippedWeapon->SetOwner(PlayerCharacter); // is replicated
+		EquippedWeapon->SetHUDAmmo();
+		UpdateCarriedAmmo();
+		PlayEquipSound();
+	}
+	if(AMeleeWeapon* MeleeWeaponToEquip = Cast<AMeleeWeapon>(WeaponToEquip))
+	{
+		EquippedMeleeWeapon = MeleeWeaponToEquip;
+		EquippedMeleeWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		AttachActorToSocket(EquippedMeleeWeapon, FName("RightHandSocket"));
+		EquippedMeleeWeapon->SetOwner(PlayerCharacter); // is replicated
+		if(EquippedMeleeWeapon && EquippedMeleeWeapon->EquipSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, EquippedMeleeWeapon->EquipSound, PlayerCharacter->GetActorLocation());
+		}
+	}
 	
 	PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	PlayerCharacter->bUseControllerRotationYaw = true;
@@ -345,7 +363,17 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 void UCombatComponent::DropEquippedWeapon() const
 {
-	if(EquippedWeapon) EquippedWeapon->Drop();
+	// TODO: Find how to properly reset these pointers or find another solution
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->Drop();
+		EquippedWeapon->MarkAsGarbage();
+	}
+	if(EquippedMeleeWeapon)
+	{
+		EquippedMeleeWeapon->Drop();
+		EquippedMeleeWeapon->MarkAsGarbage();
+	}
 }
 
 void UCombatComponent::UpdateCarriedAmmo()
@@ -363,9 +391,9 @@ void UCombatComponent::UpdateCarriedAmmo()
 	}
 }
 
-void UCombatComponent::PlayEquipSound()
+void UCombatComponent::PlayEquipSound() const
 {
-	if(IsValid(PlayerCharacter) && EquippedWeapon->EquipSound)
+	if(EquippedWeapon && EquippedWeapon->EquipSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, EquippedWeapon->EquipSound, PlayerCharacter->GetActorLocation());
 	}
@@ -380,6 +408,18 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		PlayerCharacter->bUseControllerRotationYaw = true;
 		EquippedWeapon->SetHUDAmmo();
+		PlayEquipSound();
+	}
+}
+
+void UCombatComponent::OnRep_EquippedMeleeWeapon()
+{
+	if(IsValid(EquippedMeleeWeapon) && IsValid(PlayerCharacter))
+	{
+		EquippedMeleeWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		AttachActorToSocket(EquippedMeleeWeapon, FName("RightHandSocket"));
+		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		PlayerCharacter->bUseControllerRotationYaw = true;
 		PlayEquipSound();
 	}
 }
@@ -554,6 +594,9 @@ void UCombatComponent::ServerThrow_Implementation()
 	ShowThrowableItem(true);
 }
 
+/*
+ * Anim Notifies
+ */
 void UCombatComponent::ThrowStart()
 {
 	CombatState = ECombatState::ECS_Throwing;
@@ -573,6 +616,18 @@ void UCombatComponent::ThrowEnd()
 	CombatState = ECombatState::ECS_Unoccupied;
 	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
 }
+
+void UCombatComponent::SetMeleeWeaponCollisionEnabled(const ECollisionEnabled::Type CollisionEnabled)
+{
+	if(PlayerCharacter->HasAuthority() && EquippedMeleeWeapon && EquippedMeleeWeapon->GetCollisionBox())
+	{
+		EquippedMeleeWeapon->GetCollisionBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedMeleeWeapon->EmptyIgnoreActors();
+	}
+}
+/*
+ * Anim Notifies - END
+ */
 
 void UCombatComponent::UpdateHUDGrenades()
 {

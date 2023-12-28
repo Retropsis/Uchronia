@@ -2,14 +2,13 @@
 
 #include "Actor/Weapon/Weapon.h"
 
-#include "Actor/Weapon/AmmoContainer.h"
-#include "Actor/Weapon/Casing.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "BaseGameplayTags.h"
 #include "ActorComponents/CombatComponent.h"
 #include "Character/PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
-#include "Engine/SkeletalMeshSocket.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/CharacterPlayerController.h"
 
@@ -45,20 +44,12 @@ AWeapon::AWeapon()
 	PickupWidget->SetupAttachment(GetRootComponent());
 	PickupWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	PickupWidget->SetDrawAtDesiredSize(true);
-	
-	AmmoContainer = CreateDefaultSubobject<AAmmoContainer>(TEXT("Ammo Container"));
-	const USkeletalMeshSocket* ClipSocket =WeaponMesh->GetSocketByName(FName("ClipSocket"));
-	if(ClipSocket)
-	{
-		ClipSocket->AttachActor(AmmoContainer, WeaponMesh);
-	}
 }
 
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWeapon, WeaponState);
-	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::BeginPlay()
@@ -75,28 +66,25 @@ void AWeapon::BeginPlay()
 	if (PickupWidget) PickupWidget->SetVisibility(false);
 }
 
-void AWeapon::Trigger(const FVector& HitTarget)
+void AWeapon::CauseDamage(const FHitResult& Hit)
 {
-	if(IsValid(FireAnimation))
+	if (HasAuthority() && Hit.bBlockingHit)
 	{
-		WeaponMesh->PlayAnimation(FireAnimation, false);
-	}
-	if(CasingClass)
-	{
-		if(const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject")))
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, 1.0f, SourceASC->MakeEffectContext());
+    
+		const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+    
+		for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
 		{
-			const FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
-			if(UWorld* World = GetWorld())
-			{
-				World->SpawnActor<ACasing>(
-					CasingClass,
-					SocketTransform.GetLocation(),
-					SocketTransform.GetRotation().Rotator()
-				);
-			}
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(1.f);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+		}
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Hit.GetActor()))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
 	}
-	SpendRound();
 }
 
 void AWeapon::Drop()
@@ -109,29 +97,6 @@ void AWeapon::Drop()
 	OwnerController = nullptr;
 }
 
-void AWeapon::SpendRound()
-{
-	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
-	SetHUDAmmo();
-}
-
-void AWeapon::AddRounds(int32 RoundsToAdd)
-{
-	Ammo = FMath::Clamp(Ammo + RoundsToAdd, 0, MagCapacity);
-	SetHUDAmmo();
-}
-
-void AWeapon::OnRep_Ammo()
-{
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("%d"), Ammo), true, true, FLinearColor::Blue, 3.f);
-	OwnerCharacter = OwnerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()) : OwnerCharacter;
-	if(IsValid(OwnerCharacter) && OwnerCharacter->GetCombatComponent() && IsFull())
-	{
-		OwnerCharacter->GetCombatComponent()->JumpToReloadEnd();
-	}
-	SetHUDAmmo();
-}
-
 void AWeapon::OnRep_Owner()
 {
 	Super::OnRep_Owner();
@@ -139,23 +104,6 @@ void AWeapon::OnRep_Owner()
 	{
 		OwnerCharacter = nullptr;
 		OwnerController = nullptr;
-	}
-	else
-	{
-		SetHUDAmmo();
-	}
-}
-
-void AWeapon::SetHUDAmmo()
-{
-	OwnerCharacter = OwnerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()) : OwnerCharacter;
-	if(OwnerCharacter)
-	{
-		OwnerController = OwnerController == nullptr ? Cast<ACharacterPlayerController>(OwnerCharacter->Controller) : OwnerController;
-		if (OwnerController)
-		{
-			OwnerController->SetHUDWeaponAmmo(Ammo);
-		}
 	}
 }
 

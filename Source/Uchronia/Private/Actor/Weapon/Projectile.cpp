@@ -66,7 +66,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	// TODO: if Explosion could have a bigger HitReact
 	if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(OtherActor))
 	{
-		CombatInterface->HitReact();
+		CombatInterface->HitReact(Hit.ImpactPoint);
 	}
 	if(HasAuthority())
 	{

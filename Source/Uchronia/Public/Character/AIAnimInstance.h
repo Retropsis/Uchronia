@@ -16,7 +16,7 @@ class UCHRONIA_API UAIAnimInstance : public UAnimInstance
 
 
 public:
-	void PlayHitReactMontage();
+	void PlayHitReactMontage(const FVector& ImpactPoint);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Montage")

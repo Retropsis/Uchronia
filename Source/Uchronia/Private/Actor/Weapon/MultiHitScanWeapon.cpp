@@ -6,11 +6,10 @@
 #include "BaseGameplayTags.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
-#include "Particles/ParticleSystemComponent.h"
 
 void AMultiHitScanWeapon::Trigger(const FVector& HitTarget)
 {
-	AWeapon::Trigger(HitTarget);
+	ARangeWeapon::Trigger(HitTarget);
 	
 	if (const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash")))
 	{

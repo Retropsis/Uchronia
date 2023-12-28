@@ -7,6 +7,7 @@
 #include "Types/AnimationStates.h"
 #include "CharacterAnimInstance.generated.h"
 
+class ARangeWeapon;
 class AWeapon;
 class APlayerCharacter;
 /**
@@ -23,8 +24,9 @@ public:
 
 	void PlayFireMontage(bool bIsAiming);
 	void PlayReloadMontage();
-	void PlayHitReactMontage();
+	void PlayHitReactMontage(const FVector& ImpactPoint);
 	void JumpToReloadEnd();
+	void DirectionalHitReact(const FVector& ImpactPoint);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
@@ -42,7 +44,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bWeaponEquipped = false;
 
-	TObjectPtr<AWeapon> EquippedWeapon;
+	TObjectPtr<ARangeWeapon> EquippedWeapon;
 
 	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
 	bool bIsCrouched = false;

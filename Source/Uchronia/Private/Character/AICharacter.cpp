@@ -103,7 +103,7 @@ void AAICharacter::InitializeDefaultAttributes() const
 }
 
 // Called through CombatInterface
-void AAICharacter::HitReact()
+void AAICharacter::HitReact(const FVector& ImpactPoint)
 {
 }
 

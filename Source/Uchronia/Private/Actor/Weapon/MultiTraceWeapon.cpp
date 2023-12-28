@@ -10,7 +10,7 @@
 
 void AMultiTraceWeapon::Trigger(const FVector& HitTarget)
 {
-	AWeapon::Trigger(HitTarget);
+	ARangeWeapon::Trigger(HitTarget);
 	
 	if(!HasAuthority()) return;
 

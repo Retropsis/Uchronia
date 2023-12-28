@@ -104,7 +104,7 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	return FVector();
 }
 
-void ABaseCharacter::HitReact()
+void ABaseCharacter::HitReact(const FVector& ImpactPoint)
 {
 }
 
@@ -176,6 +176,11 @@ TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
 UNiagaraSystem* ABaseCharacter::GetSoftBodyImpact_Implementation()
 {
 	return SoftBodyImpact;
+}
+
+USoundBase* ABaseCharacter::GetSoftBodySound_Implementation()
+{
+	return SoftBodySound;
 }
 
 FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)

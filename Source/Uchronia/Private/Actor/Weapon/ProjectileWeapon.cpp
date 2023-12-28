@@ -10,39 +10,6 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/KismetMathLibrary.h"
 
-// void AProjectileWeapon::Trigger(const FVector& HitTarget)
-// {
-// 	Super::Trigger(HitTarget);
-//
-// 	if(!HasAuthority()) return;
-// 	
-// 	APawn* InstigatorPawn = Cast<APlayerCharacter>(GetOwner());
-// 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash"));
-// 	if(MuzzleFlashSocket)
-// 	{
-// 		const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
-// 		const FVector ToTarget = HitTarget - SocketTransform.GetLocation(); // From MuzzleFlashSocket to ImpactLocation
-// 		const FRotator TargetRotation = ToTarget.Rotation();
-// 		// if(GetAmmoContainer()&& GetAmmoContainer()->GetProjectileClass() && InstigatorPawn)
-// 		if(ProjectileClass && InstigatorPawn)
-// 		{
-// 			if(UWorld* World = GetWorld())
-// 			{
-// 				FActorSpawnParameters SpawnParams;
-// 				SpawnParams.Owner = GetOwner();
-// 				SpawnParams.Instigator = InstigatorPawn;
-// 				World->SpawnActor<AProjectile>(
-// 					// GetAmmoContainer()->GetProjectileClass(),
-// 					ProjectileClass,
-// 					SocketTransform.GetLocation(),
-// 					TargetRotation,
-// 					SpawnParams
-// 				);
-// 			}
-// 		}
-// 	}
-// }
-
 void AProjectileWeapon::Trigger(const FVector& HitTarget)
 {
 	Super::Trigger(HitTarget);
@@ -90,13 +57,13 @@ void AProjectileWeapon::Trigger(const FVector& HitTarget)
 	}
 }
 
-FVector AProjectileWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget)
+FVector AProjectileWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget) const
 {
-	FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
-	FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
-	FVector RandomVector = UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(0.f, SphereRadius);
-	FVector EndLocation = SphereCenter + RandomVector;
-	FVector ToEndLocation = EndLocation - TraceStart;
+	const FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
+	const FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
+	const FVector RandomVector = UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(0.f, SphereRadius);
+	const FVector EndLocation = SphereCenter + RandomVector;
+	const FVector ToEndLocation = EndLocation - TraceStart;
 	
 	DrawDebugSphere(GetWorld(), SphereCenter, SphereRadius, 12, FColor::Red, false, 5.f);
 	DrawDebugSphere(GetWorld(), EndLocation, 4.f, 12, FColor::White, false, 5.f);
@@ -107,9 +74,9 @@ FVector AProjectileWeapon::TraceEndWithScatter(const FVector& TraceStart, const 
 
 void AProjectileWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutTraceHit)
 {
-	if(UWorld* World = GetWorld())
+	if(const UWorld* World = GetWorld())
 	{
-		FVector End = bUseScatter ? TraceEndWithScatter(TraceStart, HitTarget) : TraceStart + (HitTarget - TraceStart)  * 1.25f;
+		const FVector End = bUseScatter ? TraceEndWithScatter(TraceStart, HitTarget) : TraceStart + (HitTarget - TraceStart)  * 1.25f;
 		World->LineTraceSingleByChannel(OutTraceHit, TraceStart, End, ECC_Visibility);
 		// TODO: Need a valid BeamEnd when hitting the sky
 		FVector BeamEnd = End;
@@ -117,12 +84,5 @@ void AProjectileWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector&
 		{
 			BeamEnd = OutTraceHit.ImpactPoint;
 		}
-		// if (BeamParticles)
-		// {
-		// 	if(UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(World, BeamParticles, TraceStart, FRotator::ZeroRotator, true))
-		// 	{
-		// 		Beam->SetVectorParameter(FName("Target"), BeamEnd);
-		// 	}
-		// }
 	}
 }

@@ -20,33 +20,17 @@ void AHitScanWeapon::Trigger(const FVector& HitTarget)
 		
 		FHitResult ScanHit;
 		WeaponTraceHit(Start, HitTarget, ScanHit);
-		if (HasAuthority())
-		{
-			const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
-			const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, 1.0f, SourceASC->MakeEffectContext());
-    
-			const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-    
-			for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
-			{
-				const float ScaledDamage = Pair.Value.GetValueAtLevel(1.f);
-				UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
-			}
-			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ScanHit.GetActor()))
-			{
-				TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			}
-		}
+		CauseDamage(ScanHit);
 		ApplyWeaponEffects(SocketTransform, ScanHit);
 	}
 }
 
-void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutTraceHit)
+void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutTraceHit) const
 {
 	// TODO: Need a valid HitTarget when hitting the sky ?
-	if(UWorld* World = GetWorld())
+	if(const UWorld* World = GetWorld())
 	{
-		FVector End = bUseScatter ? TraceEndWithScatter(TraceStart, HitTarget) : TraceStart + (HitTarget - TraceStart)  * 1.25f;
+		const FVector End = bUseScatter ? TraceEndWithScatter(TraceStart, HitTarget) : TraceStart + (HitTarget - TraceStart)  * 1.25f;
 		World->LineTraceSingleByChannel(OutTraceHit, TraceStart, End, ECC_Visibility);
 		FVector BeamEnd = End;
 		if(OutTraceHit.bBlockingHit)
@@ -63,13 +47,14 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 	}
 }
 
-FVector AHitScanWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget)
+// TODO: DistanceToSphere, SphereRadius and CrosshairSpread should be related to the Weapon Properties 
+FVector AHitScanWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget) const
 {
-	FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
-	FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
-	FVector RandomVector = UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(0.f, SphereRadius);
-	FVector EndLocation = SphereCenter + RandomVector;
-	FVector ToEndLocation = EndLocation - TraceStart;
+	const FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
+	const FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
+	const FVector RandomVector = UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(0.f, SphereRadius);
+	const FVector EndLocation = SphereCenter + RandomVector;
+	const FVector ToEndLocation = EndLocation - TraceStart;
 	
 	// DrawDebugSphere(GetWorld(), SphereCenter, SphereRadius, 12, FColor::Red, false, 5.f);
 	// DrawDebugSphere(GetWorld(), EndLocation, 4.f, 12, FColor::White, false, 5.f);
@@ -78,16 +63,16 @@ FVector AHitScanWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVe
 	return FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size());
 }
 
-void AHitScanWeapon::ApplyWeaponEffects(FTransform SocketTransform, FHitResult ScanHit)
+void AHitScanWeapon::ApplyWeaponEffects(const FTransform& SocketTransform, const FHitResult& Hit) const
 {
 	UWorld* World = GetWorld();
 	if (ImpactParticles)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(World, ImpactParticles, ScanHit.ImpactPoint, ScanHit.ImpactNormal.Rotation());
+		UGameplayStatics::SpawnEmitterAtLocation(World, ImpactParticles, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 	}
 	if(ImpactSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(World, ImpactSound, ScanHit.ImpactPoint);
+		UGameplayStatics::PlaySoundAtLocation(World, ImpactSound, Hit.ImpactPoint);
 	}
 	if(MuzzleFlash)
 	{

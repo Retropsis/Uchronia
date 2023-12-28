@@ -10,6 +10,7 @@
 #include "Types/CombatState.h"
 #include "PlayerCharacter.generated.h"
 
+class ARangeWeapon;
 class UCombatComponent;
 class AWeapon;
 class UWidgetComponent;
@@ -42,7 +43,7 @@ public:
 	
 	//~ Combat Interface
 	virtual int32 GetCharacterLevel() override;
-	virtual void HitReact() override;
+	virtual void HitReact(const FVector& ImpactPoint) override;
 	virtual int32 GetGrenadeCount_Implementation() override;
 	virtual void IncrementGrenadeCount_Implementation() override;
 	//~ Combat Interface
@@ -54,7 +55,7 @@ public:
 	virtual void MulticastHandleDeath() override;
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHitReact();
+	void MulticastHitReact(const FVector& ImpactPoint);
 
 protected:
 	// TODO: Could be somewhere else like WidgetController
@@ -124,7 +125,7 @@ private:
 		
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
-	AWeapon* GetEquippedWeapon();
+	ARangeWeapon* GetEquippedWeapon();
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return CombatComponent; };
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	bool IsWeaponEquipped() const;

@@ -29,13 +29,14 @@ public:
 	
 	/* Combat Interface */
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
-	virtual void HitReact() override;
+	virtual void HitReact(const FVector& ImpactPoint) override;
 	virtual void Die() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	virtual UNiagaraSystem* GetSoftBodyImpact_Implementation() override;
+	virtual USoundBase* GetSoftBodySound_Implementation() override;
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	virtual int32 GetMinionCount_Implementation() override;
 	virtual void IncrementMinionCount_Implementation(int32 Amount) override;
@@ -44,10 +45,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 	
-	UPROPERTY(EditDefaultsOnly, Category="Combat|Montages")
+	UPROPERTY(EditDefaultsOnly, Category="Base Character Properties|Montages")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 
-	UPROPERTY(EditAnywhere, Category="Combat|Montages")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Montages")
 	TArray<FTaggedMontage> AttackMontages;
 	
 protected:
@@ -59,7 +60,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties")
 	float DespawnLifeSpan = 3.f;
 
 	bool bDead = false;
@@ -72,35 +73,35 @@ protected:
 	virtual  void InitializeDefaultAttributes() const;
 	void AddCharacterAbilities();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Base Character Properties|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Base Character Properties|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Base Character Properties|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	// TODO: Might need to be more generic
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Base Character Properties|Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Combat")
 	TObjectPtr<UStaticMeshComponent> ThrowableItem;
 
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Combat")
 	FName ThrownItemSocketName;
 	
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Combat")
 	FName CombatSocketName;
 	
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Combat")
 	FName LeftHandSocketName;
 	
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Combat")
 	FName RightHandSocketName;
 	
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Combat")
 	FName TailSocketName;
 
 	/*
@@ -119,26 +120,29 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Base Character Properties|Dissolve")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Base Character Properties|Dissolve")
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
 
 	/*
-	 * VFX
+	 *  SFX & VFX
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat|VFX")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Base Character Properties|Combat|VFX")
 	UNiagaraSystem* SoftBodyImpact;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Base Character Properties|Combat|SFX")
+	USoundBase* SoftBodySound;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Base Character Properties|Combat|SFX")
+	USoundBase* DeathSound;	
 	/*
-	 * SFX
+	 * SFX & VFX - END
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat|SFX")
-	USoundBase* DeathSound;
 
 private:
-	UPROPERTY(EditAnywhere, Category="Abilities")
+	UPROPERTY(EditAnywhere, Category="Base Character Properties|Combat|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 
 public:	

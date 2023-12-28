@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Actor/Weapon/RangeWeapon.h"
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
 #include "Camera/CameraComponent.h"
@@ -238,15 +239,15 @@ void APlayerCharacter::IncrementGrenadeCount_Implementation()
 	}
 }
 
-void APlayerCharacter::HitReact()
+void APlayerCharacter::HitReact(const FVector& ImpactPoint)
 {
-	MulticastHitReact();
+	MulticastHitReact(ImpactPoint);
 }
 
-void APlayerCharacter::MulticastHitReact_Implementation()
+void APlayerCharacter::MulticastHitReact_Implementation(const FVector& ImpactPoint)
 {
 	UCharacterAnimInstance* AnimInstance = Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-	AnimInstance->PlayHitReactMontage();	
+	AnimInstance->PlayHitReactMontage(ImpactPoint);	
 }
 
 // TODO: Try having this code in AnimInstance instead
@@ -389,7 +390,7 @@ void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 
 bool APlayerCharacter::IsWeaponEquipped() const
 {
-	return (CombatComponent && CombatComponent->EquippedWeapon);
+	return (CombatComponent && (CombatComponent->EquippedWeapon || CombatComponent->EquippedMeleeWeapon));
 }
 
 bool APlayerCharacter::IsAiming() const
@@ -397,7 +398,7 @@ bool APlayerCharacter::IsAiming() const
 	return (CombatComponent && CombatComponent->bAiming);
 }
 
-AWeapon* APlayerCharacter::GetEquippedWeapon()
+ARangeWeapon* APlayerCharacter::GetEquippedWeapon()
 {
 	if(!IsValid(CombatComponent)) return nullptr;
 	return CombatComponent->EquippedWeapon;

@@ -42,7 +42,7 @@ class UCHRONIA_API ICombatInterface
 
 public:
 	virtual int32 GetCharacterLevel();
-	virtual void HitReact() = 0;
+	virtual void HitReact(const FVector& ImpactPoint) = 0;
 	virtual void Die() = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -65,6 +65,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UNiagaraSystem* GetSoftBodyImpact();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	USoundBase* GetSoftBodySound();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);

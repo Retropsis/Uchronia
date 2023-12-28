@@ -31,7 +31,7 @@ public:
 	
 	/* Combat Interface */
 	virtual int32 GetCharacterLevel() override;
-	virtual void HitReact() override;
+	virtual void HitReact(const FVector& ImpactPoint) override;
 	virtual void Die() override;
 	/* Combat Interface */
 

@@ -21,7 +21,7 @@ public:
 	virtual void Trigger(const FVector& HitTarget) override;
 
 protected:
-	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget);
+	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget) const;
 	void WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutTraceHit);
 	
 private:

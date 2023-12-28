@@ -9,6 +9,8 @@
 #include "Types/CombatState.h"
 #include "CombatComponent.generated.h"
 
+class AMeleeWeapon;
+class ARangeWeapon;
 class APlayerHUD;
 class ACharacterPlayerController;
 class UCharacterAnimInstance;
@@ -26,7 +28,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void UpdateCarriedAmmo();
-	void PlayEquipSound();
+	void PlayEquipSound() const;
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void JumpToReloadEnd();
 
@@ -38,6 +40,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ThrowEnd();
+	
+	UFUNCTION(BlueprintCallable)
+	void SetMeleeWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
 	void PickupAmmunition(EWeaponType WeaponType, int32 Amount);
 
@@ -89,13 +94,19 @@ private:
 	APlayerHUD* PlayerHUD;
 
 	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeapon)
-	TObjectPtr<AWeapon> EquippedWeapon;
+	ARangeWeapon* EquippedWeapon;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_EquippedMeleeWeapon)
+	AMeleeWeapon* EquippedMeleeWeapon;
 
 	UPROPERTY()
 	UCharacterAnimInstance* CharacterAnimInstance;
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+	
+	UFUNCTION()
+	void OnRep_EquippedMeleeWeapon();
 	
 	UPROPERTY(Replicated)
 	bool bAiming = false;

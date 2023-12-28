@@ -2,6 +2,7 @@
 
 #include "Character/CharacterAnimInstance.h"
 
+#include "Actor/Weapon/RangeWeapon.h"
 #include "Actor/Weapon/Weapon.h"
 #include "Character/PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -34,6 +35,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsAccelerating = PlayerCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f;
 	bWeaponEquipped = PlayerCharacter->IsWeaponEquipped();
 	EquippedWeapon = PlayerCharacter->GetEquippedWeapon();
+	
 	bIsCrouched = PlayerCharacter->bIsCrouched;
 	bAiming = PlayerCharacter->IsAiming();
 	TurningInPlace = PlayerCharacter->GetTurningInPlace();
@@ -153,14 +155,48 @@ void UCharacterAnimInstance::JumpToReloadEnd()
 	}
 }
 
-void UCharacterAnimInstance::PlayHitReactMontage()
+void UCharacterAnimInstance::PlayHitReactMontage(const FVector& ImpactPoint)
 {
 	if(PlayerCharacter->GetCombatComponent() == nullptr || PlayerCharacter->GetEquippedWeapon() == nullptr) return;
 	
 	if(IsValid(HitReactMontage))
 	{
-		Montage_Play(HitReactMontage);
-		const FName SectionName("FromFront");
-		Montage_JumpToSection(SectionName);
+		DirectionalHitReact(ImpactPoint);
 	}
+}
+
+void UCharacterAnimInstance::DirectionalHitReact(const FVector& ImpactPoint)
+{
+	const FVector Forward = PlayerCharacter->GetActorForwardVector();
+	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, PlayerCharacter->GetActorLocation().Z);
+	const FVector ToHit = ( ImpactLowered - PlayerCharacter->GetActorLocation() ).GetSafeNormal();
+
+	// Forward .ToHit = |Forward| |ToHit| * cos(theta)
+	//  |Forward| = 1,  |ToHit| = 1, so Forward .ToHit = cos(theta)
+	const double CosTheta = FVector::DotProduct(Forward, ToHit);
+	// Take the inverse cosine (arc-cosine) of cos(theta) to get theta
+	double Theta = FMath::Acos(CosTheta);
+	// convert radians to degrees
+	Theta = FMath::RadiansToDegrees(Theta);
+		
+	// if CrossProduct points down, theta should be negative
+	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
+
+	if(CrossProduct.Z < 0)
+	{
+		Theta *= -1.f;
+	}
+	// GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Emerald, FString::Printf(TEXT("Theta: [%f]"), Theta));
+	// UKismetSystemLibrary::DrawDebugArrow(this, PlayerCharacter->GetActorLocation(), PlayerCharacter->GetActorLocation( ) + Forward * 50.f, 1.f, FLinearColor::Red, 3.f, 1.f);
+	// UKismetSystemLibrary::DrawDebugArrow(this, PlayerCharacter->GetActorLocation(), PlayerCharacter->GetActorLocation( ) + ToHit * 50.f, 1.f, FLinearColor::Green, 3.f, 1.f);
+	// UKismetSystemLibrary::DrawDebugArrow(this, PlayerCharacter->GetActorLocation(), PlayerCharacter->GetActorLocation( ) + CrossProduct * 50.f, 1.f, FLinearColor::Blue, 3.f, 1.f);
+		
+	Montage_Play(HitReactMontage);
+	FName Section("FromBack");
+
+	if(Theta >= -45.f && Theta <= 45.f) Section = FName("FromFront");
+	else if (Theta >= -135.f && Theta < -45.f) Section = FName("FromLeft");
+	else if (Theta >= 45.f && Theta < 135.f) Section = FName("FromRight");
+		
+	Montage_JumpToSection(Section);
 }
