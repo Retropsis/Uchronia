@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class UCHRONIA_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
