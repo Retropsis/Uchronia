@@ -2,9 +2,16 @@
 
 
 #include "ActorComponents/Inventory/ItemBase.h"
+#include "ActorComponents/Inventory/InventoryComponent.h"
 
-UItemBase::UItemBase()
+UItemBase::UItemBase() : bIsCopy(false), bIsPickup(false)
 {
+}
+
+void UItemBase::ResetItemFlags()
+{
+	bIsCopy = false;
+	bIsPickup = false;
 }
 
 UItemBase* UItemBase::CreateItemCopy() const
@@ -19,6 +26,7 @@ UItemBase* UItemBase::CreateItemCopy() const
 	ItemCopy->AssetData = this->AssetData;
 	ItemCopy->NumericData = this->NumericData;
 	ItemCopy->ItemStatistics = this->ItemStatistics;
+	ItemCopy->bIsCopy = true;
 
 	return ItemCopy;
 }
@@ -29,13 +37,13 @@ void UItemBase::SetQuantity(int32 NewQuantity)
 	{
 		Quantity = FMath::Clamp(NewQuantity, 0, NumericData.bIsStackable ? NumericData.MaxStackSize : 1);
 
-		// if(OwningInventory)
-		// {
-		// 	if(Quantity <= 0)
-		// 	{
-		//			OwningInventory->RemoveItem(this);
-		//     }
-		// }
+		 if(OwningInventory)
+		 {
+		 	if(Quantity <= 0)
+		 	{
+					OwningInventory->RemoveSingleInstanceOfItem(this);
+		     }
+		 }
 	}
 }
 

@@ -11,6 +11,7 @@
 #include "Types/CombatState.h"
 #include "PlayerCharacter.generated.h"
 
+class UInventoryComponent;
 class APlayerHUD;
 class ARangeWeapon;
 class UCombatComponent;
@@ -59,6 +60,8 @@ public:
 	void Aim(bool bIsAiming);
 	void TriggerButtonPressed(bool bPressed);
 	void TriggerButtonReleased(bool bPressed);
+
+	void UpdateInteractionWidget() const;
 	
 	//~ Combat Interface
 	virtual int32 GetCharacterLevel() override;
@@ -83,6 +86,9 @@ protected:
 	// TODO: Could be somewhere else like WidgetController
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> OverheadWidget;
+
+	UPROPERTY(VisibleAnywhere, Category="Character Properties | Inventory")
+	TObjectPtr<UInventoryComponent> PlayerInventory;
 
 	/*
 	 * Interaction
@@ -114,6 +120,15 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon) const;
 
+	/*
+	 * Inventory
+	 */
+	UPROPERTY(EditDefaultsOnly, Category="Character Properties | Inventory")
+	int32 DefaultInventorySlotsCapacity = 20;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character Properties | Inventory")
+	float DefaultInventoryWeightCapacity = 50.f;
+	
 	/*
 	 * Combat
 	 */
@@ -180,6 +195,7 @@ public:
 	ECombatState GetCombatState() const;
 	
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(InteractionCheckTImer); };
+	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; }
 };
 
 

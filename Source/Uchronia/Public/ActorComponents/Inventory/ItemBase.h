@@ -30,9 +30,13 @@ public:
 	UPROPERTY(VisibleAnywhere, Category="Item") FItemAssetData AssetData;
 	UPROPERTY(VisibleAnywhere, Category="Item") FItemNumericData NumericData;
 	UPROPERTY(VisibleAnywhere, Category="Item") FItemStatistics ItemStatistics;
+
+	bool bIsCopy;
+	bool bIsPickup;
 	
 	// Functions
 	UItemBase();
+	void ResetItemFlags();
 
 	UFUNCTION(Category="Item")
 	UItemBase* CreateItemCopy() const;

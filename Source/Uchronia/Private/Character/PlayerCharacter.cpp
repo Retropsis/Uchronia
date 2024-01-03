@@ -7,6 +7,7 @@
 #include "Actor/Weapon/RangeWeapon.h"
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
+#include "ActorComponents/Inventory/InventoryComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/CharacterAnimInstance.h"
 #include "Components/CapsuleComponent.h"
@@ -25,7 +26,8 @@ APlayerCharacter::APlayerCharacter()
 {
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
-	
+
+	//~ Camera
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(GetMesh());
 	SpringArm->TargetArmLength = 600.f;
@@ -34,15 +36,20 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+	//~ Camera
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Overhead Display"));
-	OverheadWidget->SetupAttachment(GetRootComponent());
-
+	//~ Components
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
+
+	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+	// PlayerInventory->SetIsReplicated(true); TODO: Investigate if i need this
+	PlayerInventory->SetSlotsCapacity(DefaultInventorySlotsCapacity);
+	PlayerInventory->SetWeightCapacity(DefaultInventoryWeightCapacity);
+	//~ Components
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 520.f);
@@ -50,6 +57,10 @@ APlayerCharacter::APlayerCharacter()
 	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	//~ Overhead, player name
+	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Overhead Display"));
+	OverheadWidget->SetupAttachment(GetRootComponent());
 }
 
 /*
@@ -590,6 +601,14 @@ void APlayerCharacter::Interact()
 	if(IsValid(TargetInteractable.GetObject()))
 	{
 		TargetInteractable->Interact(this);
+	}
+}
+
+void APlayerCharacter::UpdateInteractionWidget() const
+{
+	if(IsValid(TargetInteractable.GetObject()))
+	{
+		PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 	}
 }
 

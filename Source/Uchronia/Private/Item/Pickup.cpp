@@ -1,8 +1,6 @@
 // Retropsis @ 2023-2024
 
-
 #include "Item/Pickup.h"
-
 #include "ActorComponents/Inventory/InventoryComponent.h"
 #include "ActorComponents/Inventory/ItemBase.h"
 #include "Components/SphereComponent.h"
@@ -12,6 +10,7 @@ APickup::APickup()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
+	AActor::SetReplicateMovement(true);
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	
@@ -19,6 +18,7 @@ APickup::APickup()
 	PickupMesh->SetupAttachment(RootComponent);
 	PickupMesh->SetSimulatePhysics(true);
 	PickupMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	PickupMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
 	// TODO: Will have to remove this after pickup functionality is done by tracing instead
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
@@ -53,8 +53,9 @@ void APickup::BeginPlay()
 	if(HasAuthority())
 	{
 		OverlapSphere->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnBeginOverlap);
-		InitializePickup(UItemBase::StaticClass(), ItemQuantity);
 	}
+	// TODO: Investigate if it needs to be authoritative then passed down to clients
+	InitializePickup(UItemBase::StaticClass(), ItemQuantity);
 }
 
 void APickup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -141,10 +142,33 @@ void APickup::TakePickup(const APlayerCharacter* Taker)
 	{
 		if(ItemReference)
 		{
-			// if(UInventoryComponent* PlayerInventory = Taker->GetInventory())
-			// {
-			// 	try to add item to player inventory, adjust or destroy item
-			// }
+			if(UInventoryComponent* PlayerInventory = Taker->GetInventory())
+			{
+				const FItemAddResult AddResult = PlayerInventory->HandleAddItem(ItemReference);
+				
+				switch (AddResult.OperationResult)
+				{
+				case EItemAddResult::IAR_NoItemAdded:
+					break;
+				case EItemAddResult::IAR_PartialAmountItemAdded:
+					UpdateInteractableData();
+					Taker->UpdateInteractionWidget();
+					break;
+				case EItemAddResult::IAR_AllItemAdded:
+					Destroy();
+					break;
+				default: ;
+				}
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *AddResult.ResultMessage.ToString());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Player Inventory component is null."));				
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Item Reference is null."));				
 		}
 	}
 }
