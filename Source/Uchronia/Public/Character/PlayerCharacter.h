@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BaseCharacter.h"
+#include "Interaction/InteractionInterface.h"
 #include "Interaction/LootInterface.h"
 #include "Types/AnimationStates.h"
 #include "Types/CombatState.h"
@@ -16,6 +17,21 @@ class AWeapon;
 class UWidgetComponent;
 class UCameraComponent;
 class USpringArmComponent;
+
+USTRUCT()
+struct FInteractionData
+{
+	GENERATED_BODY()
+
+	FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f)
+	{
+		
+	};
+
+	UPROPERTY() TObjectPtr<AActor> CurrentInteractable;
+	UPROPERTY() float LastInteractionCheckTime;
+};
+
 /**
  * 
  */
@@ -34,6 +50,8 @@ public:
 	virtual void OnRep_PlayerState() override;
 	virtual void OnRep_ReplicatedMovement() override;
 
+	void BeginInteract();
+	void EndInteract();
 	virtual void Jump() override;
 	void EquipWeapon();
 	void Reload();
@@ -61,6 +79,22 @@ protected:
 	// TODO: Could be somewhere else like WidgetController
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> OverheadWidget;
+
+	/*
+	 * Interaction
+	 */
+	UPROPERTY(VisibleAnywhere, Category="Character Properties | Interaction");
+	TScriptInterface<IInteractionInterface> TargetInteractable;
+
+	float InteractionCheckFrequency = 0.1f;
+	float InteractionCheckDistance = 225.f;
+	FTimerHandle InteractionCheckTImer;
+	FInteractionData InteractionData;
+
+	void PerformInteractionCheck();
+	void FoundInteractable(AActor* NewInteractable);
+	void NoInteractableFound();
+	void Interact();
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -130,6 +164,7 @@ public:
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	bool IsWeaponEquipped() const;
 	bool IsAiming() const;
+	bool IsMelee() const;
 
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; };
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; };
@@ -139,6 +174,8 @@ public:
 	UAnimInstance* GetAnimInstance() const;
 	FVector GetHitTarget() const;
 	ECombatState GetCombatState() const;
+	
+	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(InteractionCheckTImer); };
 };
 
 

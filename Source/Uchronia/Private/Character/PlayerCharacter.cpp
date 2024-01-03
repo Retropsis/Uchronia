@@ -15,6 +15,7 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/CharacterPlayerController.h"
 #include "Player/CharacterPlayerState.h"
@@ -127,6 +128,11 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 		CalculateAO_Pitch();
 	}
 	HideCharacterIfCameraClose();
+
+	if(GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
+	{
+		PerformInteractionCheck();
+	}
 }
 
 void APlayerCharacter::OnRep_ReplicatedMovement()
@@ -398,6 +404,11 @@ bool APlayerCharacter::IsAiming() const
 	return (CombatComponent && CombatComponent->bAiming);
 }
 
+bool APlayerCharacter::IsMelee() const
+{
+	return false;
+}
+
 ARangeWeapon* APlayerCharacter::GetEquippedWeapon()
 {
 	if(!IsValid(CombatComponent)) return nullptr;
@@ -447,6 +458,126 @@ void APlayerCharacter::MulticastHandleDeath()
 		{
 			CharacterPlayerController->AimDownSights(false);
 		}
+	}
+}
+
+/*
+ * Interaction
+ */
+void APlayerCharacter::PerformInteractionCheck()
+{
+	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
+
+	FVector TraceStart(GetPawnViewLocation());
+	FVector TraceEnd(TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance));
+
+	// DotProduct to check if character looks in same direction as view rotation vector
+	float LookDirection(FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector()));
+	if(LookDirection > 0)
+	{
+		UKismetSystemLibrary::DrawDebugLine(this, TraceStart, TraceEnd, FLinearColor::Blue, 1.f);
+
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+		FHitResult TraceHit;
+
+		if(GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+		{
+			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
+			{
+				const float Distance = (TraceStart - TraceHit.ImpactPoint).Size();
+				if(TraceHit.GetActor() != InteractionData.CurrentInteractable && Distance <= InteractionCheckDistance)
+				{
+					FoundInteractable(TraceHit.GetActor());
+					return;
+				}
+				if(TraceHit.GetActor() == InteractionData.CurrentInteractable)
+				{
+					return;
+				}
+			}
+		}
+	}
+	NoInteractableFound();
+}
+
+void APlayerCharacter::FoundInteractable(AActor* NewInteractable)
+{
+	if(IsInteracting())
+	{
+		EndInteract();
+	}
+
+	if(InteractionData.CurrentInteractable)
+	{
+		TargetInteractable = InteractionData.CurrentInteractable;
+		TargetInteractable->EndFocus();
+	}
+	InteractionData.CurrentInteractable = NewInteractable;
+	TargetInteractable = NewInteractable;
+	TargetInteractable->BeginFocus();
+}
+
+void APlayerCharacter::NoInteractableFound()
+{
+	if(IsInteracting())
+	{
+		GetWorldTimerManager().ClearTimer(InteractionCheckTImer);		
+	}
+	
+	if(InteractionData.CurrentInteractable)
+	{
+		if(IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->EndFocus();
+		}
+		// hide interaction widget
+
+		InteractionData.CurrentInteractable = nullptr;
+		TargetInteractable = nullptr;
+	}
+}
+
+void APlayerCharacter::BeginInteract()
+{
+	// Verify nothing has changed during this interaction state
+	PerformInteractionCheck();
+
+	if(InteractionData.CurrentInteractable)
+	{
+		if(IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->BeginInteract();
+
+			if(FMath::IsNearlyZero(TargetInteractable->InteractableData.Duration, 0.1f))
+			{
+				Interact();
+			}
+			else
+			{
+				GetWorldTimerManager().SetTimer(InteractionCheckTImer, this, &APlayerCharacter::Interact, TargetInteractable->InteractableData.Duration, false);
+			}
+		}
+	}
+}
+
+void APlayerCharacter::EndInteract()
+{
+	GetWorldTimerManager().ClearTimer(InteractionCheckTImer);
+	
+	if(IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->EndInteract();
+	}
+}
+
+void APlayerCharacter::Interact()
+{
+	GetWorldTimerManager().ClearTimer(InteractionCheckTImer);
+	
+	if(IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->Interact();
 	}
 }
 

@@ -7,6 +7,7 @@
 #include "Interaction/CombatInterface.h"
 #include "Interaction/CrosshairInterface.h"
 #include "AbilitySystemInterface.h"
+#include "Interaction/SwimmingInterface.h"
 #include "BaseCharacter.generated.h"
 
 class UNiagaraSystem;
@@ -16,7 +17,7 @@ class UAttributeSet;
 class UAbilitySystemComponent;
 
 UCLASS()
-class UCHRONIA_API ABaseCharacter : public ACharacter, public ICrosshairInterface, public ICombatInterface, public IAbilitySystemInterface
+class UCHRONIA_API ABaseCharacter : public ACharacter, public ICrosshairInterface, public ICombatInterface, public IAbilitySystemInterface, public ISwimmingInterface
 {
 	GENERATED_BODY()
 
@@ -41,6 +42,10 @@ public:
 	virtual int32 GetMinionCount_Implementation() override;
 	virtual void IncrementMinionCount_Implementation(int32 Amount) override;
 	/* Combat Interface */
+	
+	//~Swimming Interface
+	virtual void SetSwimmingState_Implementation(bool bShouldSwim) override;
+	//~Swimming Interface
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
@@ -110,6 +115,11 @@ protected:
 	int32 MinionCount = 0;
 
 	/*
+	 * Swimming
+	 */
+	bool bSwimming = false;
+
+	/*
 	 * Dissolve Effect
 	 */
 	void Dissolve();
@@ -147,4 +157,5 @@ private:
 
 public:	
 	FORCEINLINE UStaticMeshComponent* GetThrowableItem() const { return ThrowableItem; }
+	FORCEINLINE bool ShouldSwim() const { return bSwimming; }
 };

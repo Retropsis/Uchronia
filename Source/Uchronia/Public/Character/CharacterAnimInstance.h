@@ -106,4 +106,7 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category="Combat")
 	bool bTransformRightHand;
+	
+	UPROPERTY(BlueprintReadOnly, Category="CharacterMovement")
+	bool bSwimming;
 };

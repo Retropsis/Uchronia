@@ -33,6 +33,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bAirborne = PlayerCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = PlayerCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f;
+	bSwimming = PlayerCharacter->ShouldSwim();
 	bWeaponEquipped = PlayerCharacter->IsWeaponEquipped();
 	EquippedWeapon = PlayerCharacter->GetEquippedWeapon();
 	

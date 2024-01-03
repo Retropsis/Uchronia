@@ -61,6 +61,9 @@ private:
 	TObjectPtr<UInputAction> LookAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> InteractAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -96,6 +99,8 @@ private:
 	
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
+	void BeginInteract();
+	void EndInteract();
 	void Jump();
 	void EquipButtonPressed();
 	void DropButtonPressed();

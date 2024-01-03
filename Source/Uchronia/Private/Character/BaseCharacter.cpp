@@ -5,6 +5,8 @@
 #include "BaseGameplayTags.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PhysicsVolume.h"
 #include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -147,6 +149,19 @@ UAnimMontage* ABaseCharacter::GetHitReactMontage_Implementation()
 	// return nullptr;
 }
 
+/*
+ * Swimming
+ */
+void ABaseCharacter::SetSwimmingState_Implementation(bool bShouldSwim)
+{
+	GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = bShouldSwim;
+	GetCharacterMovement()->SetMovementMode(bSwimming ? MOVE_Swimming : MOVE_Walking);
+	bSwimming = bShouldSwim;
+}
+
+/*
+ * Dissolve
+ */
 void ABaseCharacter::Dissolve()
 {
 	if(IsValid(DissolveMaterialInstance))

@@ -33,6 +33,8 @@ void ACharacterPlayerController::SetupInputComponent()
 
 	PlayerInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Move);
 	PlayerInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Look);
+	PlayerInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ACharacterPlayerController::BeginInteract);
+	PlayerInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ACharacterPlayerController::EndInteract);
 	PlayerInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Jump);
 	PlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::CrouchButtonPressed);
 	PlayerInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::EquipButtonPressed);	
@@ -95,6 +97,22 @@ void ACharacterPlayerController::Look(const FInputActionValue& InputActionValue)
 	{
 		ControlledPawn->AddControllerYawInput(LookAxisVector.X);
 		ControlledPawn->AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ACharacterPlayerController::BeginInteract()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->BeginInteract();
+	}
+}
+
+void ACharacterPlayerController::EndInteract()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->EndInteract();
 	}
 }
 
