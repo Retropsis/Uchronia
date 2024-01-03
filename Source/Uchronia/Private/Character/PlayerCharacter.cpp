@@ -122,6 +122,10 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	if(GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
 	{
 		AimOffset(DeltaSeconds);
+		if(GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
+		{
+			PerformInteractionCheck();
+		}
 	}
 	else
 	{
@@ -133,11 +137,11 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 		CalculateAO_Pitch();
 	}
 	HideCharacterIfCameraClose();
-
-	if(GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
-	{
-		PerformInteractionCheck();
-	}
+	
+	// if(GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
+	// {
+	// 	PerformInteractionCheck();
+	// }
 }
 
 void APlayerCharacter::OnRep_ReplicatedMovement()
