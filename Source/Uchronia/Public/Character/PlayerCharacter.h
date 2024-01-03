@@ -11,6 +11,7 @@
 #include "Types/CombatState.h"
 #include "PlayerCharacter.generated.h"
 
+class APlayerHUD;
 class ARangeWeapon;
 class UCombatComponent;
 class AWeapon;
@@ -76,6 +77,9 @@ public:
 	void MulticastHitReact(const FVector& ImpactPoint);
 
 protected:
+	UPROPERTY()
+	TObjectPtr<APlayerHUD> PlayerHUD;
+	
 	// TODO: Could be somewhere else like WidgetController
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> OverheadWidget;

@@ -21,8 +21,11 @@ public:
 	virtual void EndFocus() override;
 	virtual void BeginInteract() override;
 	virtual void EndInteract() override;
-	virtual void Interact() override;
+	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
 	//~ Interaction Interface
+
+	UPROPERTY(EditInstanceOnly)
+	FInteractableData InstanceInteractableData;
 
 protected:
 	virtual void BeginPlay() override;

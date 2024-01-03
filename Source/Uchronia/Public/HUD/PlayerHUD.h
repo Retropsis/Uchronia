@@ -6,6 +6,9 @@
 #include "GameFramework/HUD.h"
 #include "PlayerHUD.generated.h"
 
+struct FInteractableData;
+class UInteractionWidget;
+class UMainMenu;
 class UAttributeSet;
 class UAbilitySystemComponent;
 class UOverlayWidgetController;
@@ -46,6 +49,7 @@ class UCHRONIA_API APlayerHUD : public AHUD
 	GENERATED_BODY()
 
 public:
+	APlayerHUD();
 	virtual void DrawHUD() override;
 
 	UPROPERTY()
@@ -55,7 +59,32 @@ public:
 	
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
 
+
+	/*
+	 * Inventory Widgets
+	 */
+	UPROPERTY(EditDefaultsOnly, Category="Widgets|Inventory")
+	TSubclassOf<UMainMenu> MainMenuClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Widgets|Inventory")
+	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
+
+	bool bIsMenuVisible;
+
+	void DisplayMenu();
+	void HideMenu();
+	void ShowInteractionWidget() const;
+	void HideInteractionWidget() const;
+	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
+	
 protected:
+	virtual void BeginPlay() override;
+	
+	UPROPERTY()
+	TObjectPtr<UMainMenu> MainMenuWidget;
+	
+	UPROPERTY()
+	TObjectPtr<UInteractionWidget> InteractionWidget;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -75,5 +104,7 @@ private:
 	void DrawCrosshair(UTexture2D* Texture, const FVector2D& ViewportCenter, const FVector2D& Spread, const FLinearColor& Color);
 
 public:
-	FORCEINLINE void SetHUDPackage(const FHUDPackage& Package) { HUDPackage = Package; };
+	FORCEINLINE void SetHUDPackage(const FHUDPackage& Package) { HUDPackage = Package; }
+
+public:
 };

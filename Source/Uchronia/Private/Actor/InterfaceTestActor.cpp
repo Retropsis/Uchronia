@@ -19,6 +19,8 @@ void AInterfaceTestActor::Tick(float DeltaTime)
 void AInterfaceTestActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InteractableData = InstanceInteractableData;
 }
 
 void AInterfaceTestActor::BeginFocus()
@@ -49,7 +51,7 @@ void AInterfaceTestActor::EndInteract()
 		GEngine->AddOnScreenDebugMessage(4, 3.f, FColor::Orange, FString::Printf(TEXT("EndInteract")));
 }
 
-void AInterfaceTestActor::Interact()
+void AInterfaceTestActor::Interact(APlayerCharacter* PlayerCharacter)
 {
 		GEngine->AddOnScreenDebugMessage(5, 3.f, FColor::Green, FString::Printf(TEXT("Interact")));
 }

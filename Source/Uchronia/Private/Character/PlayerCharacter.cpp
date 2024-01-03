@@ -102,7 +102,12 @@ void APlayerCharacter::InitAbilityActorInfo()
 	/* Init Overlay only if PlayerController is not null, only locally controlled needs it */ 
 	if (ACharacterPlayerController* CharacterPlayerController = Cast<ACharacterPlayerController>(GetController()))
 	{
-		if (APlayerHUD* PlayerHUD = Cast<APlayerHUD>(CharacterPlayerController->GetHUD()))
+		// if (APlayerHUD* PlayerHUD = Cast<APlayerHUD>(CharacterPlayerController->GetHUD()))
+		// {
+		// 	PlayerHUD->InitOverlay(CharacterPlayerController, CharacterPlayerState, AbilitySystemComponent, AttributeSet);
+		// }
+		PlayerHUD = Cast<APlayerHUD>(CharacterPlayerController->GetHUD());
+		if(PlayerHUD)
 		{
 			PlayerHUD->InitOverlay(CharacterPlayerController, CharacterPlayerState, AbilitySystemComponent, AttributeSet);
 		}
@@ -485,8 +490,7 @@ void APlayerCharacter::PerformInteractionCheck()
 		{
 			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
 			{
-				const float Distance = (TraceStart - TraceHit.ImpactPoint).Size();
-				if(TraceHit.GetActor() != InteractionData.CurrentInteractable && Distance <= InteractionCheckDistance)
+				if(TraceHit.GetActor() != InteractionData.CurrentInteractable)
 				{
 					FoundInteractable(TraceHit.GetActor());
 					return;
@@ -515,6 +519,9 @@ void APlayerCharacter::FoundInteractable(AActor* NewInteractable)
 	}
 	InteractionData.CurrentInteractable = NewInteractable;
 	TargetInteractable = NewInteractable;
+
+	PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	
 	TargetInteractable->BeginFocus();
 }
 
@@ -531,7 +538,8 @@ void APlayerCharacter::NoInteractableFound()
 		{
 			TargetInteractable->EndFocus();
 		}
-		// hide interaction widget
+
+		PlayerHUD->HideInteractionWidget();
 
 		InteractionData.CurrentInteractable = nullptr;
 		TargetInteractable = nullptr;
@@ -577,7 +585,7 @@ void APlayerCharacter::Interact()
 	
 	if(IsValid(TargetInteractable.GetObject()))
 	{
-		TargetInteractable->Interact();
+		TargetInteractable->Interact(this);
 	}
 }
 
