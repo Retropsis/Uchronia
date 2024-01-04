@@ -91,7 +91,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	FItemAddResult HandleNonStackableItems(UItemBase* InItem, int32 RequestedAddAmount);
+	FItemAddResult HandleNonStackableItems(UItemBase* InItem);
 	int32 HandleStackableItems(UItemBase* InItem, int32 RequestedAddAmount);
 	int32 CalculateWeightAddAmount(UItemBase* InItem, int32 RequestedAddAmount);
 	int32 CalculateNumberForFullStack(UItemBase* StackableItem, int32 InitialRequestedAddAmount);

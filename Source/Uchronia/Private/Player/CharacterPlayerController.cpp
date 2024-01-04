@@ -33,6 +33,7 @@ void ACharacterPlayerController::SetupInputComponent()
 
 	PlayerInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Move);
 	PlayerInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Look);
+	PlayerInputComponent->BindAction(ToggleMenuAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ToggleMenu);
 	PlayerInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ACharacterPlayerController::BeginInteract);
 	PlayerInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ACharacterPlayerController::EndInteract);
 	PlayerInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::Jump);
@@ -46,6 +47,14 @@ void ACharacterPlayerController::SetupInputComponent()
 	PlayerInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ReloadButtonPressed);
 
 	PlayerInputComponent->SetupKeybindInputActions(InputConfig, this, &ThisClass::KeybindInputTagPressed, &ThisClass::KeybindInputTagReleased, &ThisClass::KeybindInputTagHeld);
+}
+
+void ACharacterPlayerController::ToggleMenu()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->ToggleMenu();
+	}
 }
 
 

@@ -73,6 +73,7 @@ public:
 
 	void DisplayMenu();
 	void HideMenu();
+	void ToggleMenu();
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;
 	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;

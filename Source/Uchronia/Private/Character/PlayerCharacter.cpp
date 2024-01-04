@@ -15,6 +15,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Item/Pickup.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -162,6 +163,11 @@ void APlayerCharacter::OnRep_ReplicatedMovement()
 	// if(GetLocalRole() == ROLE_SimulatedProxy)
 	SimProxiesTurn();
 	TimeSinceLastMovementReplication = 0.f;
+}
+
+void APlayerCharacter::ToggleMenu()
+{
+	PlayerHUD->ToggleMenu();
 }
 
 void APlayerCharacter::Jump()
@@ -609,6 +615,29 @@ void APlayerCharacter::UpdateInteractionWidget() const
 	if(IsValid(TargetInteractable.GetObject()))
 	{
 		PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	}
+}
+
+void APlayerCharacter::DropItem(UItemBase* ItemToDrop, const int32 Quantity)
+{
+	if(PlayerInventory->FindMatchingItem(ItemToDrop))
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		const FVector SpawnLocation{ GetActorLocation() + (GetActorForwardVector() * 50.f) };
+		const FTransform SpawnTransform{ GetActorRotation(), SpawnLocation };
+
+		const int32 RemovedQuantity = PlayerInventory->RemoveAmountOfItem(ItemToDrop, Quantity);
+
+		APickup* Pickup = GetWorld()->SpawnActor<APickup>(APickup::StaticClass(), SpawnTransform, SpawnParams);
+		Pickup->InitializeDrop(ItemToDrop, RemovedQuantity);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Inventory didn't find a matching Item"));
 	}
 }
 

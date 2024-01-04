@@ -11,6 +11,7 @@
 #include "Types/CombatState.h"
 #include "PlayerCharacter.generated.h"
 
+class UItemBase;
 class UInventoryComponent;
 class APlayerHUD;
 class ARangeWeapon;
@@ -52,6 +53,7 @@ public:
 	virtual void OnRep_PlayerState() override;
 	virtual void OnRep_ReplicatedMovement() override;
 
+	void ToggleMenu();
 	void BeginInteract();
 	void EndInteract();
 	virtual void Jump() override;
@@ -62,6 +64,7 @@ public:
 	void TriggerButtonReleased(bool bPressed);
 
 	void UpdateInteractionWidget() const;
+	void DropItem(UItemBase* ItemToDrop, const int32 Quantity);
 	
 	//~ Combat Interface
 	virtual int32 GetCharacterLevel() override;
