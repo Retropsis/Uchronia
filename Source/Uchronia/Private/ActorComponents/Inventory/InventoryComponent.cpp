@@ -2,10 +2,20 @@
 
 #include "ActorComponents/Inventory/InventoryComponent.h"
 #include "ActorComponents/Inventory/ItemBase.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Item/Pickup.h"
+#include "Net/UnrealNetwork.h"
 
 UInventoryComponent::UInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+}
+
+void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UInventoryComponent, EquippedMainHand);
 }
 
 void UInventoryComponent::BeginPlay()
@@ -32,6 +42,21 @@ UItemBase* UInventoryComponent::FindNextItemByID(UItemBase* InItem) const
 		if(const TArray<TObjectPtr<UItemBase>>::ElementType* Result = InventoryContents.FindByKey(InItem))
 		{
 			return *Result;
+		}
+	}
+	return nullptr;
+}
+
+UItemBase* UInventoryComponent::FindItemByID(FName InItemID) const
+{
+	if(!InItemID.IsNone())
+	{
+		for(TObjectPtr<UItemBase> Item : InventoryContents)
+		{
+			if(Item.Get()->ID == InItemID)
+			{
+				return Item.Get();
+			}
 		}
 	}
 	return nullptr;
@@ -172,7 +197,8 @@ int32 UInventoryComponent::HandleStackableItems(UItemBase* InItem, int32 Request
 			InItem->SetQuantity(AmountToDistribute);
 
 			// Max weight is reached, no more item can be added
-			if(InventoryTotalWeight >= InventoryWeightCapacity)
+			// if(InventoryTotalWeight >= InventoryWeightCapacity)
+			if(InventoryTotalWeight + ExistingItemStack->GetItemSingleWeight() > InventoryWeightCapacity)
 			{
 				OnInventoryUpdated.Broadcast();
 				return RequestedAddAmount - AmountToDistribute;
@@ -208,12 +234,12 @@ int32 UInventoryComponent::HandleStackableItems(UItemBase* InItem, int32 Request
 				AddNewItem(InItem->CreateItemCopy(), WeightLimitAddAmount);
 				return RequestedAddAmount - AmountToDistribute;
 			}
+			AddNewItem(InItem, AmountToDistribute);
+			return RequestedAddAmount;
 		}
-		AddNewItem(InItem, AmountToDistribute);
-		return RequestedAddAmount;
+		return RequestedAddAmount - AmountToDistribute;
 	}
-	OnInventoryUpdated.Broadcast();
-	return RequestedAddAmount - AmountToDistribute;
+	return 0;
 }
 
 void UInventoryComponent::AddNewItem(UItemBase* Item, int32 AmountToAdd)
@@ -237,4 +263,79 @@ void UInventoryComponent::AddNewItem(UItemBase* Item, int32 AmountToAdd)
 	InventoryContents.Add(NewItem);
 	InventoryTotalWeight += NewItem->GetItemStackWeight();
 	OnInventoryUpdated.Broadcast();
+}
+
+// TODO: Probably the wrong way to do this
+void UInventoryComponent::ServerDestroyPickup_Implementation(APickup* PickupToDestroy)
+{
+	PickupToDestroy->Destroy();
+}
+
+/*
+* BP_InventoryComponent Callables
+*/
+// void UInventoryComponent::AddItemToInventory()
+// {
+// 	
+// }
+
+/*
+* Equipment
+*/
+void UInventoryComponent::TryEquip(UItemBase* ItemToEquip, const EItemType SlotType)
+{
+	switch (SlotType) {
+	case EItemType::EIT_Weapon:
+		// ClientSetEquippedMainHand(ItemToEquip->AssetData.Actor->GetClass());
+		break;
+	case EItemType::EIT_Armor:
+		break;
+	case EItemType::EIT_Ammunition:
+		break;
+	case EItemType::EIT_Consumable:
+		break;
+	case EItemType::EIT_Material:
+		break;
+	case EItemType::EIT_Misc:
+		break;
+	default: ;
+	}
+}
+
+void UInventoryComponent::ClientSetEquippedMainHand_Implementation(UClass* ItemToEquip)
+{
+	EquippedMainHand = ItemToEquip;
+	ServerSetEquippedMainHand(ItemToEquip);
+}
+
+void UInventoryComponent::ServerSetEquippedMainHand_Implementation(UClass* ItemToEquip)
+{
+	EquippedMainHand = ItemToEquip;
+}
+
+void UInventoryComponent::OnRep_EquippedMainHand()
+{
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner()))
+	{
+		const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
+		// PlayerCharacter->GetMesh()->AttachToComponent(PlayerCharacter->GetMesh(), TransformRules, FName("LeftHandSocket"));
+		
+		AttachActorToSocket(EquippedMainHand, FName("LeftHandSocket"));
+		// const USkeletalMeshSocket* LeftHandSocket = PlayerCharacter->GetMesh()->GetSocketByName(SocketName);
+		// if (LeftHandSocket) {
+		// 	LeftHandSocket->AttachActor(ActorToAttach, PlayerCharacter->GetMesh());
+		// }
+	}
+}
+
+void UInventoryComponent::AttachActorToSocket(UClass* ActorToAttach, const FName Socket) const
+{
+	const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
+	if(!IsValid(PlayerCharacter) || PlayerCharacter->GetMesh() == nullptr || ActorToAttach == nullptr) return;
+	
+	if(const USkeletalMeshSocket* SocketToAttach= PlayerCharacter->GetMesh()->GetSocketByName(Socket))
+	{
+		// AActor* NewActor = ActorToAttach->GetDefaultObject<UItemBase>()->AssetData.Actor;
+		// SocketToAttach->AttachActor(NewActor, PlayerCharacter->GetMesh());
+	}
 }

@@ -40,7 +40,6 @@ bool UInventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropE
 	}
 	// return false  will cause the drop operation  to fall through underlying widgets if any
 	return false;
-	
 }
 
 void UInventoryPanel::RefreshInventory()
@@ -48,13 +47,13 @@ void UInventoryPanel::RefreshInventory()
 	checkf(InventorySlotClass, TEXT("InventorySlotClass is missing, please fill up InventoryPanel!"));
 	if(InventoryReference)
 	{
-		InventoryPanel->ClearChildren();
+		InventoryWrapBox->ClearChildren();
 		for(UItemBase* const& InventoryItem : InventoryReference->GetInventoryContents())
 		{
 			UInventoryItemSlot* ItemSlot = CreateWidget<UInventoryItemSlot>(this, InventorySlotClass);
 			ItemSlot->SetItemReference(InventoryItem);
 			
-			InventoryPanel->AddChildToWrapBox(ItemSlot);
+			InventoryWrapBox->AddChildToWrapBox(ItemSlot);
 		}
 		SetInfoText();
 	}

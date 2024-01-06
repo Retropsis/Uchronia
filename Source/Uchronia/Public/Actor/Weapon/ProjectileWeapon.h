@@ -30,10 +30,12 @@ private:
 	 */
 	UPROPERTY(EditDefaultsOnly, Category="Weapon Properties|Scatter")
 	bool bUseScatter = false;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Weapon Properties|Scatter")
-	float DistanceToSphere = 800.f;
 
+	// Set accuracy radius at 10m
+	UPROPERTY(EditDefaultsOnly, Category="Weapon Properties|Scatter")
+	float DistanceToSphere = 1000.f;
+
+	// Accuracy radius at 10m
 	UPROPERTY(EditDefaultsOnly, Category="Weapon Properties|Scatter")
 	float SphereRadius = 75.f;
 };

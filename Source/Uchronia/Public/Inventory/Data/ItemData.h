@@ -4,7 +4,7 @@
 #include "Engine/DataTable.h"
 #include "ItemData.generated.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum class EItemCondition : uint8
 {
 	EIC_Pristine UMETA(DisplayName="Pristine"),
@@ -14,7 +14,7 @@ enum class EItemCondition : uint8
 	EIC_Ruined UMETA(DisplayName="Ruined")
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EItemType : uint8
 {
 	EIT_Weapon UMETA(DisplayName="Weapon"),
@@ -25,91 +25,91 @@ enum class EItemType : uint8
 	EIT_Misc UMETA(DisplayName="Misc"),
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemTextData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere) FText Name;
-	UPROPERTY(EditAnywhere) FText Description;
-	UPROPERTY(EditAnywhere) FText Interaction;
-	UPROPERTY(EditAnywhere) FText Usage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Name;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Description;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Interaction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Usage;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemStatistics 
 {
 	GENERATED_BODY()
 	
 	//~ Damage
-	UPROPERTY(EditAnywhere) float FireInterval;
-	UPROPERTY(EditAnywhere) float HealthDamage;
-	UPROPERTY(EditAnywhere) float HardDamage;
-	UPROPERTY(EditAnywhere) float BloodLoss;
-	UPROPERTY(EditAnywhere) float DropoffRange;
-	UPROPERTY(EditAnywhere) float MinDamageRange;
-	UPROPERTY(EditAnywhere) float MaxRange;
-	UPROPERTY(EditAnywhere) float AccuracyRadiusAt10m;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float FireInterval;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float HealthDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float HardDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float BloodLoss;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float DropoffRange;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MinDamageRange;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MaxRange;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float AccuracyRadiusAt10m;
 	
 	//~ Aiming
-	UPROPERTY(EditAnywhere) float PerShotModifier;
-	UPROPERTY(EditAnywhere) float ShotModifierCap;
-	UPROPERTY(EditAnywhere) float RecoveryDelay;
-	UPROPERTY(EditAnywhere) float RecoveryPerSecond;
-	UPROPERTY(EditAnywhere) float GravityModifier;
-	UPROPERTY(EditAnywhere) float CrouchModifier;
-	UPROPERTY(EditAnywhere) float WalkModifier;
-	UPROPERTY(EditAnywhere) float RunModifier;
-	UPROPERTY(EditAnywhere) float SprintModifier;
-	UPROPERTY(EditAnywhere) float JumpModifier;
-	UPROPERTY(EditAnywhere) float LeanModifier;
-	UPROPERTY(EditAnywhere) float MarksmanModifier;
-	UPROPERTY(EditAnywhere) float InVehicleModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float PerShotModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float ShotModifierCap;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RecoveryDelay;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RecoveryPerSecond;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float GravityModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float CrouchModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float WalkModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RunModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float SprintModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float JumpModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float LeanModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MarksmanModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float InVehicleModifier;
 
 	//~ Movement
 
 	//~ Ammo
 	
 	//~ Inventory
-	UPROPERTY(EditAnywhere) float Value;
-	UPROPERTY(EditAnywhere) float SellValue;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float Value;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float SellValue;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemNumericData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere) int32 GridWidth;
-	UPROPERTY(EditAnywhere) int32 GridHeight;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 GridWidth;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 GridHeight;
 	
-	UPROPERTY(EditAnywhere) float Weight;
-	UPROPERTY(EditAnywhere) int32 MaxStackSize;
-	UPROPERTY(EditAnywhere) int32 MaxCharges;
-	UPROPERTY(EditAnywhere) bool bIsStackable;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float Weight;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 MaxStackSize;
+	UPROPERTY(BlueprintReadOnly) bool bIsStackable;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 MaxCharges;
+	UPROPERTY(BlueprintReadOnly) bool bHasCharges;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType, Blueprintable)
 struct FItemAssetData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere) TObjectPtr<UTexture2D> Icon;
-	UPROPERTY(EditAnywhere) TObjectPtr<UStaticMesh> Mesh;
-	UPROPERTY(EditAnywhere) TObjectPtr<USoundBase> PickupSound;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<UTexture2D> Icon;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<UStaticMesh> Mesh;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<USoundBase> PickupSound;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType, Blueprintable)
 struct FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category="Item Data") FName ID;
-	UPROPERTY(EditAnywhere, Category="Item Data") FItemTextData TextData;
-	UPROPERTY(EditAnywhere, Category="Item Data") EItemType ItemType;
-	UPROPERTY(EditAnywhere, Category="Item Data") EItemCondition ItemCondition;
-	UPROPERTY(EditAnywhere, Category="Item Data") FItemAssetData AssetData;
-	UPROPERTY(EditAnywhere, Category="Item Data") FItemNumericData NumericData;
-	UPROPERTY(EditAnywhere, Category="Item Data") FItemStatistics ItemStatistics;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FName ID;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemTextData TextData;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") EItemType ItemType;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") EItemCondition ItemCondition;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemAssetData AssetData;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemNumericData NumericData;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemStatistics ItemStatistics;
 };

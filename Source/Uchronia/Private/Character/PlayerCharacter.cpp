@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Actor/Item/WorldInteractable.h"
 #include "Actor/Weapon/RangeWeapon.h"
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
@@ -16,6 +17,7 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Item/Pickup.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -72,6 +74,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME(APlayerCharacter, DroppedItem);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -104,6 +107,7 @@ void APlayerCharacter::OnRep_PlayerState()
 
 void APlayerCharacter::InitAbilityActorInfo()
 {
+	if(!GetPlayerState<ACharacterPlayerState>()) return; // TODO: Obviously not the correct solution
 	ACharacterPlayerState* CharacterPlayerState = GetPlayerState<ACharacterPlayerState>();
 	check(CharacterPlayerState)
 	CharacterPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(CharacterPlayerState, this);
@@ -200,19 +204,19 @@ void APlayerCharacter::EquipWeapon()
 	}
 }
 
-void APlayerCharacter::Reload()
-{
-	if(CombatComponent)
-	{
-		CombatComponent->Reload();
-	}	
-}
-
 void APlayerCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(CombatComponent)
 	{
 		CombatComponent->EquipWeapon(OverlappingWeapon);
+	}	
+}
+
+void APlayerCharacter::Reload()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->Reload();
 	}	
 }
 
@@ -432,7 +436,7 @@ bool APlayerCharacter::IsAiming() const
 
 bool APlayerCharacter::IsMelee() const
 {
-	return false;
+	return  (CombatComponent && CombatComponent->EquippedMeleeWeapon);
 }
 
 ARangeWeapon* APlayerCharacter::GetEquippedWeapon()
@@ -494,15 +498,39 @@ void APlayerCharacter::PerformInteractionCheck()
 {
 	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
 
-	FVector TraceStart(GetPawnViewLocation());
+	FVector TraceStart{FollowCamera->GetComponentLocation()};
+	
+	// TODO: Probably could use the same trace data as combat component traceundercrosshairs
+	FVector2D ViewportSize;
+	if(GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+	const FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection
+	);
+	if(bScreenToWorld)
+	{
+		TraceStart = CrosshairWorldPosition;
+		const float DistanceToCharacter = (GetActorLocation() - TraceStart).Size();
+		TraceStart += CrosshairWorldDirection * (DistanceToCharacter + /*TraceExtent*/50.f);
+	}
+	//
+	
+	// FVector TraceStart(GetPawnViewLocation());
 	FVector TraceEnd(TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance));
+	// UKismetSystemLibrary::DrawDebugLine(this, TraceStart, TraceEnd, FLinearColor::Blue, 1.f);
 
 	// DotProduct to check if character looks in same direction as view rotation vector
 	float LookDirection(FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector()));
 	if(LookDirection > 0)
 	{
-		UKismetSystemLibrary::DrawDebugLine(this, TraceStart, TraceEnd, FLinearColor::Blue, 1.f);
-
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
 		FHitResult TraceHit;
@@ -616,6 +644,11 @@ void APlayerCharacter::UpdateInteractionWidget() const
 	{
 		PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 	}
+}
+
+void APlayerCharacter::ServerDropItem_Implementation(const int32 Quantity)
+{
+	DropItem(DroppedItem, Quantity);
 }
 
 void APlayerCharacter::DropItem(UItemBase* ItemToDrop, const int32 Quantity)

@@ -40,6 +40,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ThrowEnd();
+
+	UFUNCTION(BlueprintCallable)
+	void MeleeStart();
+	
+	UFUNCTION(BlueprintCallable)
+	void MeleeEnd();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetMeleeWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
@@ -133,6 +139,9 @@ private:
 	FVector HitTarget;
 	
 	FHUDPackage HUDPackage;
+	
+	UPROPERTY(EditAnywhere, Category="Weapon Properties|Crosshairs")
+	TObjectPtr<UTexture2D> Crosshair_Center;
 
 	/*
 	 * Marksman Mode
@@ -140,6 +149,8 @@ private:
 	// Set by Camera's default FoV
 	float DefaultFOV;
 	float CurrentFOV;
+
+	
 
 	/* TODO: To DataAsset */
 	UPROPERTY(EditDefaultsOnly, Category="Combat Properties")

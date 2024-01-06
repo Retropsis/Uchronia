@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "PlayerHUD.generated.h"
 
+class UEquipmentSlot;
 struct FInteractableData;
 class UInteractionWidget;
 class UMainMenu;
@@ -86,6 +87,13 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UInteractionWidget> InteractionWidget;
+
+
+	UPROPERTY()
+	TObjectPtr<UEquipmentSlot> LeftHandSlotWidget;
+	
+	UPROPERTY()
+	TObjectPtr<UEquipmentSlot> RightHandSlotWidget;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -96,7 +104,8 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
-	
+
+	UPROPERTY(EditDefaultsOnly)
 	FHUDPackage HUDPackage;
 
 	UPROPERTY(EditDefaultsOnly)

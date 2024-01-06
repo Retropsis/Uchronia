@@ -197,8 +197,7 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 			}
 			else
 			{
-				// TODO: Set to Unequipped Crosshairs
-				HUDPackage.Crosshair_Center = nullptr;
+				HUDPackage.Crosshair_Center = Crosshair_Center;
 				HUDPackage.Crosshair_Left = nullptr;
 				HUDPackage.Crosshair_Top = nullptr;
 				HUDPackage.Crosshair_Right = nullptr;
@@ -361,6 +360,31 @@ void UCombatComponent::EquipWeapon(AWeapon*  WeaponToEquip)
 	PlayerCharacter->bUseControllerRotationYaw = true;
 }
 
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if(IsValid(EquippedWeapon) && IsValid(PlayerCharacter))
+	{
+		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
+		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		PlayerCharacter->bUseControllerRotationYaw = true;
+		EquippedWeapon->SetHUDAmmo();
+		PlayEquipSound();
+	}
+}
+
+void UCombatComponent::OnRep_EquippedMeleeWeapon()
+{
+	if(IsValid(EquippedMeleeWeapon) && IsValid(PlayerCharacter))
+	{
+		EquippedMeleeWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		AttachActorToSocket(EquippedMeleeWeapon, FName("RightHandSocket"));
+		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		PlayerCharacter->bUseControllerRotationYaw = true;
+		PlayEquipSound();
+	}
+}
+
 void UCombatComponent::DropEquippedWeapon() const
 {
 	// TODO: Find how to properly reset these pointers or find another solution
@@ -396,31 +420,6 @@ void UCombatComponent::PlayEquipSound() const
 	if(EquippedWeapon && EquippedWeapon->EquipSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, EquippedWeapon->EquipSound, PlayerCharacter->GetActorLocation());
-	}
-}
-
-void UCombatComponent::OnRep_EquippedWeapon()
-{
-	if(IsValid(EquippedWeapon) && IsValid(PlayerCharacter))
-	{
-		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-		AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
-		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-		PlayerCharacter->bUseControllerRotationYaw = true;
-		EquippedWeapon->SetHUDAmmo();
-		PlayEquipSound();
-	}
-}
-
-void UCombatComponent::OnRep_EquippedMeleeWeapon()
-{
-	if(IsValid(EquippedMeleeWeapon) && IsValid(PlayerCharacter))
-	{
-		EquippedMeleeWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-		AttachActorToSocket(EquippedMeleeWeapon, FName("RightHandSocket"));
-		PlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-		PlayerCharacter->bUseControllerRotationYaw = true;
-		PlayEquipSound();
 	}
 }
 /*
@@ -615,6 +614,16 @@ void UCombatComponent::ThrowEnd()
 {
 	CombatState = ECombatState::ECS_Unoccupied;
 	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
+}
+
+void UCombatComponent::MeleeStart()
+{
+	CombatState = ECombatState::ECS_CastingAbility;
+}
+
+void UCombatComponent::MeleeEnd()
+{
+	CombatState = ECombatState::ECS_Unoccupied;
 }
 
 void UCombatComponent::SetMeleeWeaponCollisionEnabled(const ECollisionEnabled::Type CollisionEnabled)

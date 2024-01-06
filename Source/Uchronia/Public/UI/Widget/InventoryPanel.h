@@ -24,7 +24,7 @@ public:
 	void RefreshInventory();
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UWrapBox> InventoryPanel;
+	TObjectPtr<UWrapBox> InventoryWrapBox;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> WeightInfo;

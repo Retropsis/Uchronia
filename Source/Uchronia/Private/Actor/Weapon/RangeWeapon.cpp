@@ -73,7 +73,6 @@ void ARangeWeapon::AddRounds(const int32 RoundsToAdd)
 
 void ARangeWeapon::OnRep_Ammo()
 {
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("%d"), Ammo), true, true, FLinearColor::Blue, 3.f);
 	OwnerCharacter = OwnerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()) : OwnerCharacter;
 	if(IsValid(OwnerCharacter) && OwnerCharacter->GetCombatComponent() && IsFull())
 	{

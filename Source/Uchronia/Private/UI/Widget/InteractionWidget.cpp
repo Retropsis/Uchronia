@@ -42,15 +42,39 @@ void UInteractionWidget::UpdateWidget(const FInteractableData* InteractableData)
 		break;
 		
 	case EInteractableType::EIT_NonPlayableCharacter:
+		KeyPressedText->SetText(FText::FromString("Press"));
+		InteractionProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+		if(InteractableData->Quantity < 2)
+		{
+			QuantityText->SetVisibility(ESlateVisibility::Collapsed);
+		}
 		break;
 		
 	case EInteractableType::EIT_Device:
+		KeyPressedText->SetText(FText::FromString("Press"));
+		InteractionProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+		if(InteractableData->Quantity < 2)
+		{
+			QuantityText->SetVisibility(ESlateVisibility::Collapsed);
+		}
 		break;
 		
 	case EInteractableType::EIT_Toggle:
+		KeyPressedText->SetText(FText::FromString("Press"));
+		InteractionProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+		if(InteractableData->Quantity < 2)
+		{
+			QuantityText->SetVisibility(ESlateVisibility::Collapsed);
+		}
 		break;
 		
 	case EInteractableType::EIT_Container:
+		KeyPressedText->SetText(FText::FromString("Press"));
+		InteractionProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+		if(InteractableData->Quantity < 2)
+		{
+			QuantityText->SetVisibility(ESlateVisibility::Collapsed);
+		}
 		break;
 		
 	default: ;

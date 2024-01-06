@@ -58,8 +58,7 @@ void APickup::BeginPlay()
 	InitializePickup(UItemBase::StaticClass(), ItemQuantity);
 }
 
-void APickup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APickup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
 }
@@ -100,6 +99,8 @@ void APickup::InitializePickup(const TSubclassOf<UItemBase> BaseClass, const int
 		ItemReference->NumericData = ItemData->NumericData;
 		ItemReference->AssetData = ItemData->AssetData;
 
+		ItemReference->NumericData.bIsStackable = ItemData->NumericData.MaxStackSize > 1;
+		ItemReference->NumericData.bHasCharges = ItemData->NumericData.MaxCharges > 1;
 		InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
 
 		PickupMesh->SetStaticMesh(ItemData->AssetData.Mesh);
@@ -114,6 +115,7 @@ void APickup::InitializeDrop(UItemBase* ItemToDrop, const int32 InQuantity)
 	ItemReference = ItemToDrop;
 	InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
 	ItemReference->NumericData.Weight = ItemToDrop->GetItemSingleWeight();
+	ItemReference->OwningInventory = nullptr;
 	PickupMesh->SetStaticMesh(ItemToDrop->AssetData.Mesh);
 	UpdateInteractableData();
 }
@@ -155,7 +157,7 @@ void APickup::TakePickup(const APlayerCharacter* Taker)
 					Taker->UpdateInteractionWidget();
 					break;
 				case EItemAddResult::IAR_AllItemAdded:
-					Destroy();
+					 Taker->GetInventory()->ServerDestroyPickup(this);
 					break;
 				default: ;
 				}

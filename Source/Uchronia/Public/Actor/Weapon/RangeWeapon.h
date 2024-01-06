@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Weapon Properties|Container")
 	TObjectPtr<USoundBase> EmptyContainerSound;
 
+	UPROPERTY(EditAnywhere)
+	bool bVisualizeScatter = false;
+
 protected:
 
 private:

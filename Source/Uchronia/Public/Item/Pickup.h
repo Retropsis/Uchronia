@@ -43,6 +43,7 @@ protected:
 	//~ Interaction Interface
 
 	void UpdateInteractableData();
+	
 	void TakePickup(const APlayerCharacter* Taker);
 	
 	UPROPERTY(EditInstanceOnly, Category="Pickup Properties | Initialization")
@@ -67,6 +68,9 @@ protected:
 	FInteractableData InstanceInteractableData;
 	
 private:
+	UPROPERTY()
+	TObjectPtr<APlayerCharacter> PlayerTaking;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Pickup Properties")
 	TObjectPtr<USphereComponent> OverlapSphere;
 	

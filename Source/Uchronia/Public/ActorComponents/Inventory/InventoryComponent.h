@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemBase.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+class APickup;
 DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 class UItemBase;
@@ -67,6 +69,7 @@ class UCHRONIA_API UInventoryComponent : public UActorComponent
 
 public:	
 	UInventoryComponent();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	FOnInventoryUpdated OnInventoryUpdated;
 
@@ -80,6 +83,9 @@ public:
 	int32 RemoveAmountOfItem(UItemBase* ItemToRemove, int32 DesiredAmountToRemove);
 	void SplitExistingStack(UItemBase* ItemToSplit, int32 AmountToSplit);
 
+	UFUNCTION(Server, Reliable)
+	void ServerDestroyPickup(APickup* PickupToDestroy);
+
 	FORCEINLINE float GetInventoryTotalWeight() const { return InventoryTotalWeight; };
 	FORCEINLINE float GetWeightCapacity() const { return InventoryWeightCapacity; };
 	FORCEINLINE int32 GetSlotsCapacity() const { return InventorySlotsCapacity; };
@@ -88,6 +94,34 @@ public:
 	FORCEINLINE void SetSlotsCapacity(const int32 NewSlotsCapacity) { InventorySlotsCapacity = NewSlotsCapacity; };
 	FORCEINLINE void SetWeightCapacity(const float NewWeightCapacity) { InventoryWeightCapacity = NewWeightCapacity; };
 
+	FName GetItemID(const UItemBase* InItem) const { return InItem->ID; };
+	UItemBase* FindItemByID(FName InItemID) const;
+
+	/*
+	 * Blueprint Callables
+	 */
+	// UFUNCTION(BlueprintCallable)
+	// void AddItemToInventory();
+	
+	/*
+	 * Equipment
+	 */
+	void TryEquip(UItemBase* ItemToEquip, EItemType SlotType);
+
+	UPROPERTY(ReplicatedUsing=OnRep_EquippedMainHand)
+	UClass* EquippedMainHand;
+
+	UFUNCTION(Client, Reliable)
+	void ClientSetEquippedMainHand(UClass* ItemToEquip);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerSetEquippedMainHand(UClass* ItemToEquip);
+
+	UFUNCTION()
+	void OnRep_EquippedMainHand();
+
+	void AttachActorToSocket(UClass* ActorToAttach, const FName Socket) const;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -97,7 +131,7 @@ protected:
 	int32 CalculateNumberForFullStack(UItemBase* StackableItem, int32 InitialRequestedAddAmount);
 
 	void AddNewItem(UItemBase* Item, int32 AmountToAdd);
-
+	
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	float InventoryTotalWeight;
 	

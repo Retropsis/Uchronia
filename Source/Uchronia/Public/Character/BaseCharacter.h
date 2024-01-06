@@ -157,5 +157,7 @@ private:
 
 public:	
 	FORCEINLINE UStaticMeshComponent* GetThrowableItem() const { return ThrowableItem; }
-	FORCEINLINE bool ShouldSwim() const { return bSwimming; }
+
+	UFUNCTION(BlueprintCallable)
+	bool IsSwimming() const { return bSwimming; }
 };

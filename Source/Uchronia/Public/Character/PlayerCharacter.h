@@ -11,6 +11,7 @@
 #include "Types/CombatState.h"
 #include "PlayerCharacter.generated.h"
 
+class APickup;
 class UItemBase;
 class UInventoryComponent;
 class APlayerHUD;
@@ -64,7 +65,14 @@ public:
 	void TriggerButtonReleased(bool bPressed);
 
 	void UpdateInteractionWidget() const;
+
+	UFUNCTION(Server, Reliable)
+	void ServerDropItem(const int32 Quantity);
+	
 	void DropItem(UItemBase* ItemToDrop, const int32 Quantity);
+
+	UPROPERTY(Replicated)
+	UItemBase* DroppedItem;
 	
 	//~ Combat Interface
 	virtual int32 GetCharacterLevel() override;
@@ -107,6 +115,7 @@ protected:
 	void PerformInteractionCheck();
 	void FoundInteractable(AActor* NewInteractable);
 	void NoInteractableFound();
+	
 	void Interact();
 
 private:

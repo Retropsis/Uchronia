@@ -33,7 +33,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bAirborne = PlayerCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = PlayerCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f;
-	bSwimming = PlayerCharacter->ShouldSwim();
+	bSwimming = PlayerCharacter->IsSwimming();
 	bWeaponEquipped = PlayerCharacter->IsWeaponEquipped();
 	EquippedWeapon = PlayerCharacter->GetEquippedWeapon();
 	
@@ -93,9 +93,9 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			UKismetSystemLibrary::DrawDebugLine(this, MuzzleFlashTransform.GetLocation(), PlayerCharacter->GetHitTarget(), FLinearColor::Red);
 		}
 	}
-	bUseFABRIK = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied;
-	bUseAimOffsets = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied;
-	bTransformRightHand = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied;
+	bUseFABRIK = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied && !PlayerCharacter->IsMelee();
+	bUseAimOffsets = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied && !PlayerCharacter->IsMelee();
+	bTransformRightHand = PlayerCharacter->GetCombatState() == ECombatState::ECS_Unoccupied && !PlayerCharacter->IsMelee();
 }
 
 void UCharacterAnimInstance::PlayFireMontage(bool bIsAiming)
