@@ -41,6 +41,10 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category="Interactable Properties | Initialization")
 	FInteractableData InstanceInteractableData;
 
+	// TODO: can be hard coded again once properly derived
+	UPROPERTY(EditAnywhere, Category="Interactable Properties | Initialization")
+	EInteractableType InteractableType = EInteractableType::EIT_Container;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Interactable Properties | Initialization")
 	bool bUsePhysics = true;
 
@@ -50,8 +54,12 @@ public:
 	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
 	//~ Interaction Interface
 
+	// TODO: Can be a single function when BP_WorldItem is properly derived
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void TryPickup(APlayerCharacter* PlayerCharacter);
+	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void TryOpenChest();
+	void TryOpenContainer(APlayerCharacter* PlayerCharacter);
 
 	UPROPERTY(VisibleAnywhere, Category="Interactable Properties | Initialization")
 	TObjectPtr<AWorldInteractable> InteractableReference;

@@ -1,10 +1,9 @@
 // Retropsis @ 2023
 
 #include "Character/PlayerCharacter.h"
-
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
-#include "Actor/Item/WorldInteractable.h"
+#include "World/Item/WorldInteractable.h"
 #include "Actor/Weapon/RangeWeapon.h"
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
@@ -519,13 +518,15 @@ void APlayerCharacter::PerformInteractionCheck()
 	{
 		TraceStart = CrosshairWorldPosition;
 		const float DistanceToCharacter = (GetActorLocation() - TraceStart).Size();
-		TraceStart += CrosshairWorldDirection * (DistanceToCharacter + /*TraceExtent*/50.f);
+		// GEngine->AddOnScreenDebugMessage(3, 1.f, FColor::Black, FString::Printf(TEXT("Dist: %f"), DistanceToCharacter));
+		TraceStart += CrosshairWorldDirection * (DistanceToCharacter / 2.f + /*TraceExtent*/0.f);
 	}
 	//
 	
 	// FVector TraceStart(GetPawnViewLocation());
 	FVector TraceEnd(TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance));
 	// UKismetSystemLibrary::DrawDebugLine(this, TraceStart, TraceEnd, FLinearColor::Blue, 1.f);
+	// UKismetSystemLibrary::DrawDebugPoint(this, TraceStart, 15.f,FLinearColor::White, 1.f);
 
 	// DotProduct to check if character looks in same direction as view rotation vector
 	float LookDirection(FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector()));

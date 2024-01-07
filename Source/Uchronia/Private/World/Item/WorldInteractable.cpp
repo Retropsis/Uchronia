@@ -1,7 +1,7 @@
 // Retropsis @ 2023-2024
 
 
-#include "Actor/Item/WorldInteractable.h"
+#include "World/Item/WorldInteractable.h"
 #include "ActorComponents/Inventory/InventoryComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -20,7 +20,7 @@ AWorldInteractable::AWorldInteractable()
 	InteractableMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	InteractableMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
-	// TODO: Will have to remove this after pickup functionality is done by tracing instead
+	// TODO: Change this in exiting overlap to close chest for example
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphere->SetupAttachment(InteractableMesh);
 	OverlapSphere->SetSphereRadius(OverlapRadius);
@@ -99,12 +99,31 @@ void AWorldInteractable::EndFocus()
 void AWorldInteractable::Interact(APlayerCharacter* PlayerCharacter)
 {
 	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Emerald, FString::Printf(TEXT("Interacting")));
-	TryOpenChest();
+	switch (InstanceInteractableData.InteractableType)
+	{
+	case EInteractableType::EIT_Pickup:
+		TryPickup(PlayerCharacter);;
+		break;
+	case EInteractableType::EIT_NonPlayableCharacter:
+		break;
+	case EInteractableType::EIT_Device:
+		break;
+	case EInteractableType::EIT_Toggle:
+		break;
+	case EInteractableType::EIT_Container:
+		TryOpenContainer(PlayerCharacter);
+		break;
+	default: ;
+	}
+}
+
+void AWorldInteractable::TryPickup_Implementation(APlayerCharacter* PlayerCharacter)
+{
 }
 
 void AWorldInteractable::UpdateInteractableData()
 {
-	InstanceInteractableData.InteractableType = EInteractableType::EIT_Container;
+	InstanceInteractableData.InteractableType = /*EInteractableType::EIT_Container*/InteractableType;
 	InstanceInteractableData.Action = InteractableReference->TextData.Interaction;
 	InstanceInteractableData.Name = InteractableReference->TextData.Name;
 	InteractableData = InstanceInteractableData;

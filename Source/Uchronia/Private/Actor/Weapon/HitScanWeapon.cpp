@@ -4,6 +4,8 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "BaseGameplayTags.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -42,6 +44,13 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 			if(UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(World, BeamParticles, TraceStart, FRotator::ZeroRotator, true))
 			{
 				Beam->SetVectorParameter(FName("Target"), BeamEnd);
+			}
+		}
+		if (BeamLaser)
+		{
+			if(UNiagaraComponent* Beam = UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, BeamLaser, TraceStart, FRotator::ZeroRotator))
+			{
+				Beam->SetVariableVec3(FName("Beam End"), BeamEnd);
 			}
 		}
 	}

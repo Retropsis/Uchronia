@@ -19,11 +19,8 @@ public:
 	
 	void InitializePickup(const TSubclassOf<AWorldItem> BaseClass, const int32 InQuantity);
 	void InitializeDrop(AWorldItem* ItemToDrop, const int32 InQuantity);
-	
-	virtual void UpdateInteractableData() override;
-	
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UInventoryComponent> OverlappingInventory;
+
+	virtual void TryPickup_Implementation(APlayerCharacter* PlayerCharacter) override;
 	
 	UPROPERTY(EditInstanceOnly, Category="Pickup Properties | Initialization")
 	int32 ItemQuantity;
@@ -36,6 +33,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category="Pickup Properties")
 	TObjectPtr<AWorldItem> ItemReference;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UInventoryComponent> OverlappingInventory;
 
 protected:
 	virtual void BeginPlay() override;

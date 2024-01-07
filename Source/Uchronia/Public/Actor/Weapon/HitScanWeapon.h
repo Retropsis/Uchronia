@@ -6,6 +6,7 @@
 #include "RangeWeapon.h"
 #include "HitScanWeapon.generated.h"
 
+class UNiagaraSystem;
 /**
  * 
  */
@@ -33,6 +34,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	TObjectPtr<UParticleSystem> BeamParticles;
+	
+	UPROPERTY(EditAnywhere, Category="Weapon Properties")
+	TObjectPtr<UNiagaraSystem> BeamLaser;
 
 	// TODO: This could be in FireMontage
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")

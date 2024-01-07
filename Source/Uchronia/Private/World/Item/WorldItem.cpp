@@ -1,6 +1,6 @@
 // Retropsis @ 2023-2024
 
-#include "Actor/Item/WorldItem.h"
+#include "World/Item/WorldItem.h"
 
 AWorldItem::AWorldItem()
 {
@@ -31,7 +31,7 @@ void AWorldItem::InitializePickup(const TSubclassOf<AWorldItem> BaseClass, const
 		ItemReference->NumericData.bHasCharges = ItemData->NumericData.MaxCharges > 1;
 		InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
 
-		PickupMesh->SetStaticMesh(ItemData->AssetData.Mesh);
+		InteractableMesh->SetStaticMesh(ItemData->AssetData.Mesh);
 
 		UpdateInteractableData();
 	}
@@ -47,12 +47,7 @@ void AWorldItem::InitializeDrop(AWorldItem* ItemToDrop, const int32 InQuantity)
 	UpdateInteractableData();
 }
 
-void AWorldItem::UpdateInteractableData()
+void AWorldItem::TryPickup_Implementation(APlayerCharacter* PlayerCharacter)
 {
-	Super::UpdateInteractableData();
 	
-	InstanceInteractableData.InteractableType = EInteractableType::EIT_Pickup;
-	InstanceInteractableData.Action = ItemReference->TextData.Interaction;
-	InstanceInteractableData.Name = ItemReference->TextData.Name;
-	InstanceInteractableData.Quantity = ItemReference->Quantity;
 }
