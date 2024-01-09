@@ -426,9 +426,10 @@ void UInventoryComponent::ClientSpawnIem_Implementation(TSubclassOf<AWorldItem_>
 	ServerSpawnIem(ItemToSpawn, SpawnTransform);
 }
 
-void UInventoryComponent::SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn)
+void UInventoryComponent::DropItemFromInventory(TSubclassOf<AWorldItem_> ItemToDrop)
 {
-	ClientSpawnIem(ItemToSpawn, FTransform());
+	ClientSpawnIem(ItemToDrop, FTransform());
+	Inventory_.RemoveAt(Inventory_.Find(ItemToDrop));
 }
 
 void UInventoryComponent::ServerDestroyActor_Implementation(AActor* ActorToDestroy)

@@ -30,7 +30,7 @@ bool UDropSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 		// Here with interface, working too
 		if(IInteractionInterface* Interface = Cast<IInteractionInterface>(PlayerCharacter))
 		{
-			Interface->SpawnItem(ItemDragDrop->SourceItem->GetClass());
+			Interface->DropItem(ItemDragDrop->SourceItem->GetClass());
 		}
 		// 3rd try from InventoryComponent Interfacing, Source inventory seems always null ???
 		// if(IInteractionInterface* Interface = Cast<IInteractionInterface>(ItemDragDrop->SourceInventory))
@@ -43,16 +43,4 @@ bool UDropSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 		return true;
 	}
 	return false;
-}
-
-void UDropSlot::ServerSpawnActorFromClass_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
-{
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = PlayerCharacter;
-	SpawnParams.bNoFail = true;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	const FVector SpawnLocation{ PlayerCharacter->GetActorLocation() + (PlayerCharacter->GetActorForwardVector() * 150.f) };
-	const FTransform SpawnTransform_{ PlayerCharacter->GetActorRotation(), SpawnLocation };
-	GetWorld()->SpawnActor<AWorldItem_>(ItemToSpawn, SpawnTransform_, SpawnParams);
 }

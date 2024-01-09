@@ -275,7 +275,7 @@ public:
 	void ServerSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
 	UFUNCTION(Client, Reliable)
 	void ClientSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
-	virtual void SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn) override;
+	virtual void DropItem(TSubclassOf<AWorldItem_> ItemToSpawn) override;
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	float ItemDropDistance = 150.f;

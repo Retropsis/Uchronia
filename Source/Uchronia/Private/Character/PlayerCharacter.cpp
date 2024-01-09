@@ -927,10 +927,12 @@ void APlayerCharacter::ClientSpawnIem_Implementation(TSubclassOf<AWorldItem_> It
 	ServerSpawnIem(ItemToSpawn, SpawnTransform);
 }
 
-void APlayerCharacter::SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn)
+void APlayerCharacter::DropItem(TSubclassOf<AWorldItem_> ItemToSpawn)
 {
 	// ServerSpawn was working, trying client too
 	// ServerSpawnIem(ItemToSpawn, FTransform());
 
-	ClientSpawnIem(ItemToSpawn, FTransform());
+	// ClientSpawnIem(ItemToSpawn, FTransform());
+	InventoryComponent->DropItemFromInventory(ItemToSpawn);
+	if(IsLocallyControlled()) InventoryWidget->UpdateInventory();
 }

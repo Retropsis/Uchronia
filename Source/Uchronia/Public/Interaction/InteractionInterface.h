@@ -63,7 +63,7 @@ public:
 	virtual void Interact(APlayerCharacter* PlayerCharacter) = 0;
 	virtual void Use(APlayerCharacter* PlayerCharacter) {};
 	virtual void AddItem(AWorldItem_* ItemToAdd) {};
-	virtual void SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn) {};
+	virtual void DropItem(TSubclassOf<AWorldItem_> ItemToDrop) {};
 	
 	FInteractableData InteractableData;
 };

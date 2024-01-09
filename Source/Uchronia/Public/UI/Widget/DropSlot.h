@@ -24,7 +24,4 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	
-	UFUNCTION(Server, Reliable)
-	void ServerSpawnActorFromClass(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
 };
