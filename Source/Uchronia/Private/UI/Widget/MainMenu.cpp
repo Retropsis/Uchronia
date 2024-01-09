@@ -3,6 +3,7 @@
 
 #include "UI/Widget/MainMenu.h"
 
+#include "ActorComponents/Inventory/InventoryComponent.h"
 #include "ActorComponents/Inventory/ItemBase.h"
 #include "Character/PlayerCharacter.h"
 #include "UI/Widget/ItemDragDropOperation.h"
@@ -26,9 +27,8 @@ bool UMainMenu::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 
 	if(PlayerCharacter && ItemDragDrop->SourceItem)
 	{
-		PlayerCharacter->DroppedItem = ItemDragDrop->SourceItem;
-		PlayerCharacter->ServerDropItem(ItemDragDrop->SourceItem->Quantity);
 		// PlayerCharacter->DropItem(ItemDragDrop->SourceItem, ItemDragDrop->SourceItem->Quantity);
+		PlayerCharacter->GetInventory()->DropItem(ItemDragDrop->SourceItem,  ItemDragDrop->SourceItem->Quantity);
 		return true;
 	}
 	return false;

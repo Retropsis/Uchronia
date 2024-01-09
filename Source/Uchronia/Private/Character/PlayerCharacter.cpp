@@ -8,6 +8,7 @@
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
 #include "ActorComponents/Inventory/InventoryComponent.h"
+#include "ActorComponents/Inventory/InventoryComponent_v4.h"
 #include "Camera/CameraComponent.h"
 #include "Character/CharacterAnimInstance.h"
 #include "Components/CapsuleComponent.h"
@@ -18,7 +19,6 @@
 #include "Item/Pickup.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/CharacterPlayerController.h"
 #include "Player/CharacterPlayerState.h"
@@ -51,6 +51,8 @@ APlayerCharacter::APlayerCharacter()
 	// PlayerInventory->SetIsReplicated(true); TODO: Investigate if i need this
 	PlayerInventory->SetSlotsCapacity(DefaultInventorySlotsCapacity);
 	PlayerInventory->SetWeightCapacity(DefaultInventoryWeightCapacity);
+	
+	InventoryComponent_V4 = CreateDefaultSubobject<UInventoryComponent_v4>(TEXT("InventoryComponentV4"));
 	//~ Components
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
@@ -73,7 +75,13 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
-	DOREPLIFETIME(APlayerCharacter, DroppedItem);
+
+	/*
+	 * T3
+	 */
+	DOREPLIFETIME_CONDITION(APlayerCharacter, InventoryItems, COND_OwnerOnly);
+	DOREPLIFETIME(APlayerCharacter, Health);
+	DOREPLIFETIME(APlayerCharacter, Hunger);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -518,41 +526,51 @@ void APlayerCharacter::PerformInteractionCheck()
 	{
 		TraceStart = CrosshairWorldPosition;
 		const float DistanceToCharacter = (GetActorLocation() - TraceStart).Size();
-		// GEngine->AddOnScreenDebugMessage(3, 1.f, FColor::Black, FString::Printf(TEXT("Dist: %f"), DistanceToCharacter));
 		TraceStart += CrosshairWorldDirection * (DistanceToCharacter / 2.f + /*TraceExtent*/0.f);
-	}
-	//
-	
+	}	
 	// FVector TraceStart(GetPawnViewLocation());
 	FVector TraceEnd(TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance));
-	// UKismetSystemLibrary::DrawDebugLine(this, TraceStart, TraceEnd, FLinearColor::Blue, 1.f);
-	// UKismetSystemLibrary::DrawDebugPoint(this, TraceStart, 15.f,FLinearColor::White, 1.f);
+
+	if (HasAuthority())
+	{
+		Interact(TraceStart, TraceEnd);
+	}
+	else
+	{
+		ServerInteract(TraceStart, TraceEnd);
+	}
 
 	// DotProduct to check if character looks in same direction as view rotation vector
-	float LookDirection(FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector()));
-	if(LookDirection > 0)
-	{
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(this);
-		FHitResult TraceHit;
-
-		if(GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
-		{
-			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
-			{
-				if(TraceHit.GetActor() != InteractionData.CurrentInteractable)
-				{
-					FoundInteractable(TraceHit.GetActor());
-					return;
-				}
-				if(TraceHit.GetActor() == InteractionData.CurrentInteractable)
-				{
-					return;
-				}
-			}
-		}
-	}
-	NoInteractableFound();
+	// float LookDirection(FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector()));
+	// if(LookDirection > 0)
+	//
+	// FCollisionQueryParams QueryParams;
+	// QueryParams.AddIgnoredActor(this);
+	// FHitResult TraceHit;
+	//
+	// if(GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	// {
+	// 	// TODO: Testing here first
+	// 	if(IInteractionInterface* Interface =Cast<IInteractionInterface>(TraceHit.GetActor()))
+	// 	{
+	// 		Interface->Interact(this);
+	// 	}
+	//
+	// 	
+	// 	if (TraceHit.GetActor() && TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
+	// 	{
+	// 		if(TraceHit.GetActor() != InteractionData.CurrentInteractable)
+	// 		{
+	// 			FoundInteractable(TraceHit.GetActor());
+	// 			return;
+	// 		}
+	// 		if(TraceHit.GetActor() == InteractionData.CurrentInteractable)
+	// 		{
+	// 			return;
+	// 		}
+	// 	}
+	// }
+	// NoInteractableFound();
 }
 
 void APlayerCharacter::FoundInteractable(AActor* NewInteractable)
@@ -569,8 +587,8 @@ void APlayerCharacter::FoundInteractable(AActor* NewInteractable)
 	}
 	InteractionData.CurrentInteractable = NewInteractable;
 	TargetInteractable = NewInteractable;
-
-	PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	
+	if(IsLocallyControlled()) PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 	
 	TargetInteractable->BeginFocus();
 }
@@ -589,7 +607,7 @@ void APlayerCharacter::NoInteractableFound()
 			TargetInteractable->EndFocus();
 		}
 
-		PlayerHUD->HideInteractionWidget();
+		if(IsLocallyControlled()) PlayerHUD->HideInteractionWidget();
 
 		InteractionData.CurrentInteractable = nullptr;
 		TargetInteractable = nullptr;
@@ -643,13 +661,12 @@ void APlayerCharacter::UpdateInteractionWidget() const
 {
 	if(IsValid(TargetInteractable.GetObject()))
 	{
-		PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+		if(IsLocallyControlled()) PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 	}
 }
 
 void APlayerCharacter::ServerDropItem_Implementation(const int32 Quantity)
 {
-	DropItem(DroppedItem, Quantity);
 }
 
 void APlayerCharacter::DropItem(UItemBase* ItemToDrop, const int32 Quantity)
@@ -673,6 +690,184 @@ void APlayerCharacter::DropItem(UItemBase* ItemToDrop, const int32 Quantity)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Inventory didn't find a matching Item"));
 	}
+}
+
+void APlayerCharacter::Interact(FVector TraceStart, FVector TraceEnd)
+{
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	FHitResult TraceHit;
+
+	if(GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	{
+		// TODO: Testing here first
+		if(IInteractionInterface* Interface =Cast<IInteractionInterface>(TraceHit.GetActor()))
+		{
+			Interface->Interact(this);
+		}
+		
+		if (TraceHit.GetActor() && TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
+		{
+			if(TraceHit.GetActor() != InteractionData.CurrentInteractable)
+			{
+				FoundInteractable(TraceHit.GetActor());
+				return;
+			}
+			if(TraceHit.GetActor() == InteractionData.CurrentInteractable)
+			{
+				return;
+			}
+		}
+	}
+	NoInteractableFound();
+}
+
+void APlayerCharacter::ServerInteract_Implementation(FVector TraceStart, FVector TraceEnd)
+{
+	Interact(TraceStart, TraceEnd);
+}
+
+bool APlayerCharacter::ServerInteract_Validate(FVector TraceStart, FVector TraceEnd)
+{
+	return true;
+}
+
+/*
+ * T3
+ */
+void APlayerCharacter::OnRep_InventoryItems()
+{
+	if (InventoryItems.Num() > 0)
+	{
+		AddItemAndUpdateToInventoryWidget(InventoryItems[InventoryItems.Num() - 1], InventoryItems);
+	}
+	else
+	{
+		AddItemAndUpdateToInventoryWidget(FItemStruct(), InventoryItems);
+	}
+}
+
+void APlayerCharacter::AddInventoryItem(FItemStruct ItemData)
+{
+	if(HasAuthority())
+	{
+		bool bIsNewItem = true;
+		for(FItemStruct& Item : InventoryItems)
+		{
+			if(Item.ItemClass == ItemData.ItemClass)
+			{
+				if(ItemData.ItemQuantity > 1)
+				{
+					Item.ItemQuantity += ItemData.ItemQuantity;
+				}
+				else
+				{
+					++Item.ItemQuantity;
+				}
+				bIsNewItem = false;
+				break;;
+			}
+		}
+		if(bIsNewItem)
+		{
+			InventoryItems.Add(ItemData);
+		}
+		if(IsLocallyControlled())
+		{
+			OnRep_InventoryItems();
+		}
+	}
+}
+
+void APlayerCharacter::UseItem(TSubclassOf<AItem> ItemSubclass)
+{
+	if(ItemSubclass)
+	{
+		if(HasAuthority())
+		{
+			if(AItem* Item = ItemSubclass->GetDefaultObject<AItem>())
+            {
+            	Item->Use(this);
+            }
+			uint8 ItemIndex = 0;
+			for(FItemStruct& Item : InventoryItems)
+			{
+				if (Item.ItemClass == ItemSubclass)
+				{
+					--Item.ItemQuantity;
+					if (Item.ItemQuantity <= 0)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Before shrunk: %d"), InventoryItems.Num());
+						InventoryItems.RemoveAt(ItemIndex);
+						UE_LOG(LogTemp, Warning, TEXT("Shrunk: %d"), InventoryItems.Num());
+					}
+					break;
+				}
+				++ItemIndex;
+			}
+			if (IsLocallyControlled())
+			{
+				OnRep_InventoryItems();
+			}
+		}
+		else
+		{
+			if(AItem* Item = ItemSubclass->GetDefaultObject<AItem>())
+			{
+				Item->Use(this);
+			}
+			ServerUseItem(ItemSubclass);
+		}
+		
+	}
+}
+
+void APlayerCharacter::ServerUseItem_Implementation(TSubclassOf<AItem> ItemSubclass)
+{
+	for (FItemStruct& Item : InventoryItems)
+    	{
+    		if(Item.ItemClass == ItemSubclass)
+    		{
+    			if(Item.ItemQuantity)
+    			{
+    				UseItem(ItemSubclass);
+    			}
+                return;
+    		}
+    	}
+}
+
+bool APlayerCharacter::ServerUseItem_Validate(TSubclassOf<AItem> ItemSubclass)
+{
+	return true;
+}
+
+void APlayerCharacter::OnRep_Stats()
+{
+	if(IsLocallyControlled())
+	{
+		// Update HUD
+	}
+}
+
+void APlayerCharacter::AddHealth(float Value)
+{
+	Health += Value;
+	if (IsLocallyControlled())
+	{
+		// Update HUD
+	}
+	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Emerald, FString::Printf(TEXT("Health: %f"), Health));
+}
+
+void APlayerCharacter::RemoveHunger(float Value)
+{
+	Hunger -= Value;
+	if (IsLocallyControlled())
+	{
+		// Update HUD
+	}
+	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Emerald, FString::Printf(TEXT("Hunger: %f"), Hunger));
 }
 
 /*

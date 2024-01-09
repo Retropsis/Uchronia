@@ -6,6 +6,7 @@
 #include "Character/PlayerCharacter.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "ActorComponents/Inventory/InventoryComponent_v4.h"
 #include "Input/PlayerInputComponent.h"
 #include "UI/Widget/DamageTextComponent.h"
 
@@ -45,6 +46,8 @@ void ACharacterPlayerController::SetupInputComponent()
 	PlayerInputComponent->BindAction(TriggerReleasedAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::TriggerButtonReleased);	
 	PlayerInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ThrowButtonPressed);	
 	PlayerInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ReloadButtonPressed);
+	
+	PlayerInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::InventoryButtonPressed);
 
 	PlayerInputComponent->SetupKeybindInputActions(InputConfig, this, &ThisClass::KeybindInputTagPressed, &ThisClass::KeybindInputTagReleased, &ThisClass::KeybindInputTagHeld);
 }
@@ -239,4 +242,17 @@ UBaseAbilitySystemComponent* ACharacterPlayerController::GetASC()
 		BaseAbilitySystemComponent = Cast<UBaseAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
 	return BaseAbilitySystemComponent;
+}
+
+
+
+void ACharacterPlayerController::InventoryButtonPressed()
+{
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		if (PlayerCharacter->InventoryComponent_V4)
+		{
+			PlayerCharacter->InventoryComponent_V4->ToggleInventory();
+		};
+	}
 }

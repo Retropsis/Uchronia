@@ -30,10 +30,10 @@ struct FItemTextData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Name;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Description;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Interaction;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Usage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Name = FText::GetEmpty();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Description = FText::GetEmpty();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Interaction = FText::GetEmpty();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Usage = FText::GetEmpty();
 };
 
 USTRUCT(BlueprintType)
@@ -42,37 +42,37 @@ struct FItemStatistics
 	GENERATED_BODY()
 	
 	//~ Damage
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float FireInterval;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float HealthDamage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float HardDamage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float BloodLoss;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float DropoffRange;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MinDamageRange;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MaxRange;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float AccuracyRadiusAt10m;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float FireInterval = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float HealthDamage = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float HardDamage = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float BloodLoss = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float DropoffRange = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MinDamageRange = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MaxRange = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float AccuracyRadiusAt10m = 0.f;
 	
 	//~ Aiming
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float PerShotModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float ShotModifierCap;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RecoveryDelay;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RecoveryPerSecond;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float GravityModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float CrouchModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float WalkModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RunModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float SprintModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float JumpModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float LeanModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MarksmanModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float InVehicleModifier;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float PerShotModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float ShotModifierCap = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RecoveryDelay = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RecoveryPerSecond = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float GravityModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float CrouchModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float WalkModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float RunModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float SprintModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float JumpModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float LeanModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float MarksmanModifier = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float InVehicleModifier = 0.f;
 
 	//~ Movement
 
 	//~ Ammo
 	
 	//~ Inventory
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float Value;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float SellValue;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float Value = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float SellValue = 0.f;
 };
 
 USTRUCT(BlueprintType)
@@ -80,14 +80,14 @@ struct FItemNumericData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 GridWidth;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 GridHeight;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 GridWidth = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 GridHeight = 0;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) float Weight;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 MaxStackSize;
-	UPROPERTY(BlueprintReadOnly) bool bIsStackable;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 MaxCharges;
-	UPROPERTY(BlueprintReadOnly) bool bHasCharges;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float Weight = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 MaxStackSize = 0;
+	UPROPERTY(BlueprintReadOnly) bool bIsStackable = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 MaxCharges = 0.f;
+	UPROPERTY(BlueprintReadOnly) bool bHasCharges = false;
 };
 
 USTRUCT(BlueprintType, Blueprintable)
@@ -95,21 +95,21 @@ struct FItemAssetData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<UTexture2D> Icon;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<UStaticMesh> Mesh;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<USoundBase> PickupSound;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<UTexture2D> Icon = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<UStaticMesh> Mesh = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TObjectPtr<USoundBase> PickupSound = nullptr;
 };
 
-USTRUCT(BlueprintType, Blueprintable)
+USTRUCT(BlueprintType)
 struct FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FName ID;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemTextData TextData;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") EItemType ItemType;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") EItemCondition ItemCondition;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemAssetData AssetData;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemNumericData NumericData;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemStatistics ItemStatistics;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FName ID = FName();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemTextData TextData = FItemTextData();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") EItemType ItemType = EItemType::EIT_Misc;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") EItemCondition ItemCondition = EItemCondition::EIC_Pristine;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemAssetData AssetData = FItemAssetData();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemNumericData NumericData = FItemNumericData();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data") FItemStatistics ItemStatistics = FItemStatistics();
 };

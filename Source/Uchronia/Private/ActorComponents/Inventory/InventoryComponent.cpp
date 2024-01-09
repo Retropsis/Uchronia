@@ -271,13 +271,32 @@ void UInventoryComponent::ServerDestroyPickup_Implementation(APickup* PickupToDe
 	PickupToDestroy->Destroy();
 }
 
+void UInventoryComponent::DropAllInventory()
+{
+	if(GetOwner()->HasAuthority())
+	{
+		for(UItemBase* Item : InventoryContents)
+		{
+			DropItem(Item, Item->Quantity);
+		}
+	}
+}
+
+void UInventoryComponent::DropItem(UItemBase* ItemToDrop, const int32 Quantity)
+{
+	if(GetOwner()->HasAuthority())
+	{
+		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner()))
+		{
+			PlayerCharacter->DropItem(ItemToDrop, Quantity);
+		}
+	}
+}
+
+
 /*
-* BP_InventoryComponent Callables
+* BP_Inventory Component Callables
 */
-// void UInventoryComponent::AddItemToInventory()
-// {
-// 	
-// }
 
 /*
 * Equipment

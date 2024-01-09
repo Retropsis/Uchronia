@@ -97,11 +97,13 @@ public:
 	FName GetItemID(const UItemBase* InItem) const { return InItem->ID; };
 	UItemBase* FindItemByID(FName InItemID) const;
 
+
+	void DropAllInventory();
+	void DropItem(UItemBase* ItemToDrop, const int32 Quantity);
+	
 	/*
 	 * Blueprint Callables
 	 */
-	// UFUNCTION(BlueprintCallable)
-	// void AddItemToInventory();
 	
 	/*
 	 * Equipment

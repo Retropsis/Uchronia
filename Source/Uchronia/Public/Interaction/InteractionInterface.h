@@ -59,7 +59,8 @@ public:
 	virtual void BeginInteract();
 	virtual void EndInteract();
 
-	virtual void Interact(APlayerCharacter* PlayerCharacter);
+	virtual void Interact(APlayerCharacter* PlayerCharacter) = 0;
+	virtual void Use(APlayerCharacter* PlayerCharacter) {};
 
 	FInteractableData InteractableData;
 };

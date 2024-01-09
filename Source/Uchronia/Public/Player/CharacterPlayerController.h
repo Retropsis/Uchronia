@@ -69,6 +69,9 @@ private:
 	TObjectPtr<UInputAction>ToggleMenuAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction>InventoryAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -115,6 +118,8 @@ private:
 	void TriggerButtonReleased(const FInputActionValue& Value);
 	void ReloadButtonPressed(const FInputActionValue& Value);
 	void ThrowButtonPressed(const FInputActionValue& Value);
+
+	void InventoryButtonPressed();
 };
 
 

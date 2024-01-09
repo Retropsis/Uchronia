@@ -9,8 +9,11 @@
 #include "Interaction/LootInterface.h"
 #include "Types/AnimationStates.h"
 #include "Types/CombatState.h"
+#include "World/Item.h"
 #include "PlayerCharacter.generated.h"
 
+class UInventoryComponent_v4;
+struct FItemStruct;
 class APickup;
 class UItemBase;
 class UInventoryComponent;
@@ -70,9 +73,6 @@ public:
 	void ServerDropItem(const int32 Quantity);
 	
 	void DropItem(UItemBase* ItemToDrop, const int32 Quantity);
-
-	UPROPERTY(Replicated)
-	UItemBase* DroppedItem;
 	
 	//~ Combat Interface
 	virtual int32 GetCharacterLevel() override;
@@ -208,6 +208,58 @@ public:
 	
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(InteractionCheckTImer); };
 	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; }
+
+	/*
+	 * TODO: T3 Should be in a component
+	 */
+	void Interact(FVector TraceStart, FVector TraceEnd);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerInteract(FVector TraceStart, FVector TraceEnd);
+	
+	UPROPERTY(ReplicatedUsing=OnRep_InventoryItems, BlueprintReadWrite)
+	TArray<FItemStruct> InventoryItems;
+
+	UFUNCTION()
+	void OnRep_InventoryItems();
+
+	void AddInventoryItem(FItemStruct ItemData);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void AddItemAndUpdateToInventoryWidget(FItemStruct ItemData, const TArray<FItemStruct>& CurrentInventory = TArray<FItemStruct>());
+
+	UFUNCTION(BlueprintCallable)
+	void UseItem(TSubclassOf<AItem> ItemSubclass);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerUseItem(TSubclassOf<AItem> ItemSubclass);
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Stats, BlueprintReadWrite)
+	float Health = 50.f;
+	
+	UFUNCTION()
+	void OnRep_Stats();
+	
+	void AddHealth(float Value);
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Stats, BlueprintReadWrite)
+	float Hunger = 100.f;
+	
+	void RemoveHunger(float Value);
+
+	/*
+	 * Shop
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	void OpenShop(const TArray<FItemStruct>& Items);
+
+
+	/*
+	 * T4
+	 */
+	UPROPERTY(VisibleAnywhere, Category="Character Properties | Inventory")
+	TObjectPtr<UInventoryComponent_v4> InventoryComponent_V4;
+	FORCEINLINE UInventoryComponent_v4* GetInventory_V4() const { return InventoryComponent_V4; }
 };
 
 
