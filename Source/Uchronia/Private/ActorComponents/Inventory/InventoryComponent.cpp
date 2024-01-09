@@ -4,7 +4,9 @@
 #include "ActorComponents/Inventory/ItemBase.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Item/Pickup.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "World/WorldItem_.h"
 
 UInventoryComponent::UInventoryComponent()
 {
@@ -21,6 +23,11 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
+	if(PlayerCharacter)
+	{
+		PlayerCharacter->SetInventoryComponent(this);
+	}
 }
 
 UItemBase* UInventoryComponent::FindMatchingItem(UItemBase* InItem) const
@@ -286,17 +293,12 @@ void UInventoryComponent::DropItem(UItemBase* ItemToDrop, const int32 Quantity)
 {
 	if(GetOwner()->HasAuthority())
 	{
-		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner()))
+		if (PlayerCharacter)
 		{
 			PlayerCharacter->DropItem(ItemToDrop, Quantity);
 		}
 	}
 }
-
-
-/*
-* BP_Inventory Component Callables
-*/
 
 /*
 * Equipment
@@ -334,7 +336,7 @@ void UInventoryComponent::ServerSetEquippedMainHand_Implementation(UClass* ItemT
 
 void UInventoryComponent::OnRep_EquippedMainHand()
 {
-	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner()))
+	if (PlayerCharacter)
 	{
 		const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
 		// PlayerCharacter->GetMesh()->AttachToComponent(PlayerCharacter->GetMesh(), TransformRules, FName("LeftHandSocket"));
@@ -349,7 +351,6 @@ void UInventoryComponent::OnRep_EquippedMainHand()
 
 void UInventoryComponent::AttachActorToSocket(UClass* ActorToAttach, const FName Socket) const
 {
-	const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
 	if(!IsValid(PlayerCharacter) || PlayerCharacter->GetMesh() == nullptr || ActorToAttach == nullptr) return;
 	
 	if(const USkeletalMeshSocket* SocketToAttach= PlayerCharacter->GetMesh()->GetSocketByName(Socket))
@@ -357,4 +358,80 @@ void UInventoryComponent::AttachActorToSocket(UClass* ActorToAttach, const FName
 		// AActor* NewActor = ActorToAttach->GetDefaultObject<UItemBase>()->AssetData.Actor;
 		// SocketToAttach->AttachActor(NewActor, PlayerCharacter->GetMesh());
 	}
+}
+
+/*
+* T4
+*/
+void UInventoryComponent::AddItemToInventory(AWorldItem_* ItemToAdd, int32 AmountToAdd)
+{
+	Inventory_.Add(ItemToAdd->GetClass());
+	// InventoryWidget->UpdateInventory(Inventory_);
+	ItemToAdd->OwningInventory = this;
+	if(ItemToAdd->InteractableSound)
+	{
+		if(ItemToAdd->bSoundShouldPropagate)
+		{
+			if (PlayerCharacter->HasAuthority())
+            {
+            	MulticastPlayerSound(ItemToAdd->InteractableSound);
+            }
+            else
+            {
+            	ServerPlayerSound(ItemToAdd->InteractableSound);
+            }
+		}
+		else
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ItemToAdd->InteractableSound, PlayerCharacter->GetActorLocation());
+		}
+	}
+}
+void UInventoryComponent::AddItem(AWorldItem_* ItemToAdd)
+{
+	AddItemToInventory(ItemToAdd);
+}
+
+void UInventoryComponent::ServerPlayerSound_Implementation(USoundBase* InSound)
+{
+	MulticastPlayerSound(InSound);	
+}
+
+void UInventoryComponent::MulticastPlayerSound_Implementation(USoundBase* InSound)
+{
+	if (InSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, InSound, PlayerCharacter->GetActorLocation());
+	}
+}
+
+void UInventoryComponent::Interact(APlayerCharacter* InteractingPlayerCharacter)
+{
+}
+
+void UInventoryComponent::ServerSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = PlayerCharacter;
+	SpawnParams.bNoFail = true;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	const FVector SpawnLocation{ PlayerCharacter->GetActorLocation() + (PlayerCharacter->GetActorForwardVector() * ItemSpawnDistance) };
+	const FTransform SpawnTransform_{ PlayerCharacter->GetActorRotation(), SpawnLocation };
+	GetWorld()->SpawnActor<AWorldItem_>(ItemToSpawn, SpawnTransform_, SpawnParams);
+}
+
+void UInventoryComponent::ClientSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
+{
+	ServerSpawnIem(ItemToSpawn, SpawnTransform);
+}
+
+void UInventoryComponent::SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn)
+{
+	ClientSpawnIem(ItemToSpawn, FTransform());
+}
+
+void UInventoryComponent::ServerDestroyActor_Implementation(AActor* ActorToDestroy)
+{
+	ActorToDestroy->Destroy();
 }

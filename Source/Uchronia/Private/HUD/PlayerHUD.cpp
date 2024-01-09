@@ -1,8 +1,12 @@
 // Retropsis @ 2023-2024
 
 #include "HUD/PlayerHUD.h"
+
+#include "Character/PlayerCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/Widget/BaseUserwidget.h"
 #include "UI/Widget/InteractionWidget.h"
+#include "UI/Widget/InventoryWidget.h"
 #include "UI/Widget/MainMenu.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
@@ -17,6 +21,7 @@ void APlayerHUD::BeginPlay()
 	
 	checkf(MainMenuClass, TEXT("Main Menu Class missing, fill out BP_PlayerHUD"));
 	checkf(InteractionWidgetClass, TEXT("Interaction Widget Class missing, fill out BP_PlayerHUD"));
+	checkf(InventoryWidgetClass, TEXT("Inventory Widget Class missing, fill out BP_PlayerHUD"));
 
 	MainMenuWidget = CreateWidget<UMainMenu>(GetWorld(), MainMenuClass);
 	MainMenuWidget->AddToViewport(5);
@@ -25,6 +30,14 @@ void APlayerHUD::BeginPlay()
 	InteractionWidget = CreateWidget<UInteractionWidget>(GetWorld(), InteractionWidgetClass);
 	InteractionWidget->AddToViewport(-1);
 	InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	InventoryWidget = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
+	InventoryWidget->AddToViewport(5);
+	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwningPlayerController()->GetCharacter()))
+	{
+		PlayerCharacter->InventoryWidget = InventoryWidget;
+	}
 }
 
 void APlayerHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
@@ -138,15 +151,18 @@ void APlayerHUD::ToggleMenu()
 {
 	if(bIsMenuVisible)
 	{
-		HideMenu();
-		const FInputModeGameOnly InputMode;
+		// HideMenu();
+		HideInventory();
+		FInputModeGameOnly InputMode;
 		GetOwningPlayerController()->SetInputMode(InputMode);
 		GetOwningPlayerController()->SetShowMouseCursor(false);
 	}
 	else
 	{
-		DisplayMenu();
-		const FInputModeGameAndUI InputMode;
+		// DisplayMenu();
+		ShowInventory();
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
 		GetOwningPlayerController()->SetInputMode(InputMode);
 		GetOwningPlayerController()->SetShowMouseCursor(true);
 	}
@@ -177,5 +193,29 @@ void APlayerHUD::UpdateInteractionWidget(const FInteractableData* InteractableDa
 			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 		InteractionWidget->UpdateWidget(InteractableData);
+	}
+}
+
+/*
+* T4
+*/
+void APlayerHUD::ShowInventory()
+{
+	if (!GetOwningPlayerController()->IsLocalPlayerController()) return;
+	if (InventoryWidget)
+	{
+		bIsMenuVisible = true;
+		InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+		InventoryWidget->UpdateInventory();
+	}
+}
+
+void APlayerHUD::HideInventory()
+{
+	if (!GetOwningPlayerController()->IsLocalPlayerController()) return;
+	if (InventoryWidget)
+	{
+		bIsMenuVisible = false;
+		InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }

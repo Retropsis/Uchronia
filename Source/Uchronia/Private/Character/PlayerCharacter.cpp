@@ -8,7 +8,6 @@
 #include "Actor/Weapon/Weapon.h"
 #include "ActorComponents/CombatComponent.h"
 #include "ActorComponents/Inventory/InventoryComponent.h"
-#include "ActorComponents/Inventory/InventoryComponent_v4.h"
 #include "Camera/CameraComponent.h"
 #include "Character/CharacterAnimInstance.h"
 #include "Components/CapsuleComponent.h"
@@ -23,6 +22,8 @@
 #include "Player/CharacterPlayerController.h"
 #include "Player/CharacterPlayerState.h"
 #include "Uchronia/Uchronia.h"
+#include "UI/Widget/InventoryWidget.h"
+#include "World/WorldItem_.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -48,11 +49,10 @@ APlayerCharacter::APlayerCharacter()
 	CombatComponent->SetIsReplicated(true);
 
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+	PlayerInventory->PlayerCharacter = this;
 	// PlayerInventory->SetIsReplicated(true); TODO: Investigate if i need this
 	PlayerInventory->SetSlotsCapacity(DefaultInventorySlotsCapacity);
 	PlayerInventory->SetWeightCapacity(DefaultInventoryWeightCapacity);
-	
-	InventoryComponent_V4 = CreateDefaultSubobject<UInventoryComponent_v4>(TEXT("InventoryComponentV4"));
 	//~ Components
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
@@ -75,6 +75,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, TargetInteractable, COND_OwnerOnly);
 
 	/*
 	 * T3
@@ -587,10 +588,27 @@ void APlayerCharacter::FoundInteractable(AActor* NewInteractable)
 	}
 	InteractionData.CurrentInteractable = NewInteractable;
 	TargetInteractable = NewInteractable;
+
+	//
+	// if(IInteractionInterface* Interface =Cast<IInteractionInterface>(NewInteractable))
+	// {
+	// 	Interface->Interact(this);
+	// }
+	//
 	
-	if(IsLocallyControlled()) PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	if(PlayerHUD) PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 	
 	TargetInteractable->BeginFocus();
+}
+
+void APlayerCharacter::OnRep_TargetInteractable()
+{
+	if(PlayerHUD == nullptr) return;
+	if(TargetInteractable) PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	else
+	{
+		PlayerHUD->HideInteractionWidget();
+	}
 }
 
 void APlayerCharacter::NoInteractableFound()
@@ -607,7 +625,7 @@ void APlayerCharacter::NoInteractableFound()
 			TargetInteractable->EndFocus();
 		}
 
-		if(IsLocallyControlled()) PlayerHUD->HideInteractionWidget();
+		if(PlayerHUD) PlayerHUD->HideInteractionWidget();
 
 		InteractionData.CurrentInteractable = nullptr;
 		TargetInteractable = nullptr;
@@ -616,6 +634,13 @@ void APlayerCharacter::NoInteractableFound()
 
 void APlayerCharacter::BeginInteract()
 {
+	
+	//
+	if(IInteractionInterface* Interface =Cast<IInteractionInterface>(TargetInteractable.GetObject()))
+	{
+		Interface->Interact(this);
+	}
+	//
 	// Verify nothing has changed during this interaction state
 	PerformInteractionCheck();
 
@@ -661,7 +686,7 @@ void APlayerCharacter::UpdateInteractionWidget() const
 {
 	if(IsValid(TargetInteractable.GetObject()))
 	{
-		if(IsLocallyControlled()) PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+		if(PlayerHUD)  PlayerHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 	}
 }
 
@@ -700,7 +725,7 @@ void APlayerCharacter::Interact(FVector TraceStart, FVector TraceEnd)
 
 	if(GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 	{
-		// TODO: Testing here first
+		// // TODO: Testing here first
 		if(IInteractionInterface* Interface =Cast<IInteractionInterface>(TraceHit.GetActor()))
 		{
 			Interface->Interact(this);
@@ -870,6 +895,42 @@ void APlayerCharacter::RemoveHunger(float Value)
 	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Emerald, FString::Printf(TEXT("Hunger: %f"), Hunger));
 }
 
+
 /*
-*
+* T4
 */
+void APlayerCharacter::Interact(APlayerCharacter* PlayerCharacter)
+{
+	
+}
+
+void APlayerCharacter::AddItem(AWorldItem_* ItemToAdd)
+{
+	InventoryComponent->AddItemToInventory(ItemToAdd);
+	if(IsLocallyControlled()) InventoryWidget->UpdateInventory();
+}
+
+void APlayerCharacter::ServerSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.bNoFail = true;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	const FVector SpawnLocation{ GetActorLocation() + (GetActorForwardVector() * ItemDropDistance) };
+	const FTransform SpawnTransform_{ GetActorRotation(), SpawnLocation };
+	GetWorld()->SpawnActor<AWorldItem_>(ItemToSpawn, SpawnTransform_, SpawnParams);
+}
+
+void APlayerCharacter::ClientSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
+{
+	ServerSpawnIem(ItemToSpawn, SpawnTransform);
+}
+
+void APlayerCharacter::SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn)
+{
+	// ServerSpawn was working, trying client too
+	// ServerSpawnIem(ItemToSpawn, FTransform());
+
+	ClientSpawnIem(ItemToSpawn, FTransform());
+}

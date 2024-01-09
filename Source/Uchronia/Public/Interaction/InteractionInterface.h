@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
 
+class AWorldItem_;
 class APlayerCharacter;
 
 UENUM()
@@ -61,6 +62,8 @@ public:
 
 	virtual void Interact(APlayerCharacter* PlayerCharacter) = 0;
 	virtual void Use(APlayerCharacter* PlayerCharacter) {};
-
+	virtual void AddItem(AWorldItem_* ItemToAdd) {};
+	virtual void SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn) {};
+	
 	FInteractableData InteractableData;
 };

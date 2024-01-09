@@ -7,10 +7,9 @@
 #include "InventoryWidget.generated.h"
 
 class UWrapBox;
-class UTextBlock;
+class UInventoryComponent;
 class APlayerCharacter;
 class UInventorySlot;
-class UInventoryComponent_v4;
 /**
  * 
  */
@@ -21,28 +20,24 @@ class UCHRONIA_API UInventoryWidget : public UBaseUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void RefreshInventory();
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UWrapBox> InventoryWrapBox;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> WeightInfo;
+	void UpdateInventory();
 	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> CapacityInfo;
-
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
 
 	UPROPERTY()
-	TObjectPtr<UInventoryComponent_v4> InventoryReference;
+	TObjectPtr<UInventoryComponent> InventoryReference;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UInventorySlot> InventorySlotClass;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UWrapBox> InventoryWrapBox;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UInventorySlot> InventorySlotClass;
+
+	UPROPERTY()
+	TObjectPtr<UInventorySlot> InventorySlot;
+
 protected:
-	void SetInfoText() const;
 	virtual void NativeOnInitialized() override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };

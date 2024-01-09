@@ -28,24 +28,6 @@ UItemBase* UItemBase::CreateItemCopy() const
 	ItemCopy->ItemStatistics = this->ItemStatistics;
 	ItemCopy->bIsCopy = true;
 
-	if(IsSupportedForNetworking())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s IsSupported"), *GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s isnt supported"), *GetName());
-	}
-	if(IsFullNameStableForNetworking())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s FullNameStable"), *GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s isnt FullNameStable"), *GetName());
-	}
-	
-
 	return ItemCopy;
 }
 

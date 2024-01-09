@@ -35,7 +35,6 @@ void AHelm::SetVehicleReference(AVehicle* VehicleRef)
 {
 	if(VehicleRef)
 	{
-		GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Green, FString::Printf(TEXT("%s"), *VehicleRef->GetName()));
 		VehicleReference = VehicleRef;
 	}
 }
@@ -70,7 +69,6 @@ void AHelm::UpdateInteractableData()
 
 void AHelm::Interact(APlayerCharacter* PlayerCharacter)
 {
-	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Emerald, FString::Printf(TEXT("Helm Interacting")));
 	if(PlayerCharacter)
 	{
 		InitiateMovement();
@@ -106,5 +104,4 @@ void AHelm::InitiateMovement()
 		default: ;
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Emerald, FString::Printf(TEXT("Moving")));
 }

@@ -76,7 +76,7 @@ void AVehicle::Move(FVector2D Movement)
 	FVector InputDirection{Movement.X, Movement.Y, 0.f};
 
 	FVector Start = FVector{GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 300.f};
-	UKismetSystemLibrary::DrawDebugArrow(this, Start, Start + InputDirection * 100.f, 1.f, FLinearColor::Red, 5.f, 1.f);
+	// UKismetSystemLibrary::DrawDebugArrow(this, Start, Start + InputDirection * 100.f, 1.f, FLinearColor::Red, 5.f, 1.f);
 	
 	const double CosTheta = FVector::DotProduct(InputDirection, GetActorForwardVector());
 	// Take the inverse cosine (arc-cosine) of cos(theta) to get theta

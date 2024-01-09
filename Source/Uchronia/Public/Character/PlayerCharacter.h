@@ -12,7 +12,7 @@
 #include "World/Item.h"
 #include "PlayerCharacter.generated.h"
 
-class UInventoryComponent_v4;
+class UInventoryWidget;
 struct FItemStruct;
 class APickup;
 class UItemBase;
@@ -43,7 +43,7 @@ struct FInteractionData
  * 
  */
 UCLASS()
-class UCHRONIA_API APlayerCharacter : public ABaseCharacter, public ILootInterface
+class UCHRONIA_API APlayerCharacter : public ABaseCharacter, public ILootInterface, public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -104,8 +104,11 @@ protected:
 	/*
 	 * Interaction
 	 */
-	UPROPERTY(VisibleAnywhere, Category="Character Properties | Interaction");
+	UPROPERTY(ReplicatedUsing=OnRep_TargetInteractable, VisibleAnywhere, Category="Character Properties | Interaction");
 	TScriptInterface<IInteractionInterface> TargetInteractable;
+
+	UFUNCTION()
+	void OnRep_TargetInteractable();
 
 	float InteractionCheckFrequency = 0.1f;
 	float InteractionCheckDistance = 225.f;
@@ -253,13 +256,27 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OpenShop(const TArray<FItemStruct>& Items);
 
-
 	/*
 	 * T4
 	 */
-	UPROPERTY(VisibleAnywhere, Category="Character Properties | Inventory")
-	TObjectPtr<UInventoryComponent_v4> InventoryComponent_V4;
-	FORCEINLINE UInventoryComponent_v4* GetInventory_V4() const { return InventoryComponent_V4; }
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInventoryWidget> InventoryWidget;
+	
+	FORCEINLINE void SetInventoryComponent(UInventoryComponent* InInventoryComponent) { InventoryComponent = InInventoryComponent; }
+	FORCEINLINE UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	
+	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
+	virtual void AddItem(AWorldItem_* ItemToAdd) override;
+	
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
+	UFUNCTION(Client, Reliable)
+	void ClientSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
+	virtual void SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn) override;
+
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	float ItemDropDistance = 150.f;
 };
-
-

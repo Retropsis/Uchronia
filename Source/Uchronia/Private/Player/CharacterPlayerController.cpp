@@ -6,7 +6,6 @@
 #include "Character/PlayerCharacter.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
-#include "ActorComponents/Inventory/InventoryComponent_v4.h"
 #include "Input/PlayerInputComponent.h"
 #include "UI/Widget/DamageTextComponent.h"
 
@@ -244,15 +243,9 @@ UBaseAbilitySystemComponent* ACharacterPlayerController::GetASC()
 	return BaseAbilitySystemComponent;
 }
 
-
-
 void ACharacterPlayerController::InventoryButtonPressed()
 {
 	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
 	{
-		if (PlayerCharacter->InventoryComponent_V4)
-		{
-			PlayerCharacter->InventoryComponent_V4->ToggleInventory();
-		};
 	}
 }

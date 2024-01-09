@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "ItemBase.h"
 #include "Components/ActorComponent.h"
+#include "Interaction/InteractionInterface.h"
 #include "InventoryComponent.generated.h"
 
+class AWorldItem_;
+class AWorldInteractable;
 class APickup;
 DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
@@ -63,7 +66,7 @@ struct FItemAddResult
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
-class UCHRONIA_API UInventoryComponent : public UActorComponent
+class UCHRONIA_API UInventoryComponent : public UActorComponent, public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -103,7 +106,9 @@ public:
 	
 	/*
 	 * Blueprint Callables
-	 */
+	 */	
+	UPROPERTY(BlueprintReadWrite, Category="Inventory Component")
+	TArray<TSubclassOf<AWorldInteractable>> Inventory;
 	
 	/*
 	 * Equipment
@@ -146,5 +151,38 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<UItemBase>> InventoryContents;
 
-public:	
+public:
+	/*
+	 * T4
+	 */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<APlayerCharacter> PlayerCharacter;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory")
+	TArray<TSubclassOf<AWorldItem_>> Inventory_;
+
+	FORCEINLINE TArray<TSubclassOf<AWorldItem_>> GetInventory_() const { return  Inventory_; }
+
+	UFUNCTION(BlueprintCallable)
+	void AddItemToInventory(AWorldItem_* ItemToAdd, int32 AmountToAdd = 1);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerPlayerSound(USoundBase* InSound);
+	
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlayerSound(USoundBase* InSound);
+	
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerDestroyActor(AActor* ActorToDestroy);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
+	UFUNCTION(Client, Reliable)
+	void ClientSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
+	virtual void SpawnItem(TSubclassOf<AWorldItem_> ItemToSpawn) override;
+	virtual void Interact(APlayerCharacter* InteractingPlayerCharacter) override;
+	virtual void AddItem(AWorldItem_* ItemToAdd) override;
+
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	float ItemSpawnDistance = 150.f;
 };

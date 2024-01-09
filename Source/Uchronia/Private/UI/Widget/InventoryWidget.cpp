@@ -1,56 +1,47 @@
 // Retropsis @ 2023-2024
 
-
 #include "UI/Widget/InventoryWidget.h"
-
-#include "ActorComponents/Inventory/InventoryComponent_v4.h"
+#include "ActorComponents/Inventory/InventoryComponent.h"
 #include "Character/PlayerCharacter.h"
 #include "Components/WrapBox.h"
 #include "UI/Widget/InventorySlot.h"
+#include "World/WorldItem_.h"
 
 void UInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+	
 	PlayerCharacter = Cast<APlayerCharacter>(GetOwningPlayerPawn());
 	if (PlayerCharacter)
 	{
-		InventoryReference = PlayerCharacter->GetInventory_V4();
-		if(InventoryReference)
-		{
-			InventoryReference->OnInventoryUpdated.AddUObject(this, &UInventoryWidget::RefreshInventory);
-			// SetInfoText();
-		}
+		InventoryReference = PlayerCharacter->GetInventoryComponent();
 	}
+	
 }
-
-void UInventoryWidget::RefreshInventory()
-{
-	checkf(InventorySlotClass, TEXT("InventorySlotClass is missing, please fill up InventoryPanel!"));
-	if(InventoryReference)
-	{
-		InventoryWrapBox->ClearChildren();
-		for(const TSubclassOf<AW_Item> InventoryItem : InventoryReference->GetInventoryContents())
-		{
-			UInventorySlot* ItemSlot = CreateWidget<UInventorySlot>(this, InventorySlotClass);
-			ItemSlot->SetItemReference(InventoryItem);
-			InventoryWrapBox->AddChildToWrapBox(ItemSlot);
-		}
-		SetInfoText();
-	}
-}
-
-void UInventoryWidget::SetInfoText() const
-{
-	// const FString WeightInfoValue = { FString::SanitizeFloat(InventoryReference->GetInventoryTotalWeight())  + "/" + FString::SanitizeFloat(InventoryReference->GetWeightCapacity()) };
-	// WeightInfo->SetText(FText::FromString(WeightInfoValue));
-	//
-	// const FString CapacityInfoValue = { FString::FromInt(InventoryReference->GetInventoryContents().Num())  + "/" + FString::FromInt(InventoryReference->GetSlotsCapacity()) };
-	// CapacityInfo->SetText(FText::FromString(CapacityInfoValue));
-}
-
 
 bool UInventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
 	UDragDropOperation* InOperation)
 {
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+}
+
+void UInventoryWidget::UpdateInventory()
+{
+	checkf(InventorySlotClass, TEXT("InventorySlotClass is missing, please fill up InventoryPanel!"));
+	PlayerCharacter = Cast<APlayerCharacter>(GetOwningPlayer()->GetCharacter());
+	if (PlayerCharacter)
+	{
+		InventoryReference = PlayerCharacter->GetInventoryComponent();
+	}
+	if(InventoryReference)
+	{
+		InventoryWrapBox->ClearChildren();
+		for(const TSubclassOf<AWorldItem_>& InventoryItem : InventoryReference->GetInventory_())
+		{
+			UInventorySlot* ItemSlot = CreateWidget<UInventorySlot>(this, InventorySlotClass);
+			// Test here GetClass
+			ItemSlot->SetItemReference(InventoryItem->GetDefaultObject<AWorldItem_>());
+			InventoryWrapBox->AddChildToWrapBox(ItemSlot);
+		}
+	}
 }
