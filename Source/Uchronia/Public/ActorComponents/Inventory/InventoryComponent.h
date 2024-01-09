@@ -66,7 +66,7 @@ struct FItemAddResult
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
-class UCHRONIA_API UInventoryComponent : public UActorComponent, public IInteractionInterface
+class UCHRONIA_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -177,11 +177,11 @@ public:
 	
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
+
+	// Not used anymore
 	UFUNCTION(Client, Reliable)
 	void ClientSpawnIem(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform);
-	virtual void Interact(APlayerCharacter* InteractingPlayerCharacter) override;
-	virtual void AddItem(AWorldItem_* ItemToAdd) override;
-
+	
 	void DropItemFromInventory(TSubclassOf<AWorldItem_> ItemToDrop);
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")

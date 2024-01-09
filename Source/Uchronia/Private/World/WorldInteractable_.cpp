@@ -10,18 +10,24 @@ AWorldInteractable_::AWorldInteractable_()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
+	AActor::SetReplicateMovement(true);
+
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	
 	InteractableMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("InteractableMesh"));
-	InteractableMesh->SetupAttachment(GetRootComponent());
-	InteractableMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// InteractableMesh->SetCollisionResponseToAllChannels(ECR_Block);
-	// InteractableMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	InteractableMesh->SetupAttachment(RootComponent);
+
+	InteractableMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	InteractableMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	// InteractableMesh->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Overlap);
-	// InteractableMesh->SetSimulatePhysics(true);
+	InteractableMesh->SetSimulatePhysics(true);
 	
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
 	CollisionSphere->SetupAttachment(InteractableMesh);
 	CollisionSphere->SetSphereRadius(CollisionRadius);
+	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
 void AWorldInteractable_::BeginPlay()

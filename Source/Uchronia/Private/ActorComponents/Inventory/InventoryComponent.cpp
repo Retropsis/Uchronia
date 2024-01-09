@@ -2,7 +2,6 @@
 
 #include "ActorComponents/Inventory/InventoryComponent.h"
 #include "ActorComponents/Inventory/ItemBase.h"
-#include "Engine/SkeletalMeshSocket.h"
 #include "Item/Pickup.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -338,7 +337,7 @@ void UInventoryComponent::OnRep_EquippedMainHand()
 {
 	if (PlayerCharacter)
 	{
-		const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
+		// const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
 		// PlayerCharacter->GetMesh()->AttachToComponent(PlayerCharacter->GetMesh(), TransformRules, FName("LeftHandSocket"));
 		
 		AttachActorToSocket(EquippedMainHand, FName("LeftHandSocket"));
@@ -353,11 +352,11 @@ void UInventoryComponent::AttachActorToSocket(UClass* ActorToAttach, const FName
 {
 	if(!IsValid(PlayerCharacter) || PlayerCharacter->GetMesh() == nullptr || ActorToAttach == nullptr) return;
 	
-	if(const USkeletalMeshSocket* SocketToAttach= PlayerCharacter->GetMesh()->GetSocketByName(Socket))
-	{
+	// if(const USkeletalMeshSocket* SocketToAttach= PlayerCharacter->GetMesh()->GetSocketByName(Socket))
+	// {
 		// AActor* NewActor = ActorToAttach->GetDefaultObject<UItemBase>()->AssetData.Actor;
 		// SocketToAttach->AttachActor(NewActor, PlayerCharacter->GetMesh());
-	}
+	// }
 }
 
 /*
@@ -387,10 +386,6 @@ void UInventoryComponent::AddItemToInventory(AWorldItem_* ItemToAdd, int32 Amoun
 		}
 	}
 }
-void UInventoryComponent::AddItem(AWorldItem_* ItemToAdd)
-{
-	AddItemToInventory(ItemToAdd);
-}
 
 void UInventoryComponent::ServerPlayerSound_Implementation(USoundBase* InSound)
 {
@@ -403,10 +398,6 @@ void UInventoryComponent::MulticastPlayerSound_Implementation(USoundBase* InSoun
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, InSound, PlayerCharacter->GetActorLocation());
 	}
-}
-
-void UInventoryComponent::Interact(APlayerCharacter* InteractingPlayerCharacter)
-{
 }
 
 void UInventoryComponent::ServerSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
@@ -428,7 +419,8 @@ void UInventoryComponent::ClientSpawnIem_Implementation(TSubclassOf<AWorldItem_>
 
 void UInventoryComponent::DropItemFromInventory(TSubclassOf<AWorldItem_> ItemToDrop)
 {
-	ClientSpawnIem(ItemToDrop, FTransform());
+	// ClientSpawnIem(ItemToDrop, FTransform());
+	ServerSpawnIem(ItemToDrop, FTransform());
 	Inventory_.RemoveAt(Inventory_.Find(ItemToDrop));
 }
 
