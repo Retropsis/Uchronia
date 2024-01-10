@@ -12,12 +12,18 @@ UInventoryComponent::UInventoryComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UInventoryComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	// Add some refs here
+}
+
 void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
 	DOREPLIFETIME(UInventoryComponent, EquippedMainHand);
 }
+
 
 void UInventoryComponent::BeginPlay()
 {
@@ -367,7 +373,29 @@ void UInventoryComponent::AddItemToInventory(AWorldItem_* ItemToAdd, int32 Amoun
 	// TODO: Need to investigate client dupe and eaten drop, but both could be overlap related, need to nuke it
 	if(ItemToAdd == nullptr) return;
 	
-	Inventory_.Add(ItemToAdd->GetClass());
+	bool bIsNewItem = true;
+	for(TSubclassOf<AWorldItem_> Item : Inventory_)
+	{
+		// if(Item->GetClass() == ItemToAdd->GetClass())
+		// {
+		// 	if(ItemToAdd->Quantity > 1)
+		// 	{
+		// 		Item->GetClass() += ItemToAdd->Quantity;
+		// 	}
+		// 	else
+		// 	{
+		// 		++Item.ItemQuantity;
+		// 	}
+		// 	bIsNewItem = false;
+		// 	break;
+		// }
+	}
+	if(bIsNewItem)
+	{
+		Inventory_.Add(ItemToAdd->GetClass());
+	}
+	
+	// Inventory_.Add(ItemToAdd->GetClass());
 	// InventoryWidget->UpdateInventory(Inventory_);
 	ItemToAdd->OwningInventory = this;
 	if(ItemToAdd->InteractableSound)

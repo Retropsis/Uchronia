@@ -21,8 +21,6 @@ public:
 	//~ Interaction Interface
 	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
 	//~ Interaction Interface
-
-	
 	
 protected:
 	virtual void BeginPlay() override;

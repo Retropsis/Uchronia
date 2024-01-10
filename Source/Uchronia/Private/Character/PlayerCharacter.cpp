@@ -910,7 +910,11 @@ void APlayerCharacter::Interact(APlayerCharacter* PlayerCharacter)
 void APlayerCharacter::ClientUpdateInventory_Implementation(AWorldItem_* ItemToAdd)
 {
 	InventoryComponent->AddItemToInventory(ItemToAdd);
-	if(IsLocallyControlled()) InventoryWidget->UpdateInventory();
+	if(IsLocallyControlled())
+	{
+		InventoryWidget->UpdateInventory();
+		GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Blue, FString::Printf(TEXT("Inventory: %d"), InventoryComponent->Inventory_.Num()));
+	}
 }
 
 void APlayerCharacter::AddItem(AWorldItem_* ItemToAdd)
@@ -921,6 +925,7 @@ void APlayerCharacter::AddItem(AWorldItem_* ItemToAdd)
 	{
 		ClientUpdateInventory(ItemToAdd);
 	}
+	InventoryComponent->ServerDestroyActor(ItemToAdd);
 }
 
 void APlayerCharacter::ServerSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)

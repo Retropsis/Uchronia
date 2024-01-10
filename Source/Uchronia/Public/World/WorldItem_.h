@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WorldItemData.h"
 #include "World/WorldInteractable_.h"
 #include "WorldItem_.generated.h"
 
@@ -23,15 +24,13 @@ public:
 	UPROPERTY()
 	TObjectPtr<UInventoryComponent> OwningInventory;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Properties")
-	FText ItemName = FText::GetEmpty();
+	UPROPERTY(EditAnywhere, Category="Item Properties")
+	FWorldItemData ItemData;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Properties")
-	FText ItemDescription = FText::GetEmpty();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Properties")
-	TObjectPtr<UTexture2D> ItemIcon;
+	int32 Quantity;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Properties")
-	TObjectPtr<UStaticMesh> ItemMesh;
+	FORCEINLINE FWorldItemData GetItemData() const { return ItemData; }
+	void SetQuantity(int32 NewQuantity);
+	FORCEINLINE bool IsItemFullStack() const { return Quantity == ItemData.MaxStackSize; };
 };

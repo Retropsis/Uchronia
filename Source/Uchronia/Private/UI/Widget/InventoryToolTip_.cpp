@@ -12,6 +12,6 @@ void UInventoryToolTip_::NativeConstruct()
 	Super::NativeConstruct();
 
 	const AWorldItem_* ItemBeingHovered = InventorySlotBeingHovered->GetItemReference();
-	ItemName->SetText(ItemBeingHovered->ItemName);
-	ItemDescription->SetText(ItemBeingHovered->ItemDescription);
+	ItemName->SetText(FText::FromName(ItemBeingHovered->ItemData.ItemName));
+	ItemDescription->SetText(FText::FromName(ItemBeingHovered->ItemData.ItemDescription));
 }

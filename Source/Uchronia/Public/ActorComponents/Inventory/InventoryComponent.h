@@ -73,6 +73,7 @@ class UCHRONIA_API UInventoryComponent : public UActorComponent
 public:	
 	UInventoryComponent();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void InitializeComponent() override;
 
 	FOnInventoryUpdated OnInventoryUpdated;
 

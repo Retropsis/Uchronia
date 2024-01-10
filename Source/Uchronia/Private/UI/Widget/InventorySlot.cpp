@@ -1,11 +1,10 @@
 // Retropsis @ 2023-2024
 
-
 #include "UI/Widget/InventorySlot.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "UI/Widget/DragItemVisual.h"
 #include "UI/Widget/InventoryToolTip_.h"
-#include "UI/Widget/ItemDragDropOperation.h"
 #include "UI/Widget/ItemDragDropOperation_.h"
 #include "World/WorldItem_.h"
 
@@ -25,15 +24,15 @@ void UInventorySlot::NativeConstruct()
 	
 	if(ItemReference)
 	{
-		ItemIcon->SetBrushFromTexture(ItemReference->ItemIcon);
-		// if(ItemReference->Item)
-		// {
-		// 	ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
-		// }
-		// else
-		// {
-		// 	ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
-		// }
+		ItemIcon->SetBrushFromTexture(ItemReference->ItemData.ItemIcon);
+		if(ItemReference->ItemData.bIsStackable)
+		{
+			ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
+		}
+		else
+		{
+			ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 }
 
@@ -59,7 +58,7 @@ void UInventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPo
 
 	checkf(DragItemVisualClass, TEXT("DragItemVisualClass is missing, please fill up WBP_InventoryItemSlot"));
 	const TObjectPtr<UDragItemVisual> DragItemVisual = CreateWidget<UDragItemVisual>(this, DragItemVisualClass);
-	DragItemVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemIcon);
+	DragItemVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemData.ItemIcon);
 	// DragItemVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
 	
 	// ItemReference->NumericData.bIsStackable
