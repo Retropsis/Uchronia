@@ -47,6 +47,7 @@ void ACharacterPlayerController::SetupInputComponent()
 	PlayerInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::ReloadButtonPressed);
 	
 	PlayerInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &ACharacterPlayerController::InventoryButtonPressed);
+	PlayerInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ACharacterPlayerController::Interact_);
 
 	PlayerInputComponent->SetupKeybindInputActions(InputConfig, this, &ThisClass::KeybindInputTagPressed, &ThisClass::KeybindInputTagReleased, &ThisClass::KeybindInputTagHeld);
 }
@@ -245,7 +246,15 @@ UBaseAbilitySystemComponent* ACharacterPlayerController::GetASC()
 
 void ACharacterPlayerController::InventoryButtonPressed()
 {
-	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
 	{
+	}
+}
+
+void ACharacterPlayerController::Interact_()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->PerformInteractionCheck_(true);
 	}
 }

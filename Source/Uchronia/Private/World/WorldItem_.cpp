@@ -2,10 +2,12 @@
 
 #include "World/WorldItem_.h"
 #include "ActorComponents/Inventory/InventoryComponent.h"
+#include "Character/PlayerCharacter.h"
 
 void AWorldItem_::Interact(APlayerCharacter* PlayerCharacter)
 {
-	
+	PlayerCharacter->AddItem(this);
+	Destroy();
 }
 
 void AWorldItem_::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

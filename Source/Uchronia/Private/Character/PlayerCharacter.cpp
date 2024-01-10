@@ -149,6 +149,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 		if(GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
 		{
 			PerformInteractionCheck();
+			PerformInteractionCheck_();
 		}
 	}
 	else
@@ -532,14 +533,14 @@ void APlayerCharacter::PerformInteractionCheck()
 	// FVector TraceStart(GetPawnViewLocation());
 	FVector TraceEnd(TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance));
 
-	if (HasAuthority())
-	{
-		Interact(TraceStart, TraceEnd);
-	}
-	else
-	{
-		ServerInteract(TraceStart, TraceEnd);
-	}
+	// if (HasAuthority())
+	// {
+	// 	Interact(TraceStart, TraceEnd);
+	// }
+	// else
+	// {
+	// 	ServerInteract(TraceStart, TraceEnd);
+	// }
 
 	// DotProduct to check if character looks in same direction as view rotation vector
 	// float LookDirection(FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector()));
@@ -681,6 +682,7 @@ void APlayerCharacter::Interact()
 		TargetInteractable->Interact(this);
 	}
 }
+
 
 void APlayerCharacter::UpdateInteractionWidget() const
 {
@@ -850,16 +852,16 @@ void APlayerCharacter::UseItem(TSubclassOf<AItem> ItemSubclass)
 void APlayerCharacter::ServerUseItem_Implementation(TSubclassOf<AItem> ItemSubclass)
 {
 	for (FItemStruct& Item : InventoryItems)
+    {
+    	if(Item.ItemClass == ItemSubclass)
     	{
-    		if(Item.ItemClass == ItemSubclass)
+    		if(Item.ItemQuantity)
     		{
-    			if(Item.ItemQuantity)
-    			{
-    				UseItem(ItemSubclass);
-    			}
-                return;
+    			UseItem(ItemSubclass);
     		}
+            return;
     	}
+    }
 }
 
 bool APlayerCharacter::ServerUseItem_Validate(TSubclassOf<AItem> ItemSubclass)
@@ -899,15 +901,26 @@ void APlayerCharacter::RemoveHunger(float Value)
 /*
 * T4
 */
+// Could be used for trading or interacting with other players
 void APlayerCharacter::Interact(APlayerCharacter* PlayerCharacter)
 {
 	
+}
+
+void APlayerCharacter::ClientUpdateInventory_Implementation(AWorldItem_* ItemToAdd)
+{
+	InventoryComponent->AddItemToInventory(ItemToAdd);
+	if(IsLocallyControlled()) InventoryWidget->UpdateInventory();
 }
 
 void APlayerCharacter::AddItem(AWorldItem_* ItemToAdd)
 {
 	InventoryComponent->AddItemToInventory(ItemToAdd);
 	if(IsLocallyControlled()) InventoryWidget->UpdateInventory();
+	else
+	{
+		ClientUpdateInventory(ItemToAdd);
+	}
 }
 
 void APlayerCharacter::ServerSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
@@ -935,4 +948,81 @@ void APlayerCharacter::DropItem(TSubclassOf<AWorldItem_> ItemToSpawn)
 	// ClientSpawnIem(ItemToSpawn, FTransform());
 	InventoryComponent->DropItemFromInventory(ItemToSpawn);
 	if(IsLocallyControlled()) InventoryWidget->UpdateInventory();
+}
+
+void APlayerCharacter::PerformInteractionCheck_(bool bInteractButtonPressed)
+{
+	if(!IsLocallyControlled()) return;
+	FVector TraceStart{FollowCamera->GetComponentLocation()};
+	
+	FVector2D ViewportSize;
+	if(GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+	const FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+	if(UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection))
+	{
+		TraceStart = CrosshairWorldPosition;
+		const float DistanceToCharacter = (GetActorLocation() - TraceStart).Size();
+		TraceStart += CrosshairWorldDirection * (DistanceToCharacter / 2.f + /*TraceExtent*/0.f);
+	}	
+	// FVector TraceStart(GetPawnViewLocation());
+	FVector TraceEnd(TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance));
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	FHitResult TraceHit;
+
+	if(GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	{
+		if(IInteractionInterface* Interface =Cast<IInteractionInterface>(TraceHit.GetActor()))
+		{
+			PlayerHUD->ShowInteractionWidget_();
+			if(bInteractButtonPressed)
+			{
+				if(HasAuthority())
+				{
+					Interface->Interact(this);
+				}
+				else
+				{
+					ServerInteract_(TraceStart, TraceEnd);
+				}
+			}
+		}
+		else
+		{
+			PlayerHUD->HideInteractionWidget_();
+		}
+	}
+	else
+	{
+		PlayerHUD->HideInteractionWidget_();
+	}
+	// if (HasAuthority())
+	// {
+	// 	Interact(TraceStart, TraceEnd);
+	// }
+	// else
+	// {
+	// 	ServerInteract(TraceStart, TraceEnd);
+	// }
+}
+
+void APlayerCharacter::ServerInteract__Implementation(FVector TraceStart, FVector TraceEnd)
+{
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	FHitResult TraceHit;
+	if(GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	{
+		if(IInteractionInterface* Interface =Cast<IInteractionInterface>(TraceHit.GetActor()))
+		{
+			Interface->Interact(this);
+		}
+	}
 }

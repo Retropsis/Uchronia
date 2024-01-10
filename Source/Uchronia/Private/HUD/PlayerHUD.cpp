@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UI/Widget/BaseUserwidget.h"
 #include "UI/Widget/InteractionWidget.h"
+#include "UI/Widget/InteractionWidget_.h"
 #include "UI/Widget/InventoryWidget.h"
 #include "UI/Widget/MainMenu.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
@@ -21,6 +22,7 @@ void APlayerHUD::BeginPlay()
 	
 	checkf(MainMenuClass, TEXT("Main Menu Class missing, fill out BP_PlayerHUD"));
 	checkf(InteractionWidgetClass, TEXT("Interaction Widget Class missing, fill out BP_PlayerHUD"));
+	checkf(InteractionWidgetClass_, TEXT("Interaction Widget Class missing, fill out BP_PlayerHUD"));
 	checkf(InventoryWidgetClass, TEXT("Inventory Widget Class missing, fill out BP_PlayerHUD"));
 
 	MainMenuWidget = CreateWidget<UMainMenu>(GetWorld(), MainMenuClass);
@@ -30,6 +32,12 @@ void APlayerHUD::BeginPlay()
 	InteractionWidget = CreateWidget<UInteractionWidget>(GetWorld(), InteractionWidgetClass);
 	InteractionWidget->AddToViewport(-1);
 	InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+	/* T4 */
+	InteractionWidget_ = CreateWidget<UInteractionWidget_>(GetWorld(), InteractionWidgetClass_);
+	InteractionWidget_->AddToViewport(-1);
+	InteractionWidget_->SetVisibility(ESlateVisibility::Collapsed);
+	/* T4 */
 	
 	InventoryWidget = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
 	InventoryWidget->AddToViewport(5);
@@ -217,5 +225,21 @@ void APlayerHUD::HideInventory()
 	{
 		bIsMenuVisible = false;
 		InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void APlayerHUD::ShowInteractionWidget_() const
+{
+	if (InteractionWidget_)
+	{
+		InteractionWidget_->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void APlayerHUD::HideInteractionWidget_() const
+{
+	if (InteractionWidget_)
+	{
+		InteractionWidget_->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }

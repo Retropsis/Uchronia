@@ -364,6 +364,9 @@ void UInventoryComponent::AttachActorToSocket(UClass* ActorToAttach, const FName
 */
 void UInventoryComponent::AddItemToInventory(AWorldItem_* ItemToAdd, int32 AmountToAdd)
 {
+	// TODO: Need to investigate client dupe and eaten drop, but both could be overlap related, need to nuke it
+	if(ItemToAdd == nullptr) return;
+	
 	Inventory_.Add(ItemToAdd->GetClass());
 	// InventoryWidget->UpdateInventory(Inventory_);
 	ItemToAdd->OwningInventory = this;
@@ -400,6 +403,7 @@ void UInventoryComponent::MulticastPlayerSound_Implementation(USoundBase* InSoun
 	}
 }
 
+// Used
 void UInventoryComponent::ServerSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
 {
 	FActorSpawnParameters SpawnParams;
@@ -407,11 +411,21 @@ void UInventoryComponent::ServerSpawnIem_Implementation(TSubclassOf<AWorldItem_>
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	const FVector SpawnLocation{ PlayerCharacter->GetActorLocation() + (PlayerCharacter->GetActorForwardVector() * ItemSpawnDistance) };
+	FVector Location;
+	FVector Direction;
+	UGameplayStatics::GetPlayerController(this, 0)->DeprojectMousePositionToWorld(Location, Direction);
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetOwner());
+	FHitResult TraceHit;
+	UKismetSystemLibrary::LineTraceSingle(this, Location, Location + Direction * 150.f, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, TraceHit, true, FLinearColor::White);
+
+	FVector RandomLocation{ FMath::FRandRange(-75.f, 75.f), FMath::FRandRange(-75.f, 75.f), 75.f };
+	const FVector SpawnLocation{ PlayerCharacter->GetActorLocation() + (PlayerCharacter->GetActorForwardVector() * ItemSpawnDistance + RandomLocation) };
 	const FTransform SpawnTransform_{ PlayerCharacter->GetActorRotation(), SpawnLocation };
 	GetWorld()->SpawnActor<AWorldItem_>(ItemToSpawn, SpawnTransform_, SpawnParams);
 }
 
+// Skipped
 void UInventoryComponent::ClientSpawnIem_Implementation(TSubclassOf<AWorldItem_> ItemToSpawn, FTransform SpawnTransform)
 {
 	ServerSpawnIem(ItemToSpawn, SpawnTransform);

@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "PlayerHUD.generated.h"
 
+class UInteractionWidget_;
 class UInventoryWidget;
 class UEquipmentSlot;
 struct FInteractableData;
@@ -88,8 +89,7 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UInteractionWidget> InteractionWidget;
-
-
+	
 	UPROPERTY()
 	TObjectPtr<UEquipmentSlot> LeftHandSlotWidget;
 	
@@ -126,9 +126,17 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Widgets|Inventory")
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<UInteractionWidget_> InteractionWidget_;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Widgets|Inventory")
+	TSubclassOf<UInteractionWidget_> InteractionWidgetClass_;
 
 	bool bIsInventoryVisible;
 
 	void ShowInventory();
 	void HideInventory();
+	void ShowInteractionWidget_() const;
+	void HideInteractionWidget_() const;
 };

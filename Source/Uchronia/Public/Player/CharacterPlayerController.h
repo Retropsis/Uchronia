@@ -120,6 +120,7 @@ private:
 	void ThrowButtonPressed(const FInputActionValue& Value);
 
 	void InventoryButtonPressed();
+	void Interact_();
 };
 
 

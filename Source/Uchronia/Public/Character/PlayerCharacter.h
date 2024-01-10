@@ -121,6 +121,7 @@ protected:
 	
 	void Interact();
 
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> FollowCamera;
@@ -264,11 +265,20 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UInventoryWidget> InventoryWidget;
+
+	void PerformInteractionCheck_(bool bInteractButtonPressed = false);
 	
 	FORCEINLINE void SetInventoryComponent(UInventoryComponent* InInventoryComponent) { InventoryComponent = InInventoryComponent; }
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 	
 	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
+
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateInventory(AWorldItem_* ItemToAdd);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerInteract_(FVector TraceStart, FVector TraceEnd);
+	
 	virtual void AddItem(AWorldItem_* ItemToAdd) override;
 	
 	UFUNCTION(Server, Reliable)
@@ -279,4 +289,5 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	float ItemDropDistance = 150.f;
+
 };
